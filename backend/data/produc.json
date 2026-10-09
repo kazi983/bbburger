@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "name": "Aussie Burger",
+    "ingredients": [
+      "Lean Minced Steak",
+      "Cooked Beetroot",
+      "Naan Bread",
+      "Rocket",
+      "Soured cream and chive dip"
+    ],
+    "price": 12,
+    "description": "Australian burguer",
+    "category": "burguer"
+  },
+  {
+    "id": 2,
+    "name": "Kofta burger",
+    "ingredients": [
+      "Lamb",
+      "Onion",
+      "Garlic Bulb",
+      "Garam Masala",
+      "Coriander",
+      "Chilli Sauce",
+      "Pita Bread",
+      "Tomato",
+      "Red Cabbage",
+      "Red Onions",
+      "Yogurt"
+    ],
+    "price": 13.5,
+    "description": "Turkish burguer",
+    "category": "burguer"
+  },
+  {
+    "id": 3,
+    "name": "Lamb Tzatziki Burger",
+    "ingredients": [
+      "Bulgur Wheat",
+      "Lamb Mince",
+      "Cumin",
+      "Coriander",
+      "Paprika",
+      "Garlic",
+      "Olive Oil",
+      "Bun",
+      "Cucumber",
+      "Greek Yogurt",
+      "Mint"
+    ],
+    "price": 15.4,
+    "description": "Greek burguer",
+    "category": "burguer"
+  },
+  {
+    "id": 4,
+    "name": "Yuca Fries",
+    "ingredients": [
+      "Yuca",
+      "Extra Virgin Olive Oil",
+      "Chilli Powder",
+      "Kosher Salt",
+      "Ground Black Pepper",
+      "Avocado",
+      "Sour Cream",
+      "Lime",
+      "Cilantro"
+    ],
+    "price": 10,
+    "description": "Cuba fries",
+    "category": "fries"
+  },
+  {
+    "id": 5,
+    "name": "French Fries",
+    "ingredients": ["Potato", "Extra Virgin Olive Oil"],
+    "price": 6,
+    "description": "Traditional fries",
+    "category": "fries"
+  },
+  {
+    "id": 6,
+    "name": "Coke",
+    "ingredients": [],
+    "price": 3.5,
+    "description": "coke",
+    "category": "drink"
+  },
+  {
+    "id": 6,
+    "name": "Diet Coke",
+    "ingredients": [],
+    "price": 3.5,
+    "description": "diet coke",
+    "category": "drink"
+  },
+  {
+    "id": 7,
+    "name": "Strawberry Milkshake",
+    "ingredients": ["strawberry", "milk", "vanilla ice cream"],
+    "price": 5,
+    "description": "strawberry milk shake",
+    "category": "desert"
+  },
+  {
+    "id": 8,
+    "name": "Chocolate cake",
+    "ingredients": [
+      "cocoa powder",
+      "sugar",
+      "oil",
+      "milk",
+      "baking powder",
+      "baking soda",
+      "vanilla essence"
+    ],
+    "price": 5,
+    "description": "chocolate cake",
+    "category": "desert"
+  }
+]
