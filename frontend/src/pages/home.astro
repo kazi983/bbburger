@@ -1,6 +1,6 @@
 ---
-import "../styles/global.css";
-import BottomNav from "../components/BottomNav.astro";
+import Layout from "../layouts/layout.astro";
+import BottomNavBar from "../components/BottomNavBar.astro";
 import products from "../../../backend/data/product.json";
 
 const categories = [
@@ -22,224 +22,230 @@ const productImages: Record<number, string> = {
   8: "/images/chocolate-cake.jpg",
   9: "/images/diet-coke.jpg",
 };
+
+const currency = new Intl.NumberFormat("en-CA", {
+  style: "currency",
+  currency: "CAD",
+  currencyDisplay: "code",
+});
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Menu | Awshaf BBB</title>
-  </head>
+<Layout title="Menu | Awshaf BBB">
+  <div class="mx-auto max-w-6xl px-4 pt-6 pb-28">
+    <header class="mb-8 flex items-center justify-between gap-3">
+      <a href="/home" class="text-xl font-bold text-primary">
+        Awshaf BBB
+      </a>
 
-  <body class="min-h-screen bg-orange-50 pb-24 text-stone-900">
-    <div class="mx-auto max-w-6xl px-4 py-6">
-      <header class="mb-8 flex items-center justify-between gap-3">
-        <a href="/home" class="text-xl font-bold text-red-700">
-          Awshaf BBB
-        </a>
-
-        <a
-          href="/cart"
-          class="cart-button inline-flex shrink-0 items-center gap-2 rounded-full bg-red-600 px-5 py-3 font-bold text-white shadow-md transition-colors hover:bg-red-700"
+      <a
+        href="/cart"
+        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary-container px-4 py-3 font-bold text-on-primary-container shadow-md transition-colors hover:bg-primary"
+      >
+        <svg
+          class="cart-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
         >
-          <svg
-            class="cart-icon"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M3 3h2l3 12h11l2-8H6" />
-            <circle cx="9" cy="20" r="1" />
-            <circle cx="18" cy="20" r="1" />
-          </svg>
+          <path d="M3 3h2l3 12h11l2-8H6" />
+          <circle cx="9" cy="20" r="1" />
+          <circle cx="18" cy="20" r="1" />
+        </svg>
 
-          Cart
+        Cart
 
-          <span
-            id="cart-count"
-            class="rounded-full bg-white px-2 py-0.5 text-sm text-red-700"
-          >
-            0
-          </span>
-        </a>
-      </header>
-
-      <main>
-        <section
-          class="grid items-center gap-8 overflow-hidden rounded-3xl bg-white p-6 shadow-sm sm:p-10 md:grid-cols-2"
+        <span
+          id="cart-count"
+          class="rounded-full bg-surface-container-lowest px-2 py-0.5 text-sm text-primary"
         >
-          <div>
-            <p
-              class="mb-4 inline-block rounded-full bg-amber-400 px-3 py-1 text-xs font-semibold"
-            >
-              FLAME-BROILED PERFECTION
-            </p>
+          0
+        </span>
+      </a>
+    </header>
 
-            <h1 class="text-4xl font-bold leading-tight sm:text-5xl">
-              Craving Pure
-              <span class="block text-red-700">Flame Power?</span>
-            </h1>
-
-            <p class="mt-4 max-w-md leading-relaxed text-stone-600">
-              Sizzle up your day with fresh 100% Angus patties seared on open
-              flames, crispy golden fries, and chef-crafted smoky house dips.
-            </p>
-
-            <a
-              href="#menu"
-              class="mt-6 inline-block rounded-full bg-red-600 px-6 py-3 font-semibold text-white hover:bg-red-700"
-            >
-              Explore the Menu →
-            </a>
-
-            <p class="mt-4 text-sm font-medium text-green-800">
-              15 Min Express Pickup
-            </p>
-          </div>
-
-          <img
-            src="/images/aussie-burger.jpg"
-            alt="Aussie Burger"
-            class="h-64 w-full rounded-2xl object-cover sm:h-80"
-            fetchpriority="high"
-          />
-        </section>
-
-        <section id="menu" class="mt-10">
-          <h2 class="text-2xl font-bold">Craveable Menu</h2>
-
-          <p class="mt-1 text-sm text-stone-600">
-            Handcrafted, fresh off the grill
+    <main>
+      <section
+        class="grid items-center gap-8 overflow-hidden rounded-3xl bg-surface-container-lowest p-6 shadow-sm sm:p-10 md:grid-cols-2"
+      >
+        <div>
+          <p
+            class="mb-4 inline-block rounded-full bg-secondary-container px-3 py-1 text-xs font-semibold text-on-secondary-container"
+          >
+            FLAME-BROILED PERFECTION
           </p>
 
-          <div
-            id="category-filters"
-            class="mt-5 flex flex-wrap gap-2"
-            role="group"
-            aria-label="Filter menu by category"
+          <h1 class="font-headline text-4xl font-bold leading-tight sm:text-5xl">
+            Craving Pure
+            <span class="block text-primary">Flame Power?</span>
+          </h1>
+
+          <p class="mt-4 max-w-md leading-relaxed text-on-surface-variant">
+            Sizzle up your day with fresh 100% Angus patties seared on open
+            flames, crispy golden fries, and chef-crafted smoky house dips.
+          </p>
+
+          <a
+            href="#menu"
+            class="mt-6 inline-block rounded-full bg-primary-container px-6 py-3 font-semibold text-on-primary-container hover:bg-primary"
           >
-            {
-              categories.map((category) => (
-                <button
-                  type="button"
-                  data-category={category.value}
-                  aria-pressed={category.value === "all" ? "true" : "false"}
-                  class="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold hover:border-stone-900 aria-pressed:bg-stone-900 aria-pressed:text-white"
-                >
-                  {category.label}
-                </button>
-              ))
-            }
-          </div>
+            Explore the Menu →
+          </a>
 
-          <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {
-              products.map((product) => (
-                <article
-                  data-product-category={product.category}
-                  class="flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm"
-                >
-                  <img
-                    src={productImages[product.id]}
-                    alt={product.name}
-                    loading="lazy"
-                    class="h-56 w-full object-cover"
-                  />
+          <p class="mt-4 text-sm font-medium text-tertiary">
+            15 Min Express Pickup
+          </p>
+        </div>
 
-                  <div class="flex flex-1 flex-col p-5">
-                    <p class="mb-3 text-xs font-semibold uppercase text-red-700">
-                      {
-                        categories.find(
-                          (category) => category.value === product.category
-                        )?.label ?? product.category
-                      }
-                    </p>
+     <img
+  src="/images/hero-burger.jpg"
+  alt="Burger promotion"
+  class="h-64 w-full rounded-2xl object-cover sm:h-80"
+  fetchpriority="high"
+/>
+      </section>
 
-                    <h3 class="text-lg font-bold">{product.name}</h3>
+      <section id="menu" class="mt-10">
+        <h2 class="font-headline text-2xl font-bold">Craveable Menu</h2>
 
-                    <p class="mt-2 text-sm text-stone-600">
-                      {product.description}
-                    </p>
+        <p class="mt-1 text-sm text-on-surface-variant">
+          Handcrafted, fresh off the grill
+        </p>
 
-                    {
-                      product.ingredients.length > 0 && (
-                        <p class="mt-3 text-sm text-stone-500">
-                          {product.ingredients.join(", ")}
-                        </p>
-                      )
-                    }
-
-                    <div class="mt-auto flex items-center justify-between gap-3 pt-5">
-                      <div>
-                        <p class="text-xs text-stone-500">Price</p>
-
-                        <p class="text-xl font-bold text-red-700">
-                          ${product.price.toFixed(2)}
-                        </p>
-                      </div>
-
-                      <button
-                        type="button"
-                        data-add-product={product.id}
-                        aria-label={`Add ${product.name} to cart`}
-                        class="rounded-full bg-red-600 px-5 py-2 font-semibold text-white hover:bg-red-700"
-                      >
-                        + Add
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              ))
-            }
-          </div>
-        </section>
-
-        <p
-          id="cart-message"
-          role="status"
-          class="mt-4 min-h-6 text-sm text-green-800"
-        ></p>
-
-        <aside
-          id="cart-summary"
-          class="mt-6 hidden rounded-2xl bg-stone-900 p-4 text-white shadow-lg"
-          aria-label="Cart summary"
+        <div
+          id="category-filters"
+          class="mt-5 flex flex-wrap gap-2"
+          role="group"
+          aria-label="Filter menu by category"
         >
-          <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="min-w-0 flex-1">
-              <p id="cart-total" class="font-bold"></p>
+          {
+            categories.map((category) => (
+              <button
+                type="button"
+                data-category={category.value}
+                aria-pressed={category.value === "all" ? "true" : "false"}
+                class="rounded-full border border-outline-variant bg-surface-container-lowest px-4 py-2 text-sm font-semibold hover:border-primary aria-pressed:bg-inverse-surface aria-pressed:text-inverse-on-surface"
+              >
+                {category.label}
+              </button>
+            ))
+          }
+        </div>
 
-              <p
-                id="cart-names"
-                class="mt-1 break-words text-sm text-stone-300"
-              ></p>
-            </div>
+        <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {
+            products.map((product) => (
+              <article
+                data-product-category={product.category}
+                class="flex flex-col overflow-hidden rounded-2xl bg-surface-container-lowest shadow-sm"
+              >
+                <img
+                  src={productImages[product.id]}
+                  alt={product.name}
+                  loading="lazy"
+                  class="h-56 w-full object-cover"
+                />
 
-            <a
-              href="/cart"
-              class="shrink-0 rounded-full bg-red-600 px-4 py-3 text-sm font-semibold hover:bg-red-700"
-            >
-              View Order →
-            </a>
+                <div class="flex flex-1 flex-col p-5">
+                  <p class="mb-3 text-xs font-semibold uppercase text-primary">
+                    {
+                      categories.find(
+                        (category) => category.value === product.category
+                      )?.label ?? product.category
+                    }
+                  </p>
+
+                  <h3 class="font-headline text-lg font-bold">
+                    {product.name}
+                  </h3>
+
+                  <p class="mt-2 text-sm text-on-surface-variant">
+                    {product.description}
+                  </p>
+
+                  {
+                    product.ingredients.length > 0 && (
+                      <p class="mt-3 text-sm text-on-surface-variant">
+                        {product.ingredients.join(", ")}
+                      </p>
+                    )
+                  }
+
+                  <div class="mt-auto flex items-center justify-between gap-3 pt-5">
+                    <div>
+                      <p class="text-xs text-on-surface-variant">Price</p>
+
+                      <p class="text-lg font-bold text-primary">
+                        {currency.format(product.price)}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      data-add-product={product.id}
+                      aria-label={`Add ${product.name} to cart`}
+                      class="shrink-0 rounded-full bg-primary-container px-5 py-2 font-semibold text-on-primary-container hover:bg-primary"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <p
+        id="cart-message"
+        role="status"
+        class="mt-4 min-h-6 text-sm text-tertiary"
+      ></p>
+
+      <aside
+        id="cart-summary"
+        class="mt-6 hidden rounded-2xl bg-inverse-surface p-4 text-inverse-on-surface shadow-lg"
+        aria-label="Cart summary"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="min-w-0 flex-1">
+            <p id="cart-total" class="font-bold"></p>
+
+            <p
+              id="cart-names"
+              class="mt-1 break-words text-sm"
+            ></p>
           </div>
-        </aside>
-      </main>
-    </div>
 
-    <BottomNav />
-  </body>
-</html>
+          <a
+            href="/cart"
+            class="shrink-0 rounded-full bg-primary-container px-4 py-3 text-sm font-semibold text-on-primary-container hover:bg-primary"
+          >
+            View Order →
+          </a>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <BottomNavBar active="menu" />
+</Layout>
 
 <script>
   import products from "../../../backend/data/product.json";
   import { cart, loadCart, addToCart } from "../stores/cartStore";
+
+  const currency = new Intl.NumberFormat("en-CA", {
+    style: "currency",
+    currency: "CAD",
+    currencyDisplay: "code",
+  });
 
   const filterButtons = document.querySelectorAll<HTMLButtonElement>(
     "#category-filters button"
@@ -265,7 +271,7 @@ const productImages: Record<number, string> = {
           category === "all" ||
           card.dataset.productCategory === category;
 
-        card.classList.toggle("hidden", !matchesCategory);
+        card.style.display = matchesCategory ? "flex" : "none";
       });
     });
   });
@@ -300,7 +306,7 @@ const productImages: Record<number, string> = {
     if (cartTotal) {
       cartTotal.textContent =
         `${count} ${count === 1 ? "item" : "items"} · ` +
-        `$${(totalCents / 100).toFixed(2)}`;
+        currency.format(totalCents / 100);
     }
 
     if (cartNames) {
