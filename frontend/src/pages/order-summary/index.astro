@@ -1,5 +1,5 @@
 ---
-import "../../styles/global.css";
+import Layout from "../../layouts/layout.astro";
 import CartHeader from '../../components/CartHeader.astro';
 import CartItem from "../../components/CartItem.astro";
 import CustomerForm from "../../components/CustomerForm.astro";
@@ -8,21 +8,13 @@ import ButtomNav from "../../components/ButtomNav.astro";
 
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>BBB - Order Summary</title>
-	</head>
-	<body class="bg-background text-on-background font-body pb-28">
+<Layout title="BBB - Order Summary">
+	<div class="text-on-background font-body pb-28">
 		<CartHeader />
 
 		<main class="max-w-120 mx-auto px-margin-mobile mt-space-md space-y-space-md">
 			<!-- Dummy data -->
-			<CartItem 
+			<CartItem
 				id=1
                 name="Double Flame Cheeseburger"
                 price={8.99}
@@ -36,6 +28,5 @@ import ButtomNav from "../../components/ButtomNav.astro";
 		<CustomerForm />
 		<Payment />
 		<ButtomNav />
-		
-	</body>
-</html>
+	</div>
+</Layout>
