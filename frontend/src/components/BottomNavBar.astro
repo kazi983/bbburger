@@ -1,6 +1,6 @@
 ---
 interface Props {
-  active: "menu" | "cart" | "tracking" | "orders";
+  active: "menu" | "cart" | "tracking" | "order";
 }
 
 const { active } = Astro.props;
@@ -25,47 +25,36 @@ const navItems = [
     icon: "fact_check",
   },
   {
-    id: "orders",
-    label: "Orders",
-    href: "/orders",
+    id: "order",
+    label: "Order",
+    href: "/order",
     icon: "receipt_long",
   },
 ] as const;
 ---
 
-<nav
-  class="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around rounded-t-lg border-t border-outline-variant/20 bg-surface px-4 py-2 shadow-lg"
->
-  <a
-    class="flex flex-col items-center justify-center px-3 py-1.5 text-on-surface-variant transition-colors hover:text-primary"
-    href="/menu"
-  >
-    <span class="material-symbols-outlined">fastfood</span>
-    <span class="mt-0.5 text-label-sm font-label-sm">Menu</span>
-  </a>
+<nav class="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around border-t border-outline-variant/20 bg-surface px-4 py-2 shadow-lg">
+  {navItems.map((item) => {
+    const isActive = active === item.id;
 
-  <a
-    class="flex flex-col items-center justify-center px-3 py-1.5 text-on-surface-variant transition-colors hover:text-primary"
-    href="/cart"
-  >
-    <span class="material-symbols-outlined">shopping_bag</span>
-    <span class="mt-0.5 text-label-sm font-label-sm">Cart</span>
-  </a>
-
-  <a
-    aria-current="page"
-    class="flex flex-col items-center justify-center rounded-full bg-primary-container px-4 py-1.5 text-on-primary-container transition-all"
-    href="/tracking"
-  >
-    <span class="material-symbols-outlined fill-icon">fact_check</span>
-    <span class="mt-0.5 text-label-sm font-label-sm font-bold">Status</span>
-  </a>
-
-  <a
-    class="flex flex-col items-center justify-center px-3 py-1.5 text-on-surface-variant transition-colors hover:text-primary"
-    href="/orders"
-  >
-    <span class="material-symbols-outlined">receipt_long</span>
-    <span class="mt-0.5 text-label-sm font-label-sm">Orders</span>
-  </a>
+    return (
+      <a
+        href={item.href}
+        aria-current={isActive ? "page" : undefined}
+        class:list={[
+          "flex flex-col items-center justify-center px-3 py-1.5 transition-all",
+          isActive
+            ? "rounded-full bg-primary-container text-on-primary-container"
+            : "text-on-surface-variant hover:text-primary",
+        ]}
+      >
+        <span class:list={["material-symbols-outlined text-2xl", isActive && "font-bold"]}>
+          {item.icon}
+        </span>
+        <span class:list={["mt-0.5 text-sm", isActive && "font-bold"]}>
+          {item.label}
+        </span>
+      </a>
+    );
+  })}
 </nav>
