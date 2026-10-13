@@ -1,0 +1,60 @@
+---
+interface Props {
+  active: "menu" | "cart" | "tracking" | "order";
+}
+
+const { active } = Astro.props;
+
+const navItems = [
+  {
+    id: "menu",
+    label: "Menu",
+    href: "/menu",
+    icon: "fastfood",
+  },
+  {
+    id: "cart",
+    label: "Cart",
+    href: "/cart",
+    icon: "shopping_bag",
+  },
+  {
+    id: "tracking",
+    label: "Status",
+    href: "/tracking",
+    icon: "fact_check",
+  },
+  {
+    id: "order",
+    label: "Order",
+    href: "/order",
+    icon: "receipt_long",
+  },
+] as const;
+---
+
+<nav class="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around border-t border-outline-variant/20 bg-surface px-4 py-2 shadow-lg">
+  {navItems.map((item) => {
+    const isActive = active === item.id;
+
+    return (
+      <a
+        href={item.href}
+        aria-current={isActive ? "page" : undefined}
+        class:list={[
+          "flex flex-col items-center justify-center px-3 py-1.5 transition-all",
+          isActive
+            ? "rounded-full bg-primary-container text-on-primary-container"
+            : "text-on-surface-variant hover:text-primary",
+        ]}
+      >
+        <span class:list={["material-symbols-outlined text-2xl", isActive && "font-bold"]}>
+          {item.icon}
+        </span>
+        <span class:list={["mt-0.5 text-sm", isActive && "font-bold"]}>
+          {item.label}
+        </span>
+      </a>
+    );
+  })}
+</nav>
