@@ -1,4 +1,8 @@
 ---
+import "../styles/global.css";
+import Header from '../components/Header.astro';
+import CartItem from "../components/CartItem.astro";
+import Payment from "../components/Payment.astro";
 ---
 
 <html lang="en">
@@ -8,9 +12,26 @@
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>BBB - Order Summary</title>
 	</head>
-	<body>
-		<h1>Astro</h1>
+	<body class="bg-[#FFF9F5] text-[#1A1A1A] pb-28">
+		<Header />
+		
+		<main class="max-w-[480px] mx-auto px-4 mt-4 space-y-4">
+			<!-- Dummy data -->
+			<CartItem 
+				id="item-1"
+                name="Double Flame Cheeseburger"
+                price={8.99}
+                quantity={1}
+                description="Med-Well, Extra Pickles"
+                tag="Chef's Pick"
+                image="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=200&q=80"
+                index={0}
+			/>
+		</main>
+
+		<Payment />
+		
 	</body>
 </html>

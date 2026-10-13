@@ -1,0 +1,31 @@
+---
+export interface Props {
+	id: string;
+	name: string;
+	price: number;
+	quantity: number;
+	description: string;
+	tag?: string | null;
+	image: string;
+	index: number;
+}
+
+const { id, name, price, quantity, description, tag, image, index } = Astro.props;
+---
+
+<div class="bg-white rounded-2xl p-4 flex gap-4 border border-[#F3E6DE] shadow-xs" data-item-id={id}>
+	<img src={image} alt={name} class="w-20 h-20 rounded-xl object-cover bg-gray-200 shrink-0" />
+	<div class="flex-1">
+		{tag && <span class="inline-block bg-[#FDF3E3] text-[#8C6200] text-[11px] font-bold px-2 py-0.5 rounded-md mb-1">{tag}</span>}
+		<h4 class="text-base font-bold mb-0.5">{name}</h4>
+		<p class="text-xs text-[#6B6B6B] mb-2">Unit: CAD {price.toFixed(2)} • {description}</p>
+		<div class="flex justify-between items-center">
+			<span class="text-lg font-extrabold text-[#D9381E]">CAD {(price * quantity).toFixed(2)}</span>
+			<div class="flex items-center bg-[#FFF2EE] rounded-full px-2.5 py-1 gap-3">
+				<button class="minus bg-white text-[#D9381E] border border-[#F3C4BC] w-6 h-6 rounded-full text-sm cursor-pointer flex items-center justify-center font-bold" onclick={`updateQuantity(${index}, -1)`}>-</button>
+				<span class="font-bold text-sm min-w-[12px] text-center">{quantity}</span>
+				<button class="plus bg-[#D9381E] text-white border-none w-6 h-6 rounded-full text-sm cursor-pointer flex items-center justify-center font-bold" onclick={`updateQuantity(${index}, 1)`}>+</button>
+			</div>
+		</div>
+	</div>
+</div>
