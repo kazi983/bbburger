@@ -1,18 +1,27 @@
+---
+export interface Props {
+	id: string;
+	name: string;
+}
+
+const { id, name } = Astro.props;
+---
+
 <div id="order-confirmed-view" class="space-y-4">
-	<!-- Check the main card () Alex Johnson is dummy-->
+	<!-- Check the main card (Alex Johnson is dummy) -->
 	<div class="bg-white rounded-3xl p-6 text-center shadow-sm border border-[#F3E6DE]">
 		<div class="w-16 h-16 bg-[#FDF3E3] text-[#8C6200] rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
 			✓
 		</div>
 		<h2 class="text-2xl font-extrabold mb-2">Order Confirmed!</h2>
 		<p class="text-xs text-[#6B6B6B] mb-6 leading-relaxed">
-			Thanks <span class="font-bold text-[#1A1A1A]">Alex Johnson</span>, our kitchen has received your order and is firing up the grill.
+			Thanks <span class="font-bold text-[#1A1A1A]">{name}</span>, our kitchen has received your order and is firing up the grill.
 		</p>
 
-		<!-- Show order number (current num is dummy) -->
+		<!-- Show order number  -->
 		<div class="bg-[#FAF5F0] rounded-2xl py-3 px-4 border border-[#F3E6DE] flex items-center justify-center gap-2">
 			<span class="text-xs text-[#6B6B6B] font-medium">Order Number:</span>
-			<span class="text-base font-extrabold text-[#D9381E]">#FG-8429</span>
+			<span class="text-base font-extrabold text-[#D9381E]">{id}</span>
 		</div>
 	</div>
 

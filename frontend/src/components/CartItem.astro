@@ -23,7 +23,7 @@ const { id, name, price, quantity, description, tag, image, index } = Astro.prop
 			<span class="text-lg font-extrabold text-[#D9381E]">CAD {(price * quantity).toFixed(2)}</span>
 			<div class="flex items-center bg-[#FFF2EE] rounded-full px-2.5 py-1 gap-3">
 				<button class="minus bg-white text-[#D9381E] border border-[#F3C4BC] w-6 h-6 rounded-full text-sm cursor-pointer flex items-center justify-center font-bold" onclick={`updateQuantity(${index}, -1)`}>-</button>
-				<span class="font-bold text-sm min-w-[12px] text-center">{quantity}</span>
+				<span class="font-bold text-sm min-w-3 text-center">{quantity}</span>
 				<button class="plus bg-[#D9381E] text-white border-none w-6 h-6 rounded-full text-sm cursor-pointer flex items-center justify-center font-bold" onclick={`updateQuantity(${index}, 1)`}>+</button>
 			</div>
 		</div>
