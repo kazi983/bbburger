@@ -1,6 +1,14 @@
 ---
 import "../styles/global.css";
 import products from "../../../backend/data/product.json";
+
+const categories = [
+  { value: "all", label: "All" },
+  { value: "burguer", label: "Burgers" },
+  { value: "fries", label: "Fries" },
+  { value: "drink", label: "Drinks" },
+  { value: "desert", label: "Desserts" },
+];
 ---
 
 <html lang="en">
@@ -62,12 +70,41 @@ import products from "../../../backend/data/product.json";
             Handcrafted, fresh off the grill
           </p>
 
+          <div
+            id="category-filters"
+            class="mt-5 flex flex-wrap gap-2"
+            role="group"
+            aria-label="Filter menu by category"
+          >
+            {
+              categories.map((category) => (
+                <button
+                  type="button"
+                  data-category={category.value}
+                  aria-pressed={
+                    category.value === "all" ? "true" : "false"
+                  }
+                  class="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold hover:border-stone-900 aria-pressed:bg-stone-900 aria-pressed:text-white"
+                >
+                  {category.label}
+                </button>
+              ))
+            }
+          </div>
+
           <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {
               products.map((product) => (
-                <article class="flex flex-col rounded-2xl bg-white p-5 shadow-sm">
+                <article
+                  data-product-category={product.category}
+                  class="flex flex-col rounded-2xl bg-white p-5 shadow-sm"
+                >
                   <p class="mb-3 text-xs font-semibold uppercase text-red-700">
-                    {product.category}
+                    {
+                      categories.find(
+                        (category) => category.value === product.category
+                      )?.label ?? product.category
+                    }
                   </p>
 
                   <h3 class="text-lg font-bold">{product.name}</h3>
@@ -76,9 +113,13 @@ import products from "../../../backend/data/product.json";
                     {product.description}
                   </p>
 
-                  <p class="mt-3 text-sm text-stone-500">
-                    {product.ingredients.join(", ")}
-                  </p>
+                  {
+                    product.ingredients.length > 0 && (
+                      <p class="mt-3 text-sm text-stone-500">
+                        {product.ingredients.join(", ")}
+                      </p>
+                    )
+                  }
 
                   <div class="mt-auto pt-5">
                     <p class="text-xs text-stone-500">Price</p>
@@ -96,3 +137,34 @@ import products from "../../../backend/data/product.json";
     </div>
   </body>
 </html>
+
+<script>
+  const filterButtons = document.querySelectorAll<HTMLButtonElement>(
+    "#category-filters button"
+  );
+
+  const productCards = document.querySelectorAll<HTMLElement>(
+    "[data-product-category]"
+  );
+
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const category = button.dataset.category;
+
+      filterButtons.forEach((filterButton) => {
+        filterButton.setAttribute(
+          "aria-pressed",
+          String(filterButton === button)
+        );
+      });
+
+      productCards.forEach((card) => {
+        const matchesCategory =
+          category === "all" ||
+          card.dataset.productCategory === category;
+
+        card.classList.toggle("hidden", !matchesCategory);
+      });
+    });
+  });
+</script>
