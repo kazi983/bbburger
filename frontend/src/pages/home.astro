@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import BottomNav from "../components/BottomNav.astro";
 import products from "../../../backend/data/product.json";
 
 const categories = [
@@ -18,18 +19,43 @@ const categories = [
     <title>Menu | Awshaf BBB</title>
   </head>
 
-  <body class="min-h-screen bg-orange-50 text-stone-900">
+  <body class="min-h-screen bg-orange-50 pb-24 text-stone-900">
     <div class="mx-auto max-w-6xl px-4 py-6">
-      <header class="mb-8 flex items-center justify-between">
+      <header class="mb-8 flex items-center justify-between gap-3">
         <a href="/home" class="text-xl font-bold text-red-700">
           Awshaf BBB
         </a>
 
         <a
           href="/cart"
-          class="rounded-full border border-red-700 px-4 py-2 text-sm font-semibold text-red-700"
+          class="cart-button inline-flex shrink-0 items-center gap-2 rounded-full bg-red-600 px-5 py-3 font-bold text-white shadow-md transition-colors hover:bg-red-700"
         >
-          Cart (<span id="cart-count">0</span>)
+          <svg
+            class="cart-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 3h2l3 12h11l2-8H6" />
+            <circle cx="9" cy="20" r="1" />
+            <circle cx="18" cy="20" r="1" />
+          </svg>
+
+          Cart
+
+          <span
+            id="cart-count"
+            class="rounded-full bg-white px-2 py-0.5 text-sm text-red-700"
+          >
+            0
+          </span>
         </a>
       </header>
 
@@ -122,6 +148,7 @@ const categories = [
                   <div class="mt-auto flex items-center justify-between gap-3 pt-5">
                     <div>
                       <p class="text-xs text-stone-500">Price</p>
+
                       <p class="text-xl font-bold text-red-700">
                         ${product.price.toFixed(2)}
                       </p>
@@ -150,18 +177,22 @@ const categories = [
 
         <aside
           id="cart-summary"
-          class="sticky bottom-4 mt-4 hidden rounded-2xl bg-stone-900 p-4 text-white shadow-lg"
+          class="mt-6 hidden rounded-2xl bg-stone-900 p-4 text-white shadow-lg"
           aria-label="Cart summary"
         >
           <div class="flex flex-wrap items-center justify-between gap-4">
-            <div>
+            <div class="min-w-0 flex-1">
               <p id="cart-total" class="font-bold"></p>
-              <p id="cart-names" class="mt-1 text-sm text-stone-300"></p>
+
+              <p
+                id="cart-names"
+                class="mt-1 break-words text-sm text-stone-300"
+              ></p>
             </div>
 
             <a
               href="/cart"
-              class="rounded-full bg-red-600 px-5 py-3 text-sm font-semibold hover:bg-red-700"
+              class="shrink-0 rounded-full bg-red-600 px-4 py-3 text-sm font-semibold hover:bg-red-700"
             >
               View Order →
             </a>
@@ -169,6 +200,8 @@ const categories = [
         </aside>
       </main>
     </div>
+
+    <BottomNav />
   </body>
 </html>
 
@@ -269,3 +302,30 @@ const categories = [
     });
   });
 </script>
+
+
+  <style>
+  .cart-icon {
+    animation: cart-roll 2s ease-in-out infinite;
+  }
+
+  @keyframes cart-roll {
+    0%, 100% {
+      transform: translateX(0) rotate(0deg);
+    }
+
+    30% {
+      transform: translateX(3px) rotate(-8deg);
+    }
+
+    60% {
+      transform: translateX(-2px) rotate(5deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cart-icon {
+      animation: none;
+    }
+  }
+</style>
