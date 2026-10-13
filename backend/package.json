@@ -4,7 +4,7 @@
   "description": "This final project will help you build a full stack web application using Node.js, Express, Astro, authentication, API calls, and WebSockets.",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon backend/JS/server.js",
+    "dev": "nodemon JS/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
