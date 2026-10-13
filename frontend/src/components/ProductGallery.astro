@@ -1,0 +1,254 @@
+---
+interface Props {
+  name: string;
+  images: string[];
+}
+
+const { name, images } = Astro.props;
+const hasGallery = images.length > 1;
+---
+
+<div class="product-gallery">
+  {
+    hasGallery ? (
+      <button
+        type="button"
+        data-open-gallery
+        aria-label={`View photos of ${name}`}
+        class="relative block w-full overflow-hidden"
+      >
+        <img
+          src={images[0]}
+          alt={name}
+          data-card-photo
+          loading="lazy"
+          class="h-56 w-full object-cover"
+        />
+
+        <span class="absolute right-3 bottom-3 rounded-full bg-inverse-surface px-3 py-1 text-xs font-semibold text-inverse-on-surface">
+          View {images.length} photos
+        </span>
+      </button>
+    ) : (
+      <img
+        src={images[0]}
+        alt={name}
+        loading="lazy"
+        class="h-56 w-full object-cover"
+      />
+    )
+  }
+
+  {
+    hasGallery && (
+      <dialog
+        aria-label={`Photo gallery for ${name}`}
+        class="gallery-dialog rounded-2xl bg-surface-container-lowest p-4 text-on-surface shadow-xl"
+      >
+        <div class="mb-4 flex items-center justify-between gap-4">
+          <h2 class="font-headline text-lg font-bold">{name}</h2>
+
+          <button
+            type="button"
+            data-close-gallery
+            aria-label="Close gallery"
+            class="rounded-full px-3 py-2 font-bold hover:bg-surface-container"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="rounded-xl bg-surface-container">
+          {
+            images.map((image, index) => (
+              <img
+                src={image}
+                alt={`${name}, photo ${index + 1}`}
+                data-gallery-photo
+                hidden={index !== 0}
+                loading="lazy"
+                class="gallery-photo w-full rounded-xl object-contain"
+              />
+            ))
+          }
+        </div>
+
+        <div class="mt-4 flex items-center justify-between gap-3">
+          <button
+            type="button"
+            data-previous-photo
+            aria-label="Previous photo"
+            class="rounded-full bg-primary-container px-4 py-2 font-semibold text-on-primary-container hover:bg-primary"
+          >
+            ←
+          </button>
+
+          <p data-photo-counter aria-live="polite" class="text-sm">
+            1 / {images.length}
+          </p>
+
+          <button
+            type="button"
+            data-next-photo
+            aria-label="Next photo"
+            class="rounded-full bg-primary-container px-4 py-2 font-semibold text-on-primary-container hover:bg-primary"
+          >
+            →
+          </button>
+        </div>
+      </dialog>
+    )
+  }
+
+  {
+    hasGallery && (
+      <button
+        type="button"
+        data-toggle-slideshow
+        aria-pressed="false"
+        class="m-2 rounded-full px-3 py-1 text-xs font-semibold text-primary hover:bg-surface-container"
+      >
+        Pause photos
+      </button>
+    )
+  }
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".product-gallery").forEach((gallery) => {
+    const dialog = gallery.querySelector<HTMLDialogElement>("dialog");
+    const openButton = gallery.querySelector<HTMLButtonElement>(
+      "[data-open-gallery]"
+    );
+    const cardPhoto = gallery.querySelector<HTMLImageElement>(
+      "[data-card-photo]"
+    );
+    const pauseButton = gallery.querySelector<HTMLButtonElement>(
+      "[data-toggle-slideshow]"
+    );
+
+    if (!dialog || !openButton || !cardPhoto || !pauseButton) return;
+
+    const photos = dialog.querySelectorAll<HTMLImageElement>(
+      "[data-gallery-photo]"
+    );
+    const counter = dialog.querySelector("[data-photo-counter]");
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    let currentIndex = 0;
+    let cardIndex = 0;
+    let paused = reducedMotion.matches;
+    let slideshow: ReturnType<typeof setInterval> | undefined;
+
+    function showPhoto(index: number) {
+      currentIndex = (index + photos.length) % photos.length;
+
+      photos.forEach((photo, photoIndex) => {
+        photo.hidden = photoIndex !== currentIndex;
+      });
+
+      if (counter) {
+        counter.textContent = `${currentIndex + 1} / ${photos.length}`;
+      }
+    }
+
+    function stopSlideshow() {
+      if (slideshow !== undefined) {
+        clearInterval(slideshow);
+        slideshow = undefined;
+      }
+    }
+
+    function startSlideshow() {
+      stopSlideshow();
+
+      if (paused || dialog.open || document.hidden) return;
+
+      slideshow = setInterval(() => {
+        if (gallery.getClientRects().length === 0) return;
+
+        cardIndex = (cardIndex + 1) % photos.length;
+        cardPhoto.src = photos[cardIndex].src;
+      }, 4000);
+    }
+
+    function updatePauseButton() {
+      pauseButton.textContent = paused ? "Play photos" : "Pause photos";
+      pauseButton.setAttribute("aria-pressed", String(paused));
+    }
+
+    pauseButton.addEventListener("click", () => {
+      paused = !paused;
+      updatePauseButton();
+      startSlideshow();
+    });
+
+    openButton.addEventListener("click", () => {
+      stopSlideshow();
+      showPhoto(cardIndex);
+      dialog.showModal();
+    });
+
+    dialog.addEventListener("close", startSlideshow);
+
+    dialog.querySelector("[data-close-gallery]")?.addEventListener("click", () => {
+      dialog.close();
+    });
+
+    dialog.querySelector("[data-previous-photo]")?.addEventListener("click", () => {
+      showPhoto(currentIndex - 1);
+    });
+
+    dialog.querySelector("[data-next-photo]")?.addEventListener("click", () => {
+      showPhoto(currentIndex + 1);
+    });
+
+    dialog.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        showPhoto(currentIndex - 1);
+      }
+
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        showPhoto(currentIndex + 1);
+      }
+    });
+
+    document.addEventListener("visibilitychange", startSlideshow);
+
+    reducedMotion.addEventListener("change", () => {
+      paused = reducedMotion.matches;
+      updatePauseButton();
+      startSlideshow();
+    });
+
+    updatePauseButton();
+    startSlideshow();
+
+    window.addEventListener("pagehide", stopSlideshow, { once: true });
+  });
+</script>
+
+<style>
+  .gallery-dialog {
+    width: min(90vw, 680px);
+    max-height: 90vh;
+    margin: auto;
+    overflow-y: auto;
+  }
+
+  .gallery-dialog::backdrop {
+    background: rgb(0 0 0 / 65%);
+  }
+
+  .gallery-photo {
+    height: min(55vh, 440px);
+  }
+
+  .gallery-photo[hidden] {
+    display: none;
+  }
+</style>
