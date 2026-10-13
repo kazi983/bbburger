@@ -1,0 +1,215 @@
+---
+import Layout from "../layouts/layout.astro";
+import Header from "../components/Header.astro";
+import BottomNavBar from "../components/BottomNavBar.astro";
+import "../styles/tracking.css";
+---
+
+<Layout title="Order Tracking | Awshaf BBB">
+  <Header title="Check Order Status" />
+
+  <main class="mx-auto flex w-full max-w-xl flex-1 flex-col px-4 pt-20 pb-28">
+    <section class="mt-4 flex flex-col items-center text-center">
+      <div class="relative my-2 flex h-44 w-44 items-center justify-center">
+        <div
+          class="absolute inset-2 rounded-full border-2 border-dashed border-outline-variant/60"
+        >
+        </div>
+        <div class="absolute inset-6 rounded-full border border-primary/20">
+        </div>
+        <div
+          class="absolute inset-10 rounded-full bg-surface-container-high/60"
+        >
+        </div>
+
+        <div
+          class="pointer-events-none absolute inset-8 rounded-full bg-secondary-container/20 animate-radar-wave"
+        >
+        </div>
+        <div
+          class="pointer-events-none absolute inset-8 rounded-full bg-primary-container/20 animate-radar-wave-delayed"
+        >
+        </div>
+
+        <div class="absolute top-0 bottom-0 w-px bg-outline-variant/40"></div>
+        <div class="absolute right-0 left-0 h-px bg-outline-variant/40"></div>
+
+        <div
+          class="relative z-10 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-tr from-primary to-primary-container shadow-lg shadow-primary-container/30"
+        >
+          <span
+            class="material-symbols-outlined fill-icon text-[36px] text-on-primary"
+          >
+            local_fire_department
+          </span>
+        </div>
+
+        <div
+          class="absolute top-2 right-2 flex items-center gap-1 rounded-full border border-outline-variant/30 bg-surface-container-lowest px-2.5 py-1 text-on-surface shadow-md"
+        >
+          <span class="material-symbols-outlined text-[16px] text-tertiary"
+            >radar</span
+          >
+          <span class="text-label-sm font-label-sm font-bold text-tertiary"
+            >LIVE KITCHEN</span
+          >
+        </div>
+      </div>
+
+      <h2
+        class="mt-1 text-headline-md font-headline-md font-bold text-on-surface"
+      >
+        In-Store &amp; Counter Status
+      </h2>
+
+      <p
+        class="mt-1 max-w-sm text-body-md font-body-md text-on-surface-variant"
+      >
+        Check your counter or dine-in order status in real-time right from our
+        kitchen to the pickup counter.
+      </p>
+    </section>
+
+    <section class="mt-6">
+      <div
+        class="rounded-lg border border-surface-container-high bg-surface-container-lowest p-5 shadow-sm"
+      >
+        <label
+          class="mb-2 block text-label-md font-label-md font-bold text-on-surface"
+          for="order-id-input"
+        >
+          Enter Order Number
+        </label>
+
+        <form id="tracking-form" class="flex flex-col gap-3">
+          <div class="relative flex items-center">
+            <span
+              class="material-symbols-outlined pointer-events-none absolute left-4 text-[22px] text-outline"
+            >
+              receipt_long
+            </span>
+
+            <input
+              class="h-14 w-full rounded border border-outline-variant/50 bg-surface-container-low pr-12 pl-12 font-body-lg text-body-lg font-semibold tracking-wider text-on-surface uppercase transition-all placeholder:text-outline/70 focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 focus:outline-none"
+              id="order-id-input"
+              name="orderId"
+              placeholder="e.g. FG-8429 or 10482"
+              required
+              type="text"
+              value="FG-8429"
+              autocomplete="off"
+            />
+
+            <button
+              id="clear-input"
+              aria-label="Clear field"
+              class="absolute right-3.5 flex h-8 w-8 items-center justify-center rounded-full text-outline transition-colors hover:bg-surface-container hover:text-on-surface"
+              type="button"
+            >
+              <span class="material-symbols-outlined text-[18px]">cancel</span>
+            </button>
+          </div>
+
+          <button
+            class="mt-1 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-primary-container text-label-lg font-label-lg text-on-primary shadow-lg shadow-primary-container/25 transition-all hover:bg-primary active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+            id="track-cta"
+            type="submit"
+          >
+            <span class="material-symbols-outlined text-[20px]">search</span>
+            <span id="track-button-text">Consult Order Status</span>
+          </button>
+        </form>
+
+        <div
+          class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-surface-container pt-4"
+          id="live-status-badge"
+        >
+          <div class="flex items-center gap-2.5">
+            <div
+              class="h-3 w-3 animate-pulse rounded-full bg-secondary-container"
+            >
+            </div>
+            <span class="text-label-md font-label-md font-bold text-on-surface">
+              Grill Status Active
+            </span>
+          </div>
+
+          <span
+            class="text-label-sm font-label-sm font-medium text-on-surface-variant"
+          >
+            Est. Pickup: 12-16 mins
+          </span>
+        </div>
+
+        <p
+          id="tracking-message"
+          class="mt-3 text-body-sm text-on-surface-variant"
+          aria-live="polite"
+          role="status"
+        >
+        </p>
+      </div>
+    </section>
+  </main>
+  <BottomNavBar active="tracking" />
+</Layout>
+
+<script>
+  const trackingForm =
+    document.querySelector<HTMLFormElement>("#tracking-form");
+
+  const orderIdInput =
+    document.querySelector<HTMLInputElement>("#order-id-input");
+
+  const clearInputButton =
+    document.querySelector<HTMLButtonElement>("#clear-input");
+
+  const trackButton = document.querySelector<HTMLButtonElement>("#track-cta");
+
+  const trackButtonText =
+    document.querySelector<HTMLSpanElement>("#track-button-text");
+
+  const trackingMessage =
+    document.querySelector<HTMLParagraphElement>("#tracking-message");
+
+  function handleClearInput() {
+    if (orderIdInput) {
+      orderIdInput.value = "";
+      orderIdInput.focus();
+    }
+
+    if (trackingMessage) {
+      trackingMessage.textContent = "";
+    }
+  }
+
+  function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+
+    if (!orderIdInput || !trackButton || !trackButtonText || !trackingMessage) {
+      return;
+    }
+
+    const orderId = orderIdInput.value.trim();
+
+    if (!orderId) {
+      trackingMessage.textContent = "Please enter your order number.";
+      return;
+    }
+
+    trackButton.disabled = true;
+    trackButtonText.textContent = "Searching Live Kitchen...";
+    trackingMessage.textContent = `Searching for order ${orderId}...`;
+
+    window.setTimeout(() => {
+      trackButton.disabled = false;
+      trackButtonText.textContent = "Consult Order Status";
+
+      trackingMessage.textContent =
+        "Demo only: connect the backend API to retrieve the real order status.";
+    }, 700);
+  }
+
+  clearInputButton?.addEventListener("click", handleClearInput);
+  trackingForm?.addEventListener("submit", handleSubmit);
+</script>
