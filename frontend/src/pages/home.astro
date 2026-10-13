@@ -29,7 +29,7 @@ const categories = [
           href="/cart"
           class="rounded-full border border-red-700 px-4 py-2 text-sm font-semibold text-red-700"
         >
-          Cart
+          Cart (<span id="cart-count">0</span>)
         </a>
       </header>
 
@@ -81,9 +81,7 @@ const categories = [
                 <button
                   type="button"
                   data-category={category.value}
-                  aria-pressed={
-                    category.value === "all" ? "true" : "false"
-                  }
+                  aria-pressed={category.value === "all" ? "true" : "false"}
                   class="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold hover:border-stone-900 aria-pressed:bg-stone-900 aria-pressed:text-white"
                 >
                   {category.label}
@@ -121,24 +119,63 @@ const categories = [
                     )
                   }
 
-                  <div class="mt-auto pt-5">
-                    <p class="text-xs text-stone-500">Price</p>
+                  <div class="mt-auto flex items-center justify-between gap-3 pt-5">
+                    <div>
+                      <p class="text-xs text-stone-500">Price</p>
+                      <p class="text-xl font-bold text-red-700">
+                        ${product.price.toFixed(2)}
+                      </p>
+                    </div>
 
-                    <p class="text-xl font-bold text-red-700">
-                      ${product.price.toFixed(2)}
-                    </p>
+                    <button
+                      type="button"
+                      data-add-product={product.id}
+                      aria-label={`Add ${product.name} to cart`}
+                      class="rounded-full bg-red-600 px-5 py-2 font-semibold text-white hover:bg-red-700"
+                    >
+                      + Add
+                    </button>
                   </div>
                 </article>
               ))
             }
           </div>
         </section>
+
+        <p
+          id="cart-message"
+          role="status"
+          class="mt-4 min-h-6 text-sm text-green-800"
+        ></p>
+
+        <aside
+          id="cart-summary"
+          class="sticky bottom-4 mt-4 hidden rounded-2xl bg-stone-900 p-4 text-white shadow-lg"
+          aria-label="Cart summary"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p id="cart-total" class="font-bold"></p>
+              <p id="cart-names" class="mt-1 text-sm text-stone-300"></p>
+            </div>
+
+            <a
+              href="/cart"
+              class="rounded-full bg-red-600 px-5 py-3 text-sm font-semibold hover:bg-red-700"
+            >
+              View Order →
+            </a>
+          </div>
+        </aside>
       </main>
     </div>
   </body>
 </html>
 
 <script>
+  import products from "../../../backend/data/product.json";
+  import { cart, loadCart, addToCart } from "../stores/cartStore";
+
   const filterButtons = document.querySelectorAll<HTMLButtonElement>(
     "#category-filters button"
   );
@@ -165,6 +202,70 @@ const categories = [
 
         card.classList.toggle("hidden", !matchesCategory);
       });
+    });
+  });
+
+  const cartCount = document.querySelector("#cart-count");
+  const cartSummary = document.querySelector("#cart-summary");
+  const cartTotal = document.querySelector("#cart-total");
+  const cartNames = document.querySelector("#cart-names");
+  const cartMessage = document.querySelector("#cart-message");
+
+  function updateCartSummary() {
+    let count = 0;
+    let totalCents = 0;
+    const names: string[] = [];
+
+    cart.get().forEach((item) => {
+      const product = products.find(
+        (product) => product.id === item.productId
+      );
+
+      if (!product) return;
+
+      count += item.quantity;
+      totalCents += Math.round(product.price * 100) * item.quantity;
+      names.push(`${product.name} × ${item.quantity}`);
+    });
+
+    if (cartCount) {
+      cartCount.textContent = String(count);
+    }
+
+    if (cartTotal) {
+      cartTotal.textContent =
+        `${count} ${count === 1 ? "item" : "items"} · ` +
+        `$${(totalCents / 100).toFixed(2)}`;
+    }
+
+    if (cartNames) {
+      cartNames.textContent = names.join(", ");
+    }
+
+    cartSummary?.classList.toggle("hidden", count === 0);
+  }
+
+  loadCart();
+  cart.subscribe(updateCartSummary);
+
+  const addButtons = document.querySelectorAll<HTMLButtonElement>(
+    "[data-add-product]"
+  );
+
+  addButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const productId = Number(button.dataset.addProduct);
+      const product = products.find(
+        (product) => product.id === productId
+      );
+
+      if (!product) return;
+
+      addToCart(productId);
+
+      if (cartMessage) {
+        cartMessage.textContent = `${product.name} added to cart.`;
+      }
     });
   });
 </script>
