@@ -1,8 +1,8 @@
 ---
-import Layout from "../layouts/layout.astro";
-import BottomNavBar from "../components/BottomNavBar.astro";
-import ProductGallery from "../components/ProductGallery.astro";
-import products from "../../../backend/data/product.json";
+import Layout from "../../layouts/layout.astro";
+import BottomNavBar from "../../components/BottomNavBar.astro";
+import ProductGallery from "../../components/ProductGallery.astro";
+import products from "../../../../backend/data/product.json";
 
 const categories = [
   { value: "all", label: "All", icon: "restaurant_menu" },
@@ -74,9 +74,9 @@ const currency = new Intl.NumberFormat("en-CA", {
           stroke-linejoin="round"
           aria-hidden="true"
         >
-          <path d="M3 3h2l3 12h11l2-8H6" />
-          <circle cx="9" cy="20" r="1" />
-          <circle cx="18" cy="20" r="1" />
+          <path d="M3 3h2l3 12h11l2-8H6"></path>
+          <circle cx="9" cy="20" r="1"></circle>
+          <circle cx="18" cy="20" r="1"></circle>
         </svg>
 
         <span id="cart-label">Cart</span>
@@ -101,7 +101,9 @@ const currency = new Intl.NumberFormat("en-CA", {
             FLAME-BROILED PERFECTION
           </p>
 
-          <h1 class="font-headline text-4xl font-bold leading-tight sm:text-5xl">
+          <h1
+            class="font-headline text-4xl font-bold leading-tight sm:text-5xl"
+          >
             Craving Pure
             <span class="block text-primary">Flame Power?</span>
           </h1>
@@ -191,11 +193,9 @@ const currency = new Intl.NumberFormat("en-CA", {
 
                 <div class="flex flex-1 flex-col p-5">
                   <p class="mb-3 text-xs font-semibold uppercase text-primary">
-                    {
-                      categories.find(
-                        (category) => category.value === product.category
-                      )?.label ?? product.category
-                    }
+                    {categories.find(
+                      (category) => category.value === product.category,
+                    )?.label ?? product.category}
                   </p>
 
                   <h3 class="font-headline text-lg font-bold">
@@ -206,13 +206,11 @@ const currency = new Intl.NumberFormat("en-CA", {
                     {product.description}
                   </p>
 
-                  {
-                    product.ingredients.length > 0 && (
-                      <p class="mt-3 text-sm text-on-surface-variant">
-                        {product.ingredients.join(", ")}
-                      </p>
-                    )
-                  }
+                  {product.ingredients.length > 0 && (
+                    <p class="mt-3 text-sm text-on-surface-variant">
+                      {product.ingredients.join(", ")}
+                    </p>
+                  )}
 
                   <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5">
                     <div>
@@ -247,21 +245,22 @@ const currency = new Intl.NumberFormat("en-CA", {
     aria-live="polite"
     aria-atomic="true"
     class="cart-toast"
-  ></div>
+  >
+  </div>
 
   <BottomNavBar active="menu" />
 </Layout>
 
 <script>
-  import products from "../../../backend/data/product.json";
-  import { cart, loadCart, addToCart } from "../stores/cartStore";
+  import products from "../../../../backend/data/product.json";
+  import { cart, loadCart, addToCart } from "../../stores/cartStore";
 
   const filterButtons = document.querySelectorAll<HTMLButtonElement>(
-    "#category-filters button"
+    "#category-filters button",
   );
 
   const productCards = document.querySelectorAll<HTMLElement>(
-    "[data-product-category]"
+    "[data-product-category]",
   );
 
   filterButtons.forEach((button) => {
@@ -271,14 +270,13 @@ const currency = new Intl.NumberFormat("en-CA", {
       filterButtons.forEach((filterButton) => {
         filterButton.setAttribute(
           "aria-pressed",
-          String(filterButton === button)
+          String(filterButton === button),
         );
       });
 
       productCards.forEach((card) => {
         const matchesCategory =
-          category === "all" ||
-          card.dataset.productCategory === category;
+          category === "all" || card.dataset.productCategory === category;
 
         card.style.display = matchesCategory ? "flex" : "none";
       });
@@ -295,7 +293,7 @@ const currency = new Intl.NumberFormat("en-CA", {
   function updateCartCount() {
     const count = cart.get().reduce((total, item) => {
       const productExists = products.some(
-        (product) => product.id === item.productId
+        (product) => product.id === item.productId,
       );
 
       return productExists ? total + item.quantity : total;
@@ -311,7 +309,7 @@ const currency = new Intl.NumberFormat("en-CA", {
 
     headerCart?.setAttribute(
       "aria-label",
-      `View cart, ${count} ${count === 1 ? "item" : "items"}`
+      `View cart, ${count} ${count === 1 ? "item" : "items"}`,
     );
   }
 
@@ -331,14 +329,14 @@ const currency = new Intl.NumberFormat("en-CA", {
     if (!headerCart) return;
 
     const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
     if (reducedMotion) return;
 
     const card = button.closest("article");
     const photo = card?.querySelector<HTMLImageElement>(
-      "[data-card-photo], .product-gallery img"
+      "[data-card-photo], .product-gallery img",
     );
 
     if (!photo) return;
@@ -348,10 +346,7 @@ const currency = new Intl.NumberFormat("en-CA", {
     const targetRect = headerCart.getBoundingClientRect();
 
     const visibleTop = Math.max(photoRect.top, targetRect.bottom);
-    const visibleBottom = Math.min(
-      photoRect.bottom,
-      window.innerHeight
-    );
+    const visibleBottom = Math.min(photoRect.bottom, window.innerHeight);
     const photoIsVisible = visibleBottom > visibleTop;
 
     const startX = photoIsVisible
@@ -392,15 +387,14 @@ const currency = new Intl.NumberFormat("en-CA", {
           opacity: 1,
         },
         {
-          transform:
-            `translate(${endX - startX}px, ${endY - startY}px) scale(0.25)`,
+          transform: `translate(${endX - startX}px, ${endY - startY}px) scale(0.25)`,
           opacity: 0,
         },
       ],
       {
         duration: 650,
         easing: "cubic-bezier(0.4, 0, 0.2, 1)",
-      }
+      },
     );
 
     flight.onfinish = () => {
@@ -412,7 +406,7 @@ const currency = new Intl.NumberFormat("en-CA", {
           { transform: "scale(1.1)" },
           { transform: "scale(1)" },
         ],
-        { duration: 250 }
+        { duration: 250 },
       );
     };
 
@@ -422,22 +416,20 @@ const currency = new Intl.NumberFormat("en-CA", {
   loadCart();
   cart.subscribe(updateCartCount);
 
-  document.querySelectorAll<HTMLButtonElement>(
-    "[data-add-product]"
-  ).forEach((button) => {
-    button.addEventListener("click", () => {
-      const productId = Number(button.dataset.addProduct);
-      const product = products.find(
-        (product) => product.id === productId
-      );
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-add-product]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const productId = Number(button.dataset.addProduct);
+        const product = products.find((product) => product.id === productId);
 
-      if (!product) return;
+        if (!product) return;
 
-      addToCart(productId);
-      showCartMessage(product.name);
-      animateToCart(button);
+        addToCart(productId);
+        showCartMessage(product.name);
+        animateToCart(button);
+      });
     });
-  });
 </script>
 
 <style>
@@ -451,7 +443,8 @@ const currency = new Intl.NumberFormat("en-CA", {
   }
 
   @keyframes cart-roll {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateX(0) rotate(0deg);
     }
 
@@ -481,7 +474,9 @@ const currency = new Intl.NumberFormat("en-CA", {
     pointer-events: none;
     opacity: 0;
     transform: translate(-50%, -8px);
-    transition: opacity 180ms ease, transform 180ms ease;
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease;
   }
 
   .cart-toast.is-visible {
