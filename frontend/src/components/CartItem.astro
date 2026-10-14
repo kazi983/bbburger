@@ -1,0 +1,65 @@
+---
+export interface Props {
+	id: number;
+	name: string;
+	price: number;
+	quantity: number;
+	description: string;
+	tag?: string | null;
+	image: string;
+	index: number;
+}
+
+const { id, name, price, quantity, description, tag, image, index } = Astro.props;
+---
+
+<div class="bg-surface-container-lowest rounded-default p-space-md flex gap-gutter border border-outline-variant shadow-xs" data-item-id={id}>
+	<img src={image} alt={name} class="w-20 h-20 rounded-default object-cover bg-surface-variant shrink-0" />
+	<div class="flex-1">
+		{tag && <span class="inline-block bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm px-space-sm py-0.5 rounded-md mb-space-xs">{tag}</span>}
+		<h4 class="font-label-lg text-label-lg mb-0.5">{name}</h4>
+		<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-sm">Unit: CAD {price.toFixed(2)} • {description}</p>
+		<div class="flex justify-between items-center">
+			<span class="font-headline-sm text-headline-sm text-primary">CAD {(price * quantity).toFixed(2)}</span>
+			<div class="flex items-center bg-surface-container rounded-full px-2.5 py-1 gap-3">
+				<button class="minus bg-surface-container-lowest text-primary border border-outline-variant w-6 h-6 rounded-full text-label-md cursor-pointer flex items-center justify-center" onclick={`updateQuantity(${index}, -1)`}>-</button>
+				<span class="font-label-md text-label-md min-w-3 text-center">{quantity}</span>
+				<button class="plus bg-primary-container text-on-primary border-none w-6 h-6 rounded-full text-label-md cursor-pointer flex items-center justify-center" onclick={`updateQuantity(${index}, 1)`}>+</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+        const itemContainers = document.querySelectorAll('[data-item-index]');
+
+        itemContainers.forEach(container => {
+            const price = parseFloat(container.getAttribute('data-price') || '0');
+            const minusBtn = container.querySelector('.minus');
+            const plusBtn = container.querySelector('.plus');
+            const quantitySpan = container.querySelector('.item-quantity');
+            const totalPriceSpan = container.querySelector('.item-total-price');
+
+            let currentQuantity = parseInt(quantitySpan?.textContent || '1', 10);
+
+            // The function to chenge the quantity
+            const updateDisplay = (newQty: number) => {
+                if (newQty < 1) return; // Regulate under 1
+                currentQuantity = newQty;
+                if (quantitySpan) quantitySpan.textContent = String(currentQuantity);
+                if (totalPriceSpan) totalPriceSpan.textContent = `CAD ${(price * currentQuantity).toFixed(2)}`;
+            };
+
+            plusBtn?.addEventListener('click', () => {
+                updateDisplay(currentQuantity + 1);
+            });
+
+            minusBtn?.addEventListener('click', () => {
+                if (currentQuantity > 1) {
+                    updateDisplay(currentQuantity - 1);
+                }
+            });
+        });
+    });
+</script>
