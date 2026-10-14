@@ -202,7 +202,7 @@ import "../styles/tracking.css";
     try {
       // Fetch order data from the backend
       const response = await fetch(
-        `http://localhost:3000/api/orders/${encodeURIComponent(orderNum)}`,
+        `http://localhost:3000/orders/${encodeURIComponent(orderNum)}`,
       );
       const data = await response.json();
 

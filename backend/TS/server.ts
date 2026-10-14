@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import orderRoutes from "./routes/orders";
 
 const app = express();
 const PORT = 3000;
@@ -12,6 +13,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Food Ordering API is running!");
 });
+
+app.use("/orders", orderRoutes);
 
 // Start server
 app.listen(PORT, () => {
