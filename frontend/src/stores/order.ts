@@ -13,7 +13,7 @@ type OrderItem = {
   options?: BurgerOptions;
 };
 
-export type OrderMessage = {
+export type Order = {
   orderId: number;
   customerName: string;
   orderedAt: number;
@@ -22,10 +22,6 @@ export type OrderMessage = {
   total: number;
 };
 
-export type Order = {
-  kind: "message";
-  message: OrderMessage;
-};
 
 export const $orderId = atom<number>(0);
 export const $order = atom<Order | null>(null);
