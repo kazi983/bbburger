@@ -9,4 +9,7 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
+  redirects: {
+    "/cart": "/order-summary",
+  },
 });
