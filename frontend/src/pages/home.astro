@@ -1,0 +1,501 @@
+---
+import Layout from "../layouts/layout.astro";
+import BottomNavBar from "../components/BottomNavBar.astro";
+import ProductGallery from "../components/ProductGallery.astro";
+import products from "../../../backend/data/product.json";
+
+const categories = [
+  { value: "all", label: "All", icon: "restaurant_menu" },
+  { value: "burguer", label: "Burgers", icon: "lunch_dining" },
+  { value: "fries", label: "Fries", icon: "fastfood" },
+  { value: "drink", label: "Drinks", icon: "local_drink" },
+  { value: "desert", label: "Desserts", icon: "cake" },
+];
+
+const productImages: Record<number, string[]> = {
+  1: [
+    "/images/aussie-burger.jpg",
+    "/images/aussie-burger-2.jpg",
+    "/images/aussie-burger-3.jpg",
+  ],
+  2: ["/images/kofta-burger.png", "/images/kofta-burger-2.jpg"],
+  3: ["/images/lamb-burger.png", "/images/lamb-burger-2.jpg"],
+  4: ["/images/yuca-fries.png", "/images/yuca-fries-2.jpg"],
+  5: ["/images/french-fries.png", "/images/french-fries-2.jpg"],
+  6: ["/images/coke.jpg"],
+  7: ["/images/strawberry-milkshake.jpg"],
+  8: ["/images/chocolate-cake.jpg"],
+  9: ["/images/diet-coke.jpg"],
+};
+
+const currency = new Intl.NumberFormat("en-CA", {
+  style: "currency",
+  currency: "CAD",
+  currencyDisplay: "code",
+});
+---
+
+<Layout title="Menu | Awshaf BBB">
+  <div class="mx-auto max-w-7xl px-4 pb-28">
+    <header
+      class="sticky top-0 z-40 mb-8 flex items-center justify-between gap-3 bg-background/95 py-3 backdrop-blur-sm"
+    >
+      <a
+        href="/home"
+        class="flex min-w-0 items-center gap-2 text-base font-bold text-primary sm:text-2xl"
+      >
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container"
+          aria-hidden="true"
+        >
+          <span class="material-symbols-outlined fill-icon">
+            local_fire_department
+          </span>
+        </span>
+
+        <span>Awshaf BBB</span>
+      </a>
+
+      <a
+        id="header-cart"
+        href="/cart"
+        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary-container px-3 py-3 text-sm font-bold text-on-primary-container shadow-lg hover:bg-primary sm:gap-3 sm:px-6 sm:py-4 sm:text-lg"
+      >
+        <svg
+          class="cart-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="30"
+          height="30"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 3h2l3 12h11l2-8H6" />
+          <circle cx="9" cy="20" r="1" />
+          <circle cx="18" cy="20" r="1" />
+        </svg>
+
+        <span id="cart-label">Cart</span>
+
+        <span
+          id="cart-count"
+          class="rounded-full bg-surface-container-lowest px-2.5 py-1 text-sm text-primary"
+        >
+          0
+        </span>
+      </a>
+    </header>
+
+    <main>
+      <section
+        class="grid items-center gap-8 overflow-hidden rounded-3xl bg-surface-container-lowest p-6 shadow-sm sm:p-10 md:grid-cols-2"
+      >
+        <div>
+          <p
+            class="mb-4 inline-block rounded-full bg-secondary-container px-3 py-1 text-xs font-semibold text-on-secondary-container"
+          >
+            FLAME-BROILED PERFECTION
+          </p>
+
+          <h1 class="font-headline text-4xl font-bold leading-tight sm:text-5xl">
+            Craving Pure
+            <span class="block text-primary">Flame Power?</span>
+          </h1>
+
+          <p class="mt-4 max-w-md leading-relaxed text-on-surface-variant">
+            Sizzle up your day with fresh 100% Angus patties seared on open
+            flames, crispy golden fries, and chef-crafted smoky house dips.
+          </p>
+
+          <a
+            href="#menu"
+            class="mt-6 inline-block rounded-full bg-primary-container px-6 py-3 font-semibold text-on-primary-container hover:bg-primary"
+          >
+            Explore the Menu →
+          </a>
+
+          <div class="mt-4">
+            <div
+              class="inline-flex items-center gap-2 rounded-full bg-surface-container px-4 py-2 text-sm font-semibold text-on-surface-variant"
+            >
+              <span
+                class="material-symbols-outlined fill-icon text-tertiary"
+                aria-hidden="true"
+              >
+                timer
+              </span>
+
+              <span>15 Min Express Pickup</span>
+            </div>
+          </div>
+        </div>
+
+        <img
+          src="/images/hero-burger.jpg"
+          alt="Burger promotion"
+          class="h-64 w-full rounded-2xl object-cover sm:h-80"
+          fetchpriority="high"
+        />
+      </section>
+
+      <section id="menu" class="menu-products mt-10">
+        <h2 class="font-headline text-2xl font-bold">Craveable Menu</h2>
+
+        <p class="mt-1 text-sm text-on-surface-variant">
+          Handcrafted, fresh off the grill
+        </p>
+
+        <div
+          id="category-filters"
+          class="mt-6 flex flex-wrap gap-2 sm:gap-3"
+          role="group"
+          aria-label="Filter menu by category"
+        >
+          {
+            categories.map((category) => (
+              <button
+                type="button"
+                data-category={category.value}
+                aria-pressed={category.value === "all" ? "true" : "false"}
+                class="flex min-h-20 w-24 flex-col items-center justify-center gap-1.5 rounded-2xl border border-outline-variant bg-surface-container-lowest px-2 py-3 text-primary shadow-sm transition-colors hover:bg-surface-container aria-pressed:border-primary-container aria-pressed:bg-primary-container aria-pressed:text-on-primary-container sm:w-28"
+              >
+                <span
+                  class="material-symbols-outlined"
+                  style="font-size: 28px;"
+                  aria-hidden="true"
+                >
+                  {category.icon}
+                </span>
+
+                <span class="text-sm font-bold">{category.label}</span>
+              </button>
+            ))
+          }
+        </div>
+
+        <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {
+            products.map((product) => (
+              <article
+                data-product-category={product.category}
+                class="flex min-w-0 flex-col overflow-hidden rounded-2xl bg-surface-container-lowest shadow-sm"
+              >
+                <ProductGallery
+                  name={product.name}
+                  images={productImages[product.id]}
+                />
+
+                <div class="flex flex-1 flex-col p-5">
+                  <p class="mb-3 text-xs font-semibold uppercase text-primary">
+                    {
+                      categories.find(
+                        (category) => category.value === product.category
+                      )?.label ?? product.category
+                    }
+                  </p>
+
+                  <h3 class="font-headline text-lg font-bold">
+                    {product.name}
+                  </h3>
+
+                  <p class="mt-2 text-sm text-on-surface-variant">
+                    {product.description}
+                  </p>
+
+                  {
+                    product.ingredients.length > 0 && (
+                      <p class="mt-3 text-sm text-on-surface-variant">
+                        {product.ingredients.join(", ")}
+                      </p>
+                    )
+                  }
+
+                  <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5">
+                    <div>
+                      <p class="text-xs text-on-surface-variant">Price</p>
+
+                      <p class="text-lg font-bold text-primary">
+                        {currency.format(product.price)}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      data-add-product={product.id}
+                      aria-label={`Add ${product.name} to cart`}
+                      class="rounded-full bg-primary-container px-5 py-2 font-semibold text-on-primary-container hover:bg-primary"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div
+    id="cart-message"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+    class="cart-toast"
+  ></div>
+
+  <BottomNavBar active="menu" />
+</Layout>
+
+<script>
+  import products from "../../../backend/data/product.json";
+  import { cart, loadCart, addToCart } from "../stores/cartStore";
+
+  const filterButtons = document.querySelectorAll<HTMLButtonElement>(
+    "#category-filters button"
+  );
+
+  const productCards = document.querySelectorAll<HTMLElement>(
+    "[data-product-category]"
+  );
+
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const category = button.dataset.category;
+
+      filterButtons.forEach((filterButton) => {
+        filterButton.setAttribute(
+          "aria-pressed",
+          String(filterButton === button)
+        );
+      });
+
+      productCards.forEach((card) => {
+        const matchesCategory =
+          category === "all" ||
+          card.dataset.productCategory === category;
+
+        card.style.display = matchesCategory ? "flex" : "none";
+      });
+    });
+  });
+
+  const cartCount = document.querySelector("#cart-count");
+  const cartLabel = document.querySelector("#cart-label");
+  const headerCart = document.querySelector<HTMLElement>("#header-cart");
+  const toast = document.querySelector<HTMLElement>("#cart-message");
+
+  let toastTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function updateCartCount() {
+    const count = cart.get().reduce((total, item) => {
+      const productExists = products.some(
+        (product) => product.id === item.productId
+      );
+
+      return productExists ? total + item.quantity : total;
+    }, 0);
+
+    if (cartCount) {
+      cartCount.textContent = String(count);
+    }
+
+    if (cartLabel) {
+      cartLabel.textContent = count > 0 ? "View my cart" : "Cart";
+    }
+
+    headerCart?.setAttribute(
+      "aria-label",
+      `View cart, ${count} ${count === 1 ? "item" : "items"}`
+    );
+  }
+
+  function showCartMessage(name: string) {
+    if (!toast) return;
+
+    clearTimeout(toastTimer);
+    toast.textContent = `✓ ${name} added to cart`;
+    toast.classList.add("is-visible");
+
+    toastTimer = setTimeout(() => {
+      toast.classList.remove("is-visible");
+    }, 2000);
+  }
+
+  function animateToCart(button: HTMLButtonElement) {
+    if (!headerCart) return;
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (reducedMotion) return;
+
+    const card = button.closest("article");
+    const photo = card?.querySelector<HTMLImageElement>(
+      "[data-card-photo], .product-gallery img"
+    );
+
+    if (!photo) return;
+
+    const photoRect = photo.getBoundingClientRect();
+    const buttonRect = button.getBoundingClientRect();
+    const targetRect = headerCart.getBoundingClientRect();
+
+    const visibleTop = Math.max(photoRect.top, targetRect.bottom);
+    const visibleBottom = Math.min(
+      photoRect.bottom,
+      window.innerHeight
+    );
+    const photoIsVisible = visibleBottom > visibleTop;
+
+    const startX = photoIsVisible
+      ? photoRect.left + photoRect.width / 2 - 28
+      : buttonRect.left + buttonRect.width / 2 - 28;
+
+    const startY = photoIsVisible
+      ? (visibleTop + visibleBottom) / 2 - 28
+      : buttonRect.top + buttonRect.height / 2 - 28;
+
+    const endX = targetRect.left + targetRect.width / 2 - 28;
+    const endY = targetRect.top + targetRect.height / 2 - 28;
+
+    const flyingPhoto = document.createElement("img");
+    flyingPhoto.src = photo.currentSrc || photo.src;
+    flyingPhoto.alt = "";
+    flyingPhoto.setAttribute("aria-hidden", "true");
+
+    Object.assign(flyingPhoto.style, {
+      position: "fixed",
+      left: `${startX}px`,
+      top: `${startY}px`,
+      width: "56px",
+      height: "56px",
+      objectFit: "cover",
+      borderRadius: "50%",
+      pointerEvents: "none",
+      zIndex: "100",
+      boxShadow: "0 4px 16px rgb(0 0 0 / 25%)",
+    });
+
+    document.body.append(flyingPhoto);
+
+    const flight = flyingPhoto.animate(
+      [
+        {
+          transform: "translate(0, 0) scale(1)",
+          opacity: 1,
+        },
+        {
+          transform:
+            `translate(${endX - startX}px, ${endY - startY}px) scale(0.25)`,
+          opacity: 0,
+        },
+      ],
+      {
+        duration: 650,
+        easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+      }
+    );
+
+    flight.onfinish = () => {
+      flyingPhoto.remove();
+
+      headerCart.animate(
+        [
+          { transform: "scale(1)" },
+          { transform: "scale(1.1)" },
+          { transform: "scale(1)" },
+        ],
+        { duration: 250 }
+      );
+    };
+
+    flight.oncancel = () => flyingPhoto.remove();
+  }
+
+  loadCart();
+  cart.subscribe(updateCartCount);
+
+  document.querySelectorAll<HTMLButtonElement>(
+    "[data-add-product]"
+  ).forEach((button) => {
+    button.addEventListener("click", () => {
+      const productId = Number(button.dataset.addProduct);
+      const product = products.find(
+        (product) => product.id === productId
+      );
+
+      if (!product) return;
+
+      addToCart(productId);
+      showCartMessage(product.name);
+      animateToCart(button);
+    });
+  });
+</script>
+
+<style>
+  .menu-products {
+    scroll-margin-top: 110px;
+  }
+
+  .cart-icon {
+    flex-shrink: 0;
+    animation: cart-roll 2s ease-in-out infinite;
+  }
+
+  @keyframes cart-roll {
+    0%, 100% {
+      transform: translateX(0) rotate(0deg);
+    }
+
+    30% {
+      transform: translateX(3px) rotate(-8deg);
+    }
+
+    60% {
+      transform: translateX(-2px) rotate(5deg);
+    }
+  }
+
+  .cart-toast {
+    position: fixed;
+    top: 105px;
+    left: 50%;
+    z-index: 60;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    padding: 12px 20px;
+    border-radius: 14px;
+    background: rgb(0 0 0 / 78%);
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    box-shadow: 0 6px 24px rgb(0 0 0 / 15%);
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -8px);
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .cart-toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cart-icon {
+      animation: none;
+    }
+
+    .cart-toast {
+      transition: none;
+    }
+  }
+</style>
