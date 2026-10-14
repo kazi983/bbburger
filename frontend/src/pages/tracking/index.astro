@@ -27,7 +27,9 @@ import "../../styles/tracking.css";
         <div class="flex items-center gap-2">
           <span class="animate-status-pulse h-2 w-2 rounded-full bg-tertiary"
           ></span>
-          <span class="text-sm font-semibold text-tertiary"> In Progress </span>
+          <span id="statusOrder" class="text-sm font-semibold text-tertiary">
+            In Progress
+          </span>
         </div>
       </div>
 
@@ -322,6 +324,8 @@ import "../../styles/tracking.css";
     //connect to backend
     const socket = io("http://localhost:3000");
 
+    const statusOrder = document.getElementById("statusOrder");
+
     const prepStatus = document.getElementById("prepText");
     const prepBar = document.getElementById("prepBar");
     const prepIcon = document.getElementById("prepIcon");
@@ -372,7 +376,16 @@ import "../../styles/tracking.css";
       }
 
       if (status === "Ready") {
-        if (readyStatus && readyBar && readyIcon && stage2 && stage3) {
+        if (
+          statusOrder &&
+          readyStatus &&
+          readyBar &&
+          readyIcon &&
+          stage2 &&
+          stage3
+        ) {
+          statusOrder.textContent = "Completed";
+
           readyStatus.classList.remove("text-primary");
           readyStatus.classList.add("text-tertiary");
 

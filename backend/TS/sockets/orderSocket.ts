@@ -1,5 +1,4 @@
 import type { Server, Socket } from "socket.io";
-import { handleReceivedOrder } from "../controllers/OrderController";
 
 let currentOrderStatus = "Received";
 
