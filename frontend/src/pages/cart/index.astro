@@ -14,7 +14,7 @@ import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
       <div class="flex items-center justify-between gap-3">
         <h1 class="font-headline text-xl font-bold">Items Ordered</h1>
 
-        <a href="/menu" class="text-sm font-bold text-primary">
+        <a href="/home" class="text-sm font-bold text-primary">
           + Add More
         </a>
       </div>
@@ -28,7 +28,7 @@ import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
         <p>Your cart is empty.</p>
 
         <a
-          href="/menu"
+          href="/home"
           class="mt-4 inline-block rounded-full bg-primary-container px-5 py-3 font-semibold text-on-primary-container"
         >
           Browse Menu
@@ -266,7 +266,7 @@ import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
         replacement.focus();
       } else {
         document.querySelector<HTMLAnchorElement>(
-          'main a[href="/menu"]'
+          'main a[href="/home"]'
         )?.focus();
       }
     }
