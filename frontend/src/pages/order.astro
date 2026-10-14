@@ -33,7 +33,7 @@ import "../styles/tracking.css";
 
       <!-- Order Number -->
       <div>
-        <p class="text-sm text-on-surface-variant">Order #FG-8429</p>
+        <p id = order-number  class="text-sm text-on-surface-variant">Order #</p>
 
         <h2 class="mt-2 font-headline text-2xl font-bold text-on-surface">
           Est. Ready in
@@ -137,81 +137,16 @@ import "../styles/tracking.css";
         </h2>
 
         <span
-          class="rounded-full bg-surface-container px-3 py-1 text-xs font-bold text-on-surface-variant"
+          id = "order-item-count" class="rounded-full bg-surface-container px-3 py-1 text-xs font-bold text-on-surface-variant"
         >
-          Order Items (3)
+          Order Items (0)
         </span>
       </div>
 
       <p class="text-sm text-on-surface-variant">Downtown Flagship</p>
 
-      <!-- Item 1 -->
-      <div
-        class="flex items-start justify-between gap-4 border-b border-outline-variant/40 pb-4"
-      >
-        <div class="flex gap-3">
-          <span
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-container text-sm font-bold text-on-surface"
-          >
-            1x
-          </span>
-
-          <div>
-            <h3 class="font-semibold text-on-surface">
-              Double Flame Deluxe Burger
-            </h3>
-            <p class="mt-1 text-sm text-on-surface-variant">
-              Smoked Bacon, Extra Cheddar Melt
-            </p>
-          </div>
-        </div>
-
-        <p class="shrink-0 font-semibold text-on-surface">CAD 12.49</p>
-      </div>
-
-      <!-- Item 2 -->
-      <div
-        class="flex items-start justify-between gap-4 border-b border-outline-variant/40 pb-4"
-      >
-        <div class="flex gap-3">
-          <span
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-container text-sm font-bold text-on-surface"
-          >
-            1x
-          </span>
-
-          <div>
-            <h3 class="font-semibold text-on-surface">Seasoned Fries (L)</h3>
-            <p class="mt-1 text-sm text-on-surface-variant">
-              Signature Cajun Spice Dust
-            </p>
-          </div>
-        </div>
-
-        <p class="shrink-0 font-semibold text-on-surface">CAD 4.79</p>
-      </div>
-
-      <!-- Item 3 -->
-      <div
-        class="flex items-start justify-between gap-4 border-b border-outline-variant/40 pb-4"
-      >
-        <div class="flex gap-3">
-          <span
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-container text-sm font-bold text-on-surface"
-          >
-            1x
-          </span>
-
-          <div>
-            <h3 class="font-semibold text-on-surface">Craft Cola</h3>
-            <p class="mt-1 text-sm text-on-surface-variant">
-              Large, Extra Ice, Real Cane Sugar
-            </p>
-          </div>
-        </div>
-
-        <p class="shrink-0 font-semibold text-on-surface">CAD 3.20</p>
-      </div>
+   <!-- Order Items -->
+<div id="order-items"></div>
 
       <!-- Total -->
       <div class="flex items-center justify-between pt-1">
@@ -220,7 +155,7 @@ import "../styles/tracking.css";
           <p class="mt-1 text-sm text-on-surface-variant">Paid via Apple Pay</p>
         </div>
 
-        <p class="font-headline text-2xl font-bold text-primary">CAD 20.48</p>
+        <p id="order-total" class="font-headline text-2xl font-bold text-primary">CAD 0.00</p>
       </div>
 
       <!-- Receipt Button -->
@@ -236,3 +171,75 @@ import "../styles/tracking.css";
 
   <BottomNavBar active="order" />
 </Layout>
+<script>
+  // Get the order number from the URL
+  const params = new URLSearchParams(window.location.search);
+  const orderNum = params.get("orderNum");
+
+  // Get HTML elements
+  const orderNumber = document.getElementById("order-number");
+  const orderItemCount = document.getElementById("order-item-count");
+  const orderItems = document.getElementById("order-items");
+  const orderTotal = document.getElementById("order-total");
+
+  async function loadOrder() {
+
+    try {
+      // Fetch order data from the backend
+      const response = await fetch(
+        `http://localhost:3000/orders/${orderNum}`
+      );
+      const order = await response.json();
+
+      if (!response.ok) {
+        throw new Error(order.message || "Order not found.");
+      }
+
+      // Display order information
+      if (orderNumber) {
+        orderNumber.textContent = `Order #${order.orderNum}`;
+      }
+
+      if (orderItemCount) {
+        orderItemCount.textContent = `Order Items (${order.items.length})`;
+      }
+
+      if (orderItems) {
+        orderItems.innerHTML = order.items
+          .map(
+            (item: {
+              productName: string;
+              quantity: number;
+              unitPrice: number;
+            }) => `
+              <div class="flex items-start justify-between gap-4 border-b border-outline-variant/40 pb-4">
+                <div class="flex gap-3">
+                  <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-container text-sm font-bold text-on-surface">
+                    ${item.quantity}x
+                  </span>
+                  <h3 class="font-semibold text-on-surface">
+                    ${item.productName}
+                  </h3>
+                </div>
+                <p class="shrink-0 font-semibold text-on-surface">
+                  CAD ${(item.unitPrice * item.quantity).toFixed(2)}
+                </p>
+              </div>
+            `
+          )
+          .join("");
+      }
+
+      if (orderTotal) {
+        orderTotal.textContent = `CAD ${Number(order.total).toFixed(2)}`;
+      }
+    } catch (error) {
+      if (orderNumber) {
+        orderNumber.textContent =
+          error instanceof Error ? error.message : "Unable to load order.";
+      }
+    }
+  }
+
+  loadOrder();
+</script>
