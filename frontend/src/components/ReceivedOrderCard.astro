@@ -150,6 +150,14 @@ const { orderID, customerName, status, createdAt } = Astro.props;
 </div>
 
 <script>
+  import { io } from "socket.io-client";
+
+  const socket = io("http://localhost:3000");
+
+  function sendStatusUpdate(status: string) {
+    socket.emit("updated_status", status);
+  }
+
   const cards = document.querySelectorAll(".receivedCard");
 
   cards.forEach((card) => {
@@ -183,6 +191,8 @@ const { orderID, customerName, status, createdAt } = Astro.props;
         readyBtn.classList.remove("opacity-50", "cursor-not-allowed");
         readyBtn.classList.add("cursor-pointer");
       }
+
+      sendStatusUpdate("Preparing");
     });
 
     readyBtn?.addEventListener("click", () => {
@@ -216,6 +226,8 @@ const { orderID, customerName, status, createdAt } = Astro.props;
         completeBtn.classList.remove("opacity-50", "cursor-not-allowed");
         completeBtn.classList.add("cursor-pointer");
       }
+
+      sendStatusUpdate("Ready");
     });
 
     completeBtn?.addEventListener("click", () => {
