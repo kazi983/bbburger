@@ -1,11 +1,71 @@
-<div class="bg-surface-container-lowest rounded-default p-space-lg mb-space-lg border border-outline-variant shadow-sm">
-	<h3 class="font-label-lg text-label-lg mb-1.5 flex items-center gap-space-sm">👤 Customer Details</h3>
-	<p class="font-body-sm text-body-sm text-on-surface-variant mb-3.5">We need your name for pickup notification & ticket stamping.</p>
-	<div class="space-y-1.5">
-		<label class="block font-label-md text-label-md">Customer Name <span class="text-primary">*</span></label>
-		<div class="relative flex items-center">
-			<span class="absolute left-3.5 text-on-surface-variant">👤</span>
-			<input type="text" id="customer-name-input" placeholder="Enter your full name" class="w-full py-3 pr-3.5 pl-11 rounded-default border border-outline-variant bg-surface-container-low font-body-md text-body-md font-semibold text-on-surface outline-none focus:border-primary" />
-		</div>
-	</div>
+<div
+  class="rounded-default border border-outline-variant bg-surface-container-lowest p-space-lg shadow-sm"
+>
+  <h2 class="mb-1.5 flex items-center gap-space-sm font-bold">
+    <span class="material-symbols-outlined" aria-hidden="true">
+      person
+    </span>
+    Customer Details
+  </h2>
+
+  <p class="mb-4 text-sm text-on-surface-variant">
+    Enter your name so we can identify your pickup order.
+  </p>
+
+  <label
+    for="customer-name-input"
+    class="mb-2 block text-sm font-semibold"
+  >
+    Customer Name <span class="text-primary">*</span>
+  </label>
+
+  <input
+    type="text"
+    id="customer-name-input"
+    name="customerName"
+    autocomplete="name"
+    placeholder="Enter your full name"
+    required
+    maxlength="100"
+    aria-describedby="customer-name-error"
+    class="w-full rounded-default border border-outline-variant bg-surface-container-low px-4 py-3 text-on-surface focus:border-primary"
+  />
+
+  <p
+    id="customer-name-error"
+    class="mt-2 min-h-5 text-sm text-error"
+    aria-live="polite"
+  ></p>
 </div>
+
+<script>
+  const nameInput = document.querySelector<HTMLInputElement>(
+    "#customer-name-input"
+  );
+
+  const nameError = document.querySelector("#customer-name-error");
+
+  function validateCustomerName() {
+    if (!nameInput) return;
+
+    const isValid = nameInput.value.trim().length > 0;
+
+    nameInput.setCustomValidity(
+      isValid ? "" : "Please enter your name."
+    );
+
+    nameInput.setAttribute("aria-invalid", String(!isValid));
+
+    if (nameError) {
+      nameError.textContent = isValid ? "" : "Please enter your name.";
+    }
+  }
+
+  nameInput?.addEventListener("blur", validateCustomerName);
+
+  nameInput?.addEventListener("input", () => {
+    if (nameInput.getAttribute("aria-invalid") === "true") {
+      validateCustomerName();
+    }
+  });
+</script>
