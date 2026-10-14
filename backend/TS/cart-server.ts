@@ -18,7 +18,7 @@ app.get("/api/cart", (req: Request, res: Response) => {
     // Dummy products data in the cart
     const cartItems = [
         {
-            id: "item-1",
+            id: 1,
             name: "Double Flame Cheeseburger",
             price: 8.99,
             quantity: 1,
