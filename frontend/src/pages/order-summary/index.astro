@@ -3,6 +3,7 @@ import Layout from "../../layouts/layout.astro";
 import CartHeader from "../../components/CartHeader.astro";
 import CustomerForm from "../../components/CustomerForm.astro";
 import Payment from "../../components/Payment.astro";
+import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
 ---
 
 <Layout title="BBB - Order Summary">
@@ -36,15 +37,16 @@ import Payment from "../../components/Payment.astro";
 
       <ul id="cart-list" class="space-y-4"></ul>
 
-      <p id="quantity-message" role="status" class="text-sm text-tertiary"></p>
+      <p
+        id="quantity-message"
+        role="status"
+        class="text-sm text-tertiary"
+      ></p>
 
       <div id="checkout-details" class="hidden space-y-5">
         <CustomerForm />
         <Payment subtotal={0} tax={0} total={0} />
-
-        <p class="rounded-xl bg-surface-container p-4 text-sm text-on-surface-variant">
-          Order submission will be available when the backend is connected.
-        </p>
+        <PlaceOrderButton />
       </div>
     </main>
   </div>
@@ -55,8 +57,8 @@ import Payment from "../../components/Payment.astro";
   import {
     cart,
     loadCart,
-    updateQuantity,
-    removeFromCart,
+    updateCartItem,
+    removeCartItem,
   } from "../../stores/cartStore";
 
   const productImages: Record<number, string> = {
@@ -86,14 +88,14 @@ import Payment from "../../components/Payment.astro";
   function makeButton(
     text: string,
     label: string,
-    productId: number,
+    itemKey: string,
     action: string
   ) {
     const button = document.createElement("button");
     button.type = "button";
     button.textContent = text;
     button.setAttribute("aria-label", label);
-    button.dataset.productId = String(productId);
+    button.dataset.itemKey = itemKey;
     button.dataset.action = action;
     button.className =
       "flex h-10 min-w-10 items-center justify-center rounded-full " +
@@ -112,7 +114,7 @@ import Payment from "../../components/Payment.astro";
         ? document.activeElement
         : null;
 
-    const focusedId = focusedButton?.dataset.productId;
+    const focusedKey = focusedButton?.dataset.itemKey;
     const focusedAction = focusedButton?.dataset.action;
 
     cartList.replaceChildren();
@@ -154,6 +156,33 @@ import Payment from "../../components/Payment.astro";
       unitPrice.className = "mt-1 text-sm text-on-surface-variant";
       unitPrice.textContent = `Unit: ${currency.format(product.price)}`;
 
+      details.append(name, unitPrice);
+
+      const optionLabels: string[] = [];
+
+      if (item.options.doneness) {
+        optionLabels.push(`Cooked: ${item.options.doneness}`);
+      }
+
+      item.options.removedIngredients.forEach((ingredient) => {
+        optionLabels.push(`No ${ingredient}`);
+      });
+
+      if (optionLabels.length > 0) {
+        const optionsList = document.createElement("ul");
+        optionsList.className =
+          "mt-2 space-y-1 rounded-lg bg-surface-container p-2 " +
+          "text-xs text-on-surface-variant";
+
+        optionLabels.forEach((label) => {
+          const option = document.createElement("li");
+          option.textContent = label;
+          optionsList.append(option);
+        });
+
+        details.append(optionsList);
+      }
+
       const total = document.createElement("p");
       total.className = "mt-2 font-bold text-primary";
       total.textContent = currency.format(itemTotalCents / 100);
@@ -166,41 +195,47 @@ import Payment from "../../components/Payment.astro";
       quantity.className = "min-w-6 text-center font-semibold";
       quantity.setAttribute("aria-label", `Quantity: ${item.quantity}`);
 
+      const itemDescription = [
+        product.name,
+        ...optionLabels,
+      ].join(", ");
+
       controls.append(
         makeButton(
           "−",
-          `Decrease quantity of ${product.name}`,
-          product.id,
+          `Decrease quantity of ${itemDescription}`,
+          item.key,
           "decrease"
         ),
         quantity,
         makeButton(
           "+",
-          `Increase quantity of ${product.name}`,
-          product.id,
+          `Increase quantity of ${itemDescription}`,
+          item.key,
           "increase"
         ),
         makeButton(
           "Remove",
-          `Remove ${product.name}`,
-          product.id,
+          `Remove ${itemDescription}`,
+          item.key,
           "remove"
         )
       );
 
-      details.append(name, unitPrice, total, controls);
+      details.append(total, controls);
       row.append(image, details);
       cartList.append(row);
     });
 
     if (itemCount) {
-      itemCount.textContent = `${count} ${count === 1 ? "item" : "items"}`;
+      itemCount.textContent =
+        `${count} ${count === 1 ? "item" : "items"}`;
     }
 
     emptyCart?.classList.toggle("hidden", count > 0);
     checkoutDetails?.classList.toggle("hidden", count === 0);
 
-    // Uses the team's current 8% estimate; final totals belong to the backend.
+    // Matches the team's provisional 8% estimate.
     const taxCents = Math.round(subtotalCents * 0.08);
     const totalCents = subtotalCents + taxCents;
 
@@ -218,12 +253,12 @@ import Payment from "../../components/Payment.astro";
       }
     });
 
-    if (focusedId && focusedAction) {
+    if (focusedKey && focusedAction) {
       const replacement = Array.from(
         cartList.querySelectorAll<HTMLButtonElement>("button")
       ).find(
         (button) =>
-          button.dataset.productId === focusedId &&
+          button.dataset.itemKey === focusedKey &&
           button.dataset.action === focusedAction
       );
 
@@ -248,19 +283,19 @@ import Payment from "../../components/Payment.astro";
 
     if (!button) return;
 
-    const productId = Number(button.dataset.productId);
+    const itemKey = button.dataset.itemKey;
     const item = cart.get().find(
-      (item) => item.productId === productId
+      (item) => item.key === itemKey
     );
 
     if (!item) return;
 
     if (button.dataset.action === "increase") {
-      updateQuantity(productId, item.quantity + 1);
+      updateCartItem(item.key, item.quantity + 1);
     } else if (button.dataset.action === "decrease") {
-      updateQuantity(productId, item.quantity - 1);
+      updateCartItem(item.key, item.quantity - 1);
     } else if (button.dataset.action === "remove") {
-      removeFromCart(productId);
+      removeCartItem(item.key);
     }
 
     if (quantityMessage) {

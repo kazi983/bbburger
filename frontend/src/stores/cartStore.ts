@@ -1,13 +1,52 @@
 import { atom } from "nanostores";
 
-type CartItem = {
+export type BurgerOptions = {
+  removedIngredients: string[];
+  doneness: "" | "Medium rare" | "Medium" | "Well done";
+};
+
+export type CartItem = {
+  key: string;
   productId: number;
   quantity: number;
+  options: BurgerOptions;
 };
 
 export const cart = atom<CartItem[]>([]);
 
 const storageKey = "awshaf-cart";
+
+function normalizeOptions(
+  options?: Partial<BurgerOptions>
+): BurgerOptions {
+  const removedIngredients = Array.isArray(options?.removedIngredients)
+    ? [...new Set(
+        options.removedIngredients.filter(
+          (ingredient) => typeof ingredient === "string"
+        )
+      )].sort()
+    : [];
+
+  const doneness =
+    options?.doneness === "Medium rare" ||
+    options?.doneness === "Medium" ||
+    options?.doneness === "Well done"
+      ? options.doneness
+      : "";
+
+  return { removedIngredients, doneness };
+}
+
+function createItemKey(
+  productId: number,
+  options: BurgerOptions
+) {
+  return JSON.stringify([
+    productId,
+    options.doneness,
+    options.removedIngredients,
+  ]);
+}
 
 function saveCart() {
   try {
@@ -25,91 +64,119 @@ export function loadCart() {
 
     if (!savedCart) return;
 
-    const items = JSON.parse(savedCart);
+    const savedItems = JSON.parse(savedCart);
 
-    if (
-      Array.isArray(items) &&
-      items.every(
-        (item) =>
-          item !== null &&
-          Number.isSafeInteger(item.productId) &&
-          item.productId > 0 &&
-          Number.isSafeInteger(item.quantity) &&
-          item.quantity > 0
-      )
-    ) {
-      const mergedItems: CartItem[] = [];
+    if (!Array.isArray(savedItems)) return;
 
-      items.forEach((item: CartItem) => {
-        const existingItem = mergedItems.find(
-          (entry) => entry.productId === item.productId
-        );
+    const items: CartItem[] = [];
 
-        if (existingItem) {
-          existingItem.quantity += item.quantity;
-        } else {
-          mergedItems.push({
-            productId: item.productId,
-            quantity: item.quantity,
-          });
-        }
-      });
-
+    savedItems.forEach((item) => {
       if (
-        mergedItems.every((item) =>
-          Number.isSafeInteger(item.quantity)
-        )
+        !item ||
+        !Number.isSafeInteger(item.productId) ||
+        item.productId < 1 ||
+        !Number.isSafeInteger(item.quantity) ||
+        item.quantity < 1
       ) {
-        cart.set(mergedItems);
+        return;
       }
-    }
+
+      const options = normalizeOptions(item.options);
+      const key = createItemKey(item.productId, options);
+      const existingItem = items.find((entry) => entry.key === key);
+
+      if (existingItem) {
+        const quantity = existingItem.quantity + item.quantity;
+
+        if (Number.isSafeInteger(quantity)) {
+          existingItem.quantity = quantity;
+        }
+      } else {
+        items.push({
+          key,
+          productId: item.productId,
+          quantity: item.quantity,
+          options,
+        });
+      }
+    });
+
+    cart.set(items);
   } catch {
     cart.set([]);
   }
 }
 
-export function addToCart(productId: number) {
+export function addToCart(
+  productId: number,
+  selectedOptions?: Partial<BurgerOptions>
+) {
   if (!Number.isSafeInteger(productId) || productId < 1) return;
 
-  const items = cart.get();
-  const existingItem = items.find(
-    (item) => item.productId === productId
-  );
+  const options = normalizeOptions(selectedOptions);
+  const key = createItemKey(productId, options);
+
+  const existingItem = cart.get().find((item) => item.key === key);
 
   if (existingItem) {
-    updateQuantity(productId, existingItem.quantity + 1);
+    updateCartItem(key, existingItem.quantity + 1);
     return;
   }
 
-  cart.set([...items, { productId, quantity: 1 }]);
+  cart.set([
+    ...cart.get(),
+    {
+      key,
+      productId,
+      quantity: 1,
+      options,
+    },
+  ]);
+
   saveCart();
 }
 
-export function updateQuantity(productId: number, quantity: number) {
+export function updateCartItem(key: string, quantity: number) {
   if (!Number.isSafeInteger(quantity) || quantity < 0) return;
 
   if (quantity === 0) {
-    removeFromCart(productId);
+    removeCartItem(key);
     return;
   }
 
   cart.set(
     cart.get().map((item) =>
-      item.productId === productId
-        ? { ...item, quantity }
-        : item
+      item.key === key ? { ...item, quantity } : item
     )
   );
 
   saveCart();
 }
 
-export function removeFromCart(productId: number) {
-  cart.set(
-    cart.get().filter((item) => item.productId !== productId)
+export function removeCartItem(key: string) {
+  cart.set(cart.get().filter((item) => item.key !== key));
+  saveCart();
+}
+
+// Keeps the existing summary working until we update its controls.
+export function updateQuantity(productId: number, quantity: number) {
+  const item = cart.get().find(
+    (item) => item.productId === productId
   );
 
-  saveCart();
+  if (item) {
+    updateCartItem(item.key, quantity);
+  }
+}
+
+export function removeFromCart(productId: number) {
+  const item = cart.get().find(
+    (item) => item.productId === productId
+  );
+
+  if (item) {
+    removeCartItem(item.key);
+  }
 }
 
 export function clearCart() {
