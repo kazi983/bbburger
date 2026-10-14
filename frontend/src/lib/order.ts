@@ -1,3 +1,4 @@
+import type { OrderMessage } from "../stores/order";
 import { socket } from "./socket";
 
 socket.on("connect", () => {
@@ -7,3 +8,5 @@ socket.on("connect", () => {
 socket.on("disconnect", () => {
   console.log("Disconnected from server");
 });
+
+socket.on("send_order", (message: OrderMessage) => {});
