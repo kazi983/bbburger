@@ -1,0 +1,33 @@
+---
+import Layout from "../../layouts/layout.astro";
+import CartHeader from "../../components/CartHeader.astro";
+import CartItem from "../../components/CartItem.astro";
+import CustomerForm from "../../components/CustomerForm.astro";
+import Payment from "../../components/Payment.astro";
+import ButtomNav from "../../components/ButtomNav.astro";
+---
+
+<Layout title="BBB - Order Summary">
+  <div class="text-on-background font-body pb-28">
+    <CartHeader />
+
+    <main
+      class="max-w-120 mx-auto px-margin-mobile mt-space-md space-y-space-md"
+    >
+      <!-- Dummy data -->
+      <CartItem
+        id={1}
+        name="Double Flame Cheeseburger"
+        price={8.99}
+        quantity={1}
+        description="Med-Well, Extra Pickles"
+        tag="Chef's Pick"
+        image="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=200&q=80"
+        index={0}
+      />
+    </main>
+    <CustomerForm />
+    <Payment />
+    <ButtomNav />
+  </div>
+</Layout>

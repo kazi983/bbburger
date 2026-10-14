@@ -1,8 +1,8 @@
 ---
-import Layout from "../layouts/layout.astro";
-import Header from "../components/Header.astro";
-import BottomNavBar from "../components/BottomNavBar.astro";
-import "../styles/tracking.css";
+import Layout from "../../layouts/layout.astro";
+import Header from "../../components/Header.astro";
+import BottomNavBar from "../../components/BottomNavBar.astro";
+import "../../styles/tracking.css";
 ---
 
 <Layout title="Order Status">
@@ -51,7 +51,18 @@ import "../styles/tracking.css";
             >
               <span class="material-symbols-outlined text-lg"> check </span>
             </div>
-            <div class="ml-2 h-1 flex-1 rounded-full bg-tertiary"></div>
+            <!-- <div id="prepBar" class="ml-2 h-1 flex-1 rounded-full bg-primary">
+            </div> -->
+
+            <div
+              class="ml-2 h-1 flex-1 overflow-hidden rounded-full bg-surface-container-high"
+            >
+              <div
+                id="prepBar"
+                class="animate-progress-enter h-full rounded-full bg-primary"
+              >
+              </div>
+            </div>
           </div>
 
           <p class="text-sm font-bold text-tertiary">Received</p>
@@ -61,6 +72,7 @@ import "../styles/tracking.css";
         <div class="space-y-2">
           <div class="flex h-8 items-center">
             <div
+              id="prepIcon"
               class="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white"
             >
               <span
@@ -74,19 +86,21 @@ import "../styles/tracking.css";
               class="ml-2 h-1 flex-1 overflow-hidden rounded-full bg-surface-container-high"
             >
               <div
-                class="animate-progress-enter h-full rounded-full bg-primary"
+                id="readyBar"
+                class="hidden animate-progress-enter h-full rounded-full bg-primary"
               >
               </div>
             </div>
           </div>
 
-          <p class="text-sm font-bold text-primary">Preparing</p>
+          <p id="prepText" class="text-sm font-bold text-primary">Preparing</p>
         </div>
 
         <!-- Ready -->
         <div class="space-y-2">
           <div class="flex h-8 items-center">
             <div
+              id="readyIcon"
               class="flex h-7 w-7 items-center justify-center rounded-full bg-surface-container text-on-surface-variant"
             >
               <span class="material-symbols-outlined text-lg">
@@ -95,15 +109,52 @@ import "../styles/tracking.css";
             </div>
           </div>
 
-          <p class="text-sm font-semibold text-on-surface-variant">Ready</p>
+          <p
+            id="readyText"
+            class="text-sm font-semibold text-on-surface-variant"
+          >
+            Ready
+          </p>
         </div>
       </div>
 
       <!-- Current Stage -->
-      <div class="rounded-2xl bg-surface-container-low p-4">
+
+      <!-- Stage 1 -->
+      <div id="stage1" class="rounded-2xl bg-surface-container-low p-4">
         <div class="flex items-start gap-3">
           <div
-            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white"
+            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-tertiary text-white"
+          >
+            <span class="animate-flame-pulse material-symbols-outlined">
+              check
+            </span>
+          </div>
+
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <h3 class="font-headline font-bold text-on-surface">
+                Stage 1: Yay, we received your order!
+              </h3>
+
+              <span
+                class="animate-status-pulse h-2 w-2 shrink-0 rounded-full bg-tertiary"
+              ></span>
+            </div>
+
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">
+              Thank you for ordering our delicious BBB! Your food will be
+              prepared soon.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- stage 2 -->
+      <div id="stage2" class="hidden rounded-2xl bg-surface-container-low p-4">
+        <div class="flex items-start gap-3">
+          <div
+            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-tertiary text-white"
           >
             <span class="animate-flame-pulse material-symbols-outlined">
               local_fire_department
@@ -122,7 +173,36 @@ import "../styles/tracking.css";
             </div>
 
             <p class="mt-2 text-sm leading-6 text-on-surface-variant">
-              The kitchen is preparing your flame-grilled order fresh right now.
+              The kitchen is preparing your BBB order fresh right now.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- stage 3 -->
+      <div id="stage3" class="hidden rounded-2xl bg-surface-container-low p-4">
+        <div class="flex items-start gap-3">
+          <div
+            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-tertiary text-white"
+          >
+            <span class="animate-flame-pulse material-symbols-outlined">
+              shopping_bag
+            </span>
+          </div>
+
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <h3 class="font-headline font-bold text-on-surface">
+                Stage 3: Go! Go! Go!
+              </h3>
+
+              <span
+                class="animate-status-pulse h-2 w-2 shrink-0 rounded-full bg-tertiary"
+              ></span>
+            </div>
+
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">
+              Your delicious BBB is ready!!! Enjoy your meal and see you soon.
             </p>
           </div>
         </div>
@@ -235,4 +315,77 @@ import "../styles/tracking.css";
   </main>
 
   <BottomNavBar active="order" />
+
+  <script>
+    import { io } from "socket.io-client";
+
+    //connect to backend
+    const socket = io("http://localhost:3000");
+
+    const prepStatus = document.getElementById("prepText");
+    const prepBar = document.getElementById("prepBar");
+    const prepIcon = document.getElementById("prepIcon");
+
+    const readyStatus = document.getElementById("readyText");
+    const readyBar = document.getElementById("readyBar");
+    const readyIcon = document.getElementById("readyIcon");
+
+    const stage1 = document.getElementById("stage1");
+    const stage2 = document.getElementById("stage2");
+    const stage3 = document.getElementById("stage3");
+
+    socket.on("new_status", (status: string) => {
+      if (status === "Preparing") {
+        if (
+          prepStatus &&
+          prepBar &&
+          prepIcon &&
+          readyBar &&
+          readyIcon &&
+          readyStatus &&
+          stage1 &&
+          stage2
+        ) {
+          prepStatus.classList.remove("text-primary");
+          prepStatus.classList.add("text-tertiary");
+
+          prepBar.classList.remove("animate-progress-enter", "bg-primary");
+          prepBar.classList.add("animate-progress-final", "bg-tertiary");
+
+          prepIcon.classList.remove("bg-primary");
+          prepIcon.classList.add("bg-tertiary");
+
+          readyBar.classList.remove("hidden");
+
+          readyIcon.classList.remove(
+            "bg-surface-container",
+            "text-on-surface-variant",
+          );
+          readyIcon.classList.add("bg-primary", "text-white");
+
+          readyStatus.classList.remove("text-on-surface-variant");
+          readyStatus.classList.add("text-primary");
+
+          stage1.classList.add("hidden");
+          stage2.classList.remove("hidden");
+        }
+      }
+
+      if (status === "Ready") {
+        if (readyStatus && readyBar && readyIcon && stage2 && stage3) {
+          readyStatus.classList.remove("text-primary");
+          readyStatus.classList.add("text-tertiary");
+
+          readyBar.classList.remove("animate-progress-enter", "bg-primary");
+          readyBar.classList.add("animate-progress-final", "bg-tertiary");
+
+          readyIcon.classList.remove("bg-primary");
+
+          readyIcon.classList.add("bg-tertiary");
+          stage2.classList.add("hidden");
+          stage3.classList.remove("hidden");
+        }
+      }
+    });
+  </script>
 </Layout>
