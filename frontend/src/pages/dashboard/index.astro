@@ -2,6 +2,7 @@
 import Layout from "../../layouts/layout.astro";
 import ReceivedOrderCard from "../../components/ReceivedOrderCard.astro";
 import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
+import { OrderStatus } from "../../lib/constant";
 ---
 
 <Layout title="Kitchen Dashboard">
@@ -77,7 +78,7 @@ import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
         ,
         customerName="Fernanda"
         ,
-        status="Received"
+        status={OrderStatus.Received}
         ,
         createdAt={4}
       />
@@ -87,7 +88,7 @@ import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
         ,
         customerName="John Smith"
         ,
-        status="Received"
+        status={OrderStatus.Received}
         ,
         createdAt={3}
       />
@@ -97,8 +98,7 @@ import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
         ,
         customerName="Sarah"
         ,
-        status="Received"
-        ,
+        status={OrderStatus.Received}
         createdAt={1}
       />
     </div>

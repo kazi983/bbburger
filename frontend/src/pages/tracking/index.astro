@@ -319,10 +319,7 @@ import "../../styles/tracking.css";
   <BottomNavBar active="order" />
 
   <script>
-    import { io } from "socket.io-client";
-
-    //connect to backend
-    const socket = io("http://localhost:3000");
+    import { socket } from "../../lib/socket";
 
     const statusOrder = document.getElementById("statusOrder");
 
