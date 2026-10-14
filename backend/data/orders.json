@@ -1,0 +1,224 @@
+[
+  {
+    "orderNum": 1001,
+    "customerName": "Miu",
+    "createdAt": "2026-10-13T10:30:00-07:00",
+    "status": "Preparing",
+    "items": [
+      {
+        "productId": 1,
+        "productName": "Aussie Burger",
+        "unitPrice": 12,
+        "quantity": 2
+      },
+      {
+        "productId": 5,
+        "productName": "French Fries",
+        "unitPrice": 6,
+        "quantity": 1
+      }
+    ],
+    "total": 30
+  },
+  {
+    "orderNum": 1002,
+    "customerName": "Emma",
+    "createdAt": "2026-10-13T10:35:00-07:00",
+    "status": "Received",
+    "items": [
+      {
+        "productId": 2,
+        "productName": "Kofta burger",
+        "unitPrice": 13.5,
+        "quantity": 1
+      },
+      {
+        "productId": 6,
+        "productName": "Coke",
+        "unitPrice": 3.5,
+        "quantity": 2
+      }
+    ],
+    "total": 20.5
+  },
+  {
+    "orderNum": 1003,
+    "customerName": "Noah",
+    "createdAt": "2026-10-13T10:40:00-07:00",
+    "status": "Ready",
+    "items": [
+      {
+        "productId": 3,
+        "productName": "Lamb Tzatziki Burger",
+        "unitPrice": 15.4,
+        "quantity": 1
+      },
+      {
+        "productId": 4,
+        "productName": "Yuca Fries",
+        "unitPrice": 10,
+        "quantity": 1
+      }
+    ],
+    "total": 25.4
+  },
+  {
+    "orderNum": 1004,
+    "customerName": "Olivia",
+    "createdAt": "2026-10-13T10:45:00-07:00",
+    "status": "Preparing",
+    "items": [
+      {
+        "productId": 5,
+        "productName": "French Fries",
+        "unitPrice": 6,
+        "quantity": 2
+      },
+      {
+        "productId": 7,
+        "productName": "Strawberry Milkshake",
+        "unitPrice": 5,
+        "quantity": 1
+      }
+    ],
+    "total": 17
+  },
+  {
+    "orderNum": 1005,
+    "customerName": "Liam",
+    "createdAt": "2026-10-13T10:50:00-07:00",
+    "status": "Received",
+    "items": [
+      {
+        "productId": 1,
+        "productName": "Aussie Burger",
+        "unitPrice": 12,
+        "quantity": 1
+      },
+      {
+        "productId": 8,
+        "productName": "Chocolate cake",
+        "unitPrice": 5,
+        "quantity": 2
+      }
+    ],
+    "total": 22
+  },
+  {
+    "orderNum": 1006,
+    "customerName": "Sophia",
+    "createdAt": "2026-10-13T11:00:00-07:00",
+    "status": "Ready",
+    "items": [
+      {
+        "productId": 2,
+        "productName": "Kofta burger",
+        "unitPrice": 13.5,
+        "quantity": 2
+      },
+      {
+        "productId": 6,
+        "productName": "Coke",
+        "unitPrice": 3.5,
+        "quantity": 1
+      }
+    ],
+    "total": 30.5
+  },
+  {
+    "orderNum": 1007,
+    "customerName": "James",
+    "createdAt": "2026-10-13T11:05:00-07:00",
+    "status": "Preparing",
+    "items": [
+      {
+        "productId": 4,
+        "productName": "Yuca Fries",
+        "unitPrice": 10,
+        "quantity": 1
+      },
+      {
+        "productId": 6,
+        "productName": "Coke",
+        "unitPrice": 3.5,
+        "quantity": 1
+      },
+      {
+        "productId": 8,
+        "productName": "Chocolate cake",
+        "unitPrice": 5,
+        "quantity": 1
+      }
+    ],
+    "total": 18.5
+  },
+  {
+    "orderNum": 1008,
+    "customerName": "Ava",
+    "createdAt": "2026-10-13T11:10:00-07:00",
+    "status": "Received",
+    "items": [
+      {
+        "productId": 3,
+        "productName": "Lamb Tzatziki Burger",
+        "unitPrice": 15.4,
+        "quantity": 2
+      },
+      {
+        "productId": 5,
+        "productName": "French Fries",
+        "unitPrice": 6,
+        "quantity": 1
+      }
+    ],
+    "total": 36.8
+  },
+  {
+    "orderNum": 1009,
+    "customerName": "Ethan",
+    "createdAt": "2026-10-13T11:15:00-07:00",
+    "status": "Ready",
+    "items": [
+      {
+        "productId": 7,
+        "productName": "Strawberry Milkshake",
+        "unitPrice": 5,
+        "quantity": 2
+      },
+      {
+        "productId": 8,
+        "productName": "Chocolate cake",
+        "unitPrice": 5,
+        "quantity": 1
+      }
+    ],
+    "total": 15
+  },
+  {
+    "orderNum": 1010,
+    "customerName": "Isabella",
+    "createdAt": "2026-10-13T11:20:00-07:00",
+    "status": "Preparing",
+    "items": [
+      {
+        "productId": 1,
+        "productName": "Aussie Burger",
+        "unitPrice": 12,
+        "quantity": 1
+      },
+      {
+        "productId": 2,
+        "productName": "Kofta burger",
+        "unitPrice": 13.5,
+        "quantity": 1
+      },
+      {
+        "productId": 6,
+        "productName": "Coke",
+        "unitPrice": 3.5,
+        "quantity": 1
+      }
+    ],
+    "total": 29
+  }
+]

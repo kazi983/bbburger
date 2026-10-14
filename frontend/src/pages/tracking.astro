@@ -93,10 +93,10 @@ import "../styles/tracking.css";
               class="h-14 w-full rounded border border-outline-variant/50 bg-surface-container-low pr-12 pl-12 font-body-lg text-body-lg font-semibold tracking-wider text-on-surface uppercase transition-all placeholder:text-outline/70 focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 focus:outline-none"
               id="order-id-input"
               name="orderId"
-              placeholder="e.g. FG-8429 or 10482"
+              placeholder="e.g. 1001"
               required
               type="text"
-              value="FG-8429"
+              value=""
               autocomplete="off"
             />
 
@@ -133,12 +133,6 @@ import "../styles/tracking.css";
               Grill Status Active
             </span>
           </div>
-
-          <span
-            class="text-label-sm font-label-sm font-medium text-on-surface-variant"
-          >
-            Est. Pickup: 12-16 mins
-          </span>
         </div>
 
         <p
@@ -183,33 +177,58 @@ import "../styles/tracking.css";
     }
   }
 
-  function handleSubmit(event: SubmitEvent) {
+  // Handle form submission
+  async function handleSubmit(event: SubmitEvent) {
+    // Prevent page refresh
     event.preventDefault();
 
-    if (!orderIdInput || !trackButton || !trackButtonText || !trackingMessage) {
+    // Check required elements
+    if (!orderIdInput || !trackButton || !trackButtonText || !trackingMessage)
       return;
-    }
 
-    const orderId = orderIdInput.value.trim();
+    // Get the order number
+    const orderNum = orderIdInput.value.trim();
 
-    if (!orderId) {
+    // Check if the input is empty
+    if (!orderNum) {
       trackingMessage.textContent = "Please enter your order number.";
       return;
     }
 
+    // Show loading status
     trackButton.disabled = true;
     trackButtonText.textContent = "Searching Live Kitchen...";
-    trackingMessage.textContent = `Searching for order ${orderId}...`;
 
-    window.setTimeout(() => {
+    try {
+      // Fetch order data from the backend
+      const response = await fetch(
+        `http://localhost:3000/api/orders/${encodeURIComponent(orderNum)}`,
+      );
+      const data = await response.json();
+
+      // Handle API errors
+      if (!response.ok) {
+        throw new Error(data.message || "Order not found.");
+      }
+
+      // Navigate to the order page
+      window.location.href = `/order?orderNum=${encodeURIComponent(orderNum)}`;
+    } catch (error) {
+      // Display error message
+      trackingMessage.textContent =
+        error instanceof Error
+          ? error.message
+          : "Unable to retrieve order information.";
+    } finally {
+      // Restore the button
       trackButton.disabled = false;
       trackButtonText.textContent = "Consult Order Status";
-
-      trackingMessage.textContent =
-        "Demo only: connect the backend API to retrieve the real order status.";
-    }, 700);
+    }
   }
 
+  // Clear the input when the clear button is clicked
   clearInputButton?.addEventListener("click", handleClearInput);
+
+  // Submit the form when the user clicks the button
   trackingForm?.addEventListener("submit", handleSubmit);
 </script>
