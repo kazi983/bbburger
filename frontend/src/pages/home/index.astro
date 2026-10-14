@@ -2,6 +2,7 @@
 import Layout from "../../layouts/layout.astro";
 import BottomNavBar from "../../components/BottomNavBar.astro";
 import ProductGallery from "../../components/ProductGallery.astro";
+import BurgerCustomizer from "../../components/BurgerCustomizer.astro";
 import products from "../../../../backend/data/product.json";
 
 const categories = [
@@ -215,7 +216,6 @@ const currency = new Intl.NumberFormat("en-CA", {
                   <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5">
                     <div>
                       <p class="text-xs text-on-surface-variant">Price</p>
-
                       <p class="text-lg font-bold text-primary">
                         {currency.format(product.price)}
                       </p>
@@ -224,7 +224,14 @@ const currency = new Intl.NumberFormat("en-CA", {
                     <button
                       type="button"
                       data-add-product={product.id}
-                      aria-label={`Add ${product.name} to cart`}
+                      aria-label={
+                        product.category === "burguer"
+                          ? `Customize ${product.name}`
+                          : `Add ${product.name} to cart`
+                      }
+                      aria-haspopup={
+                        product.category === "burguer" ? "dialog" : undefined
+                      }
                       class="rounded-full bg-primary-container px-5 py-2 font-semibold text-on-primary-container hover:bg-primary"
                     >
                       + Add
@@ -238,6 +245,8 @@ const currency = new Intl.NumberFormat("en-CA", {
       </section>
     </main>
   </div>
+
+  <BurgerCustomizer />
 
   <div
     id="cart-message"
@@ -253,7 +262,12 @@ const currency = new Intl.NumberFormat("en-CA", {
 
 <script>
   import products from "../../../../backend/data/product.json";
-  import { cart, loadCart, addToCart } from "../../stores/cartStore";
+  import {
+    cart,
+    loadCart,
+    addToCart,
+    type BurgerOptions,
+  } from "../../stores/cartStore";
 
   const filterButtons = document.querySelectorAll<HTMLButtonElement>(
     "#category-filters button",
@@ -289,6 +303,7 @@ const currency = new Intl.NumberFormat("en-CA", {
   const toast = document.querySelector<HTMLElement>("#cart-message");
 
   let toastTimer: ReturnType<typeof setTimeout> | undefined;
+  let selectedButton: HTMLButtonElement | null = null;
 
   function updateCartCount() {
     const count = cart.get().reduce((total, item) => {
@@ -328,15 +343,14 @@ const currency = new Intl.NumberFormat("en-CA", {
   function animateToCart(button: HTMLButtonElement) {
     if (!headerCart) return;
 
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
 
-    if (reducedMotion) return;
-
-    const card = button.closest("article");
-    const photo = card?.querySelector<HTMLImageElement>(
-      "[data-card-photo], .product-gallery img",
+    const photo = button.closest("article")?.querySelector<HTMLImageElement>(
+      "[data-card-photo], .product-gallery img"
     );
 
     if (!photo) return;
@@ -382,10 +396,7 @@ const currency = new Intl.NumberFormat("en-CA", {
 
     const flight = flyingPhoto.animate(
       [
-        {
-          transform: "translate(0, 0) scale(1)",
-          opacity: 1,
-        },
+        { transform: "translate(0, 0) scale(1)", opacity: 1 },
         {
           transform: `translate(${endX - startX}px, ${endY - startY}px) scale(0.25)`,
           opacity: 0,
@@ -413,23 +424,98 @@ const currency = new Intl.NumberFormat("en-CA", {
     flight.oncancel = () => flyingPhoto.remove();
   }
 
-  loadCart();
-  cart.subscribe(updateCartCount);
-
-  document
-    .querySelectorAll<HTMLButtonElement>("[data-add-product]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        const productId = Number(button.dataset.addProduct);
-        const product = products.find((product) => product.id === productId);
+  document.querySelectorAll<HTMLButtonElement>(
+    "[data-add-product]"
+  ).forEach((button) => {
+    button.addEventListener("click", () => {
+      const productId = Number(button.dataset.addProduct);
+      const product = products.find(
+        (product) => product.id === productId
+      );
 
         if (!product) return;
 
-        addToCart(productId);
-        showCartMessage(product.name);
-        animateToCart(button);
-      });
+      if (product.category === "burguer") {
+        const dialog = document.querySelector<HTMLDialogElement>(
+          `[data-burger-dialog="${productId}"]`
+        );
+
+        if (!dialog) return;
+
+        selectedButton = button;
+        dialog.querySelector<HTMLFormElement>("form")?.reset();
+        dialog.showModal();
+        return;
+      }
+
+      addToCart(productId);
+      showCartMessage(product.name);
+      animateToCart(button);
     });
+  });
+
+  document.querySelectorAll<HTMLDialogElement>(
+    "[data-burger-dialog]"
+  ).forEach((dialog) => {
+    dialog.querySelector("[data-close-customizer]")?.addEventListener(
+      "click",
+      () => dialog.close()
+    );
+
+    const form = dialog.querySelector<HTMLFormElement>(
+      "[data-burger-form]"
+    );
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const productId = Number(dialog.dataset.burgerDialog);
+      const product = products.find(
+        (product) => product.id === productId
+      );
+
+      if (!product || !form || !form.reportValidity()) return;
+
+      const formData = new FormData(form);
+      const doneness = formData.get("doneness");
+
+      if (
+        doneness !== "Medium rare" &&
+        doneness !== "Medium" &&
+        doneness !== "Well done"
+      ) {
+        return;
+      }
+
+      const options: BurgerOptions = {
+        removedIngredients: formData
+          .getAll("removedIngredients")
+          .filter(
+            (value): value is string =>
+              typeof value === "string" &&
+              product.ingredients.includes(value)
+          ),
+        doneness,
+      };
+
+      const sourceButton = selectedButton;
+
+      addToCart(productId, options);
+      dialog.close();
+      showCartMessage(product.name);
+
+      if (sourceButton) {
+        requestAnimationFrame(() => animateToCart(sourceButton));
+      }
+    });
+
+    dialog.addEventListener("close", () => {
+      selectedButton = null;
+    });
+  });
+
+  loadCart();
+  cart.subscribe(updateCartCount);
 </script>
 
 <style>
