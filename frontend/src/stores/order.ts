@@ -16,7 +16,7 @@ type OrderItem = {
 export type OrderMessage = {
   orderId: number;
   customerName: string;
-  receivedAt: number;
+  orderedAt: number;
   status: "Received" | "Preparing" | "Ready"| "Delivered";
   items: OrderItem[];
   total: number;
