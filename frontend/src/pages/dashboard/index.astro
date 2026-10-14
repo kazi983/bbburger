@@ -72,35 +72,21 @@ import { OrderStatus } from "../../lib/constant";
       ></span> Received Orders
     </h2>
 
-    <div class="md:grid md:grid-cols-2 md:gap-4 lg:grid lg:grid-cols-3">
+    <template id="receivedCardTemplate">
       <ReceivedOrderCard
-        orderID={123}
+        orderID={0}
         ,
-        customerName="Fernanda"
+        customerName=""
         ,
         status={OrderStatus.Received}
-        ,
-        createdAt={4}
+        createdAt={0}
       />
+    </template>
 
-      <ReceivedOrderCard
-        orderID={456}
-        ,
-        customerName="John Smith"
-        ,
-        status={OrderStatus.Received}
-        ,
-        createdAt={3}
-      />
-
-      <ReceivedOrderCard
-        orderID={789}
-        ,
-        customerName="Sarah"
-        ,
-        status={OrderStatus.Received}
-        createdAt={1}
-      />
+    <div
+      id="recievedOrdersContainer"
+      class="md:gap-4 md:grid lg:grid md:grid-cols-2 lg:grid-cols-3"
+    >
     </div>
 
     <h2 class="text-2xl font-bold my-10">
@@ -124,17 +110,23 @@ import { OrderStatus } from "../../lib/constant";
       <h3>ITEM SUMMARY</h3>
       <h3>COMPLETED AT</h3>
       <h3>TOTAL</h3>
-    </div>
-    <FinishedOrderCard
-      orderID={123}
-      ,
-      customerName="Sarah Ramirez"
-      ,
-      completedAt="3:55pm"
-      ,
-      total="21.50"
-    />
+    </div>finishedOrdersContainer
+    <div id="finishedOrdersContainer"></div>
 
+    <template id="finishedOrdersTemplate">
+    <FinishedOrderCard
+        orderID={0}
+      ,
+        customerName=""
+      ,
+        completedAt=""
+      ,
+        total=""
+    />
+    </template>
+
+    <!-- ========================================================================== -->
+    <!-- STUB -->
     <FinishedOrderCard
       orderID={456}
       ,
@@ -144,5 +136,90 @@ import { OrderStatus } from "../../lib/constant";
       ,
       total="16.20"
     />
+    <!-- ========================================================================== -->
   </main>
 </Layout>
+
+<script>
+  import { OrderStatus } from "../../lib/constant";
+  import { $orders, type Order } from "../../stores/order";
+
+  const receivedCardTemplate = document.getElementById("receivedCardTemplate");
+  const finishedOrdersTemplate = document.getElementById(
+    "finishedOrdersTemplate",
+  );
+  const recievedOrdersContainer = document.getElementById(
+    "recievedOrdersContainer",
+  );
+  const finishedOrdersContainer = document.getElementById(
+    "finishedOrdersContainer",
+  );
+
+  function renderOrders(orders: Order[]) {
+    orders.map((order) => {
+      if (!receivedCardTemplate || !finishedOrdersTemplate) return;
+      if (order.status === OrderStatus.Completed) {
+        // TODO render finished orders
+      } else {
+        // render on-going orders
+        const cloneCard = receivedCardTemplate.content.cloneNode(true);
+
+        cloneCard.querySelector(".js-order-id").textContent = order.orderId;
+        cloneCard.querySelector(".js-customer-name").textContent =
+          order.customerName;
+        cloneCard.querySelector(".js-status").textContent = order.status;
+
+        const itemsTemplate = cloneCard.querySelector(".js-items-template");
+
+        order.items?.forEach((item) => {
+          const cloneItemList = itemsTemplate.content.cloneNode(true);
+
+          cloneItemList.querySelector(".js-item-quantity").textContent =
+            `${item.quantity}x`;
+          cloneItemList.querySelector(".js-item-name").textContent =
+            item.productName;
+
+          cloneCard
+            .querySelector(".js-items-container")
+            ?.appendChild(cloneItemList);
+        });
+
+        recievedOrdersContainer?.appendChild(cloneCard);
+      }
+    });
+  }
+
+  $orders.subscribe((orders) => renderOrders(orders));
+
+  // ==========================================================================
+  // STUB
+
+  const testOrders = [
+    {
+      orderId: 123,
+      customerName: "Fernanda",
+      status: OrderStatus.Received,
+      createdAt: 4,
+      items: [
+        { productName: "Double Flame Burger", quantity: 2 },
+        { productName: "Mega Fries", quantity: 3 },
+        { productName: "Strawberry Milkshake", quantity: 1 },
+      ],
+    },
+    {
+      orderId: 456,
+      customerName: "Kazi",
+      status: OrderStatus.Received,
+      createdAt: 2,
+      items: [
+        { productName: "Cheese Flame Burger", quantity: 2 },
+        { productName: "Mega Fries", quantity: 10 },
+        { productName: "Vanila Milkshake", quantity: 1 },
+      ],
+    },
+  ];
+
+  renderOrders(testOrders);
+
+  // ==========================================================================
+</script>
