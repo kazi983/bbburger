@@ -20,7 +20,7 @@ type OrderLine = {
     lineTotal: number;
 };
 
-const TAX_RATE = 0.13;
+const TAX_RATE = 0.05;  //tax rate in BC
 const MAX_QUANTITY = 99;
 const MAX_NAME_LENGTH = 50;
 
@@ -110,31 +110,7 @@ app.get("/", (req: Request, res: Response) => {
     res.json({ message: "Cart API Server is running!" });
 });
 
-// 2. Get point to get the products data in the cart
-app.get("/api/cart", (req: Request, res: Response) => {
-    // Dummy products data in the cart
-    const cartItems = [
-        {
-            id: 1,
-            name: "Double Flame Cheeseburger",
-            price: 8.99,
-            quantity: 1,
-            description: "Med-Well, Extra Pickles",
-            tag: "Chef's Pick",
-            image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=200&q=80"
-        }
-    ];
-
-    res.status(200).json({
-        success: true,
-        items: cartItems,
-        subtotal: 8.99,
-        tax: 1.17,
-        total: 10.16
-    });
-});
-
-// 3. The endpoint(POST) to accept 'Place Order'
+// 2. The endpoint(POST) to accept 'Place Order'
 app.post("/api/orders", (req: Request, res: Response) => {
     try {
         // req.body is undefined when no JSON body is sent (Express 5)
@@ -174,7 +150,7 @@ app.post("/api/orders", (req: Request, res: Response) => {
     }
 });
 
-// 4. 404 handler for unknown routes (return JSON instead of HTML)
+// 3. 404 handler for unknown routes (return JSON instead of HTML)
 app.use((req: Request, res: Response) => {
     res.status(404).json({
         success: false,
@@ -182,7 +158,7 @@ app.use((req: Request, res: Response) => {
     });
 });
 
-// 5. Error handler, e.g. invalid JSON body (return JSON instead of HTML)
+// 4. Error handler, e.g. invalid JSON body (return JSON instead of HTML)
 app.use((err: { status?: number }, req: Request, res: Response, next: NextFunction) => {
     const status = err.status || 500;
     if (status >= 500) {
