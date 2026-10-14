@@ -1,0 +1,14 @@
+---
+export interface Props {
+	total?: number;
+}
+
+//Dummy data
+const { total = 19.19 } = Astro.props;
+---
+
+<div class="fixed bottom-0 left-0 right-0 bg-surface-container-lowest border-t border-outline-variant px-margin-mobile py-space-md shadow-[0_-4px_10px_rgba(0,0,0,0.03)] z-20">
+	<button id="place-order-btn" class="bg-primary-container text-on-primary px-space-lg py-3 rounded-default font-label-md text-label-md shadow-md hover:bg-primary transition-colors cursor-pointer w-full">
+		🍴 Place Order - CAD {total.toFixed(2)}  →
+	</button>
+</div>

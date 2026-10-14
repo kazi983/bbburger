@@ -90,6 +90,21 @@
   animation: progressEnter 1s ease-out both;
 }
 
+@keyframes progressFinal {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+.animate-progress-final {
+  width: 100%;
+  animation: progressFinal 1s ease-out both;
+}
+
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .animate-radar-wave,

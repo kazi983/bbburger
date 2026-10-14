@@ -1,0 +1,148 @@
+---
+import Layout from "../../layouts/layout.astro";
+import ReceivedOrderCard from "../../components/ReceivedOrderCard.astro";
+import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
+import { OrderStatus } from "../../lib/constant";
+---
+
+<Layout title="Kitchen Dashboard">
+  <main class="pt-20">
+    <div class="bg-white p-3 shadow-lg">
+      <div class="lg:grid lg:grid-cols-2">
+        <h1 class="text-4xl font-bold mt-5 mb-8">Kitchen Operation</h1>
+
+        <div class="grid grid-cols-4 gap-2 mb-5">
+          <button
+            id="receivedBtn"
+            class="flex flex-col items-center bg-[#F7ECE7] p-2 border border-[#f3cabc] cursor-pointer"
+          >
+            <h2 class="text-[#5D403A] text-sm">RECEIVED</h2>
+            <p class="text-3xl font-bold text-[#A91A00]">1</p>
+          </button>
+
+          <button
+            class="flex flex-col items-center bg-[#F7ECE7] p-2 border border-[#f3cabc] cursor-pointer"
+          >
+            <h2 class="text-[#5D403A] text-sm">PREPARING</h2>
+            <p class="text-3xl font-bold text-[#FFAA00]">1</p>
+          </button>
+
+          <button
+            class="flex flex-col items-center bg-[#F7ECE7] p-2 border border-[#f3cabc] cursor-pointer"
+          >
+            <h2 class="text-[#5D403A] text-sm">READY</h2>
+            <p class="text-3xl font-bold text-[#0B631B]">1</p>
+          </button>
+
+          <button
+            class="flex flex-col items-center bg-[#F7ECE7] p-2 border border-[#f3cabc] cursor-pointer"
+          >
+            <h2 class="text-[#5D403A] text-sm">DONE</h2>
+            <p class="text-3xl font-bold text-black">1</p>
+          </button>
+        </div>
+      </div>
+
+      <hr class="my-4 border-t border-[#f4e2dc]" />
+
+      <div class="flex flex-row items-center justify-end sm:gap-1">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="1em"
+          height="1em"
+          viewBox="0 0 24 24"
+        >
+          <path d="M0 0h24v24H0z" fill="none"></path>
+          <path
+            fill="none"
+            stroke="#0B631B"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 16H5v5m9-13h5V3M4.583 9.003a8 8 0 0 1 14.331-1.027m.504 7.021a8 8 0 0 1-14.332 1.027"
+          ></path>
+        </svg>
+
+        <span class="text-[#5D403A] text-xs">Auto-refreshing (1s) </span>
+      </div>
+    </div>
+
+    <h2 class="text-2xl font-bold my-10">
+      <span class="h-3 w-3 animate-pulse bg-[#D62201] rounded-full inline-block"
+      ></span> Received Orders
+    </h2>
+
+    <div class="md:grid md:grid-cols-2 md:gap-4 lg:grid lg:grid-cols-3">
+      <ReceivedOrderCard
+        orderID={123}
+        ,
+        customerName="Fernanda"
+        ,
+        status={OrderStatus.Received}
+        ,
+        createdAt={4}
+      />
+
+      <ReceivedOrderCard
+        orderID={456}
+        ,
+        customerName="John Smith"
+        ,
+        status={OrderStatus.Received}
+        ,
+        createdAt={3}
+      />
+
+      <ReceivedOrderCard
+        orderID={789}
+        ,
+        customerName="Sarah"
+        ,
+        status={OrderStatus.Received}
+        createdAt={1}
+      />
+    </div>
+
+    <h2 class="text-2xl font-bold my-10">
+      <span
+        class="h-3
+    w-3
+    animate-pulse
+    bg-[#0B631B]
+    rounded-full
+    inline-block"
+      >
+      </span> Finished Orders
+    </h2>
+
+    <div
+      class="hidden md:grid md:grid-cols-6 md:items-center md:gap-2 md:p-5 md:bg-[#f6d1c0] md:font-bold"
+    >
+      <h3>ORDER #</h3>
+      <h3>STATUS</h3>
+      <h3>CUSTOMER</h3>
+      <h3>ITEM SUMMARY</h3>
+      <h3>COMPLETED AT</h3>
+      <h3>TOTAL</h3>
+    </div>
+    <FinishedOrderCard
+      orderID={123}
+      ,
+      customerName="Sarah Ramirez"
+      ,
+      completedAt="3:55pm"
+      ,
+      total="21.50"
+    />
+
+    <FinishedOrderCard
+      orderID={456}
+      ,
+      customerName="John Wallace"
+      ,
+      completedAt="4:00pm"
+      ,
+      total="16.20"
+    />
+  </main>
+</Layout>
