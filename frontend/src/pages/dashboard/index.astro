@@ -72,35 +72,19 @@ import { OrderStatus } from "../../lib/constant";
       ></span> Received Orders
     </h2>
 
-    <div class="md:grid md:grid-cols-2 md:gap-4 lg:grid lg:grid-cols-3">
+    <template id="receivedCardTemplate">
       <ReceivedOrderCard
-        orderID={123}
-        ,
-        customerName="Fernanda"
-        ,
+        orderID={0}
+        customerName=""
         status={OrderStatus.Received}
-        ,
-        createdAt={4}
+        createdAt={0}
       />
+    </template>
 
-      <ReceivedOrderCard
-        orderID={456}
-        ,
-        customerName="John Smith"
-        ,
-        status={OrderStatus.Received}
-        ,
-        createdAt={3}
-      />
-
-      <ReceivedOrderCard
-        orderID={789}
-        ,
-        customerName="Sarah"
-        ,
-        status={OrderStatus.Received}
-        createdAt={1}
-      />
+    <div
+      id="receivedOrdersContainer"
+      class="md:gap-4 md:grid lg:grid md:grid-cols-2 lg:grid-cols-3"
+    >
     </div>
 
     <h2 class="text-2xl font-bold my-10">
@@ -125,24 +109,244 @@ import { OrderStatus } from "../../lib/constant";
       <h3>COMPLETED AT</h3>
       <h3>TOTAL</h3>
     </div>
-    <FinishedOrderCard
-      orderID={123}
-      ,
-      customerName="Sarah Ramirez"
-      ,
-      completedAt="3:55pm"
-      ,
-      total="21.50"
-    />
+    <div id="finishedOrdersContainer"></div>
 
-    <FinishedOrderCard
-      orderID={456}
-      ,
-      customerName="John Wallace"
-      ,
-      completedAt="4:00pm"
-      ,
-      total="16.20"
-    />
+    <template id="finishedOrdersTemplate">
+      <FinishedOrderCard orderID={0} customerName="" completedAt="" total="" />
+    </template>
   </main>
 </Layout>
+
+<script>
+  import { OrderStatus } from "../../lib/constant";
+  import { $orders, type Order } from "../../stores/order";
+
+  const receivedCardTemplate = document.querySelector<HTMLTemplateElement>(
+    "#receivedCardTemplate",
+  );
+  const finishedOrdersTemplate = document.querySelector<HTMLTemplateElement>(
+    "#finishedOrdersTemplate",
+  );
+  const receivedOrdersContainer = document.getElementById(
+    "receivedOrdersContainer",
+  );
+  const finishedOrdersContainer = document.getElementById(
+    "finishedOrdersContainer",
+  );
+
+  function setText(root: ParentNode, selector: string, text: string) {
+    root.querySelector(selector)!.textContent = text;
+  }
+
+  function formatMinutesAgo(orderedAt: number) {
+    const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    const diffMinutes = Math.floor((Date.now() - orderedAt) / 60_000);
+
+    if (diffMinutes === 0) return "Just now";
+    else return rtf.format(-diffMinutes, "minute");
+  }
+
+  function renderOrders(orders: readonly Order[]) {
+    if (!receivedCardTemplate || !finishedOrdersTemplate) return;
+    receivedOrdersContainer?.replaceChildren();
+    finishedOrdersContainer?.replaceChildren();
+
+    orders.forEach((order) => {
+      if (order.status === OrderStatus.Completed) {
+        // render finished orders
+
+        const cloneCard = finishedOrdersTemplate.content.cloneNode(
+          true,
+        ) as DocumentFragment;
+
+        setText(cloneCard, ".js-order-id", `#${order.orderId}`);
+        setText(cloneCard, ".js-customer-name", order.customerName);
+        setText(cloneCard, ".js-total", `CAD ${order.total.toFixed(2)}`);
+
+        const itemStr = order.items
+          .map((item) => `${item.quantity}x ${item.productName}`)
+          .join(", ");
+        setText(cloneCard, ".js-items", itemStr);
+
+        if (order.completedAt) {
+          const completedTimeStr = new Date(
+            order.completedAt,
+          ).toLocaleTimeString("en-US", {
+            // TODO: Are we gonna show only today's orders?
+            hour: "numeric",
+            minute: "2-digit",
+          });
+          setText(cloneCard, ".js-completed-at", completedTimeStr);
+        }
+
+        finishedOrdersContainer?.appendChild(cloneCard);
+      } else {
+        // render on-going orders
+
+        const cloneCard = receivedCardTemplate.content.cloneNode(
+          true,
+        ) as DocumentFragment;
+
+        setText(cloneCard, ".js-order-id", `#${order.orderId}`);
+        setText(cloneCard, ".js-customer-name", order.customerName);
+        setText(cloneCard, ".js-status", order.status);
+        setText(cloneCard, ".js-ordered-at", formatMinutesAgo(order.orderedAt));
+
+        // Keep the raw timestamp on the element for periodic re-rendering
+        cloneCard.querySelector<HTMLElement>(
+          ".js-ordered-at",
+        )!.dataset.orderedAt = String(order.orderedAt);
+
+        const itemsTemplate =
+          cloneCard.querySelector<HTMLTemplateElement>(".js-items-template")!;
+        const itemsContainer = cloneCard.querySelector(".js-items-container")!;
+
+        order.items.forEach((item) => {
+          const cloneItemList = itemsTemplate.content.cloneNode(
+            true,
+          ) as HTMLElement;
+
+          setText(cloneItemList, ".js-item-quantity", `${item.quantity}x`);
+          setText(cloneItemList, ".js-item-name", item.productName);
+
+          itemsContainer.appendChild(cloneItemList);
+        });
+
+        receivedOrdersContainer?.appendChild(cloneCard);
+      }
+    });
+  }
+
+  // update only the elapsed-time labels every 30 seconds
+  setInterval(() => {
+    document
+      .querySelectorAll<HTMLElement>(".js-ordered-at[data-ordered-at]")
+      .forEach((el) => {
+        el.textContent = formatMinutesAgo(Number(el.dataset.orderedAt));
+      });
+  }, 30_000);
+
+  $orders.subscribe(renderOrders);
+
+  // ==========================================================================
+  // STUB
+
+  const testOrders: Order[] = [
+    {
+      orderId: 123,
+      customerName: "Fernanda",
+      status: OrderStatus.Received,
+      orderedAt: new Date("2026/10/14 17:55").getTime(),
+      total: 50,
+      items: [
+        {
+          productId: 1,
+          unitPrice: 1,
+          productName: "Double Flame Burger",
+          quantity: 2,
+        },
+        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 3 },
+        {
+          productId: 1,
+          unitPrice: 1,
+          productName: "Strawberry Milkshake",
+          quantity: 1,
+        },
+      ],
+    },
+    {
+      orderId: 456,
+      customerName: "Kazi",
+      status: OrderStatus.Received,
+      orderedAt: new Date("2026/10/14 18:00").getTime(),
+      total: 50,
+      items: [
+        {
+          productId: 1,
+          unitPrice: 1,
+          productName: "Double Flame Burger",
+          quantity: 2,
+        },
+        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 3 },
+        {
+          productId: 1,
+          unitPrice: 1,
+          productName: "Strawberry Milkshake",
+          quantity: 1,
+        },
+      ],
+    },
+    {
+      orderId: 888,
+      customerName: "Kazi",
+      status: OrderStatus.Received,
+      orderedAt: Date.now(),
+      total: 50,
+      items: [
+        {
+          productId: 1,
+          unitPrice: 1,
+          productName: "Double Flame Burger",
+          quantity: 2,
+        },
+        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 3 },
+        {
+          productId: 1,
+          unitPrice: 1,
+          productName: "Strawberry Milkshake",
+          quantity: 1,
+        },
+      ],
+    },
+    {
+      orderId: 789,
+      customerName: "Kazi",
+      status: OrderStatus.Completed,
+      orderedAt: 2,
+      completedAt: Date.now(),
+      total: 50,
+      items: [
+        {
+          productId: 1,
+          unitPrice: 1,
+          productName: "Cheese Flame Burger",
+          quantity: 2,
+        },
+        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 10 },
+        {
+          productId: 1,
+          unitPrice: 1,
+          productName: "Vanila Milkshake",
+          quantity: 1,
+        },
+      ],
+    },
+    {
+      orderId: 190,
+      customerName: "Kazi",
+      status: OrderStatus.Completed,
+      orderedAt: 2,
+      completedAt: Date.now(),
+      total: 50,
+      items: [
+        {
+          productId: 1,
+          unitPrice: 1,
+          productName: "Cheese Flame Burger",
+          quantity: 2,
+        },
+        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 10 },
+        {
+          productId: 1,
+          unitPrice: 1,
+          productName: "Vanila Milkshake",
+          quantity: 1,
+        },
+      ],
+    },
+  ];
+
+  renderOrders(testOrders);
+
+  // ==========================================================================
+</script>
