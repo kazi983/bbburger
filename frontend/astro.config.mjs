@@ -9,8 +9,5 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
-  //Since we will use /cart, comment out the redirect route
-  // redirects: {
-  //   "/cart": "/order-summary",
-  // },
+ 
 });

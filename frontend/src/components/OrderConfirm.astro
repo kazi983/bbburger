@@ -1,6 +1,6 @@
 ---
 export interface Props {
-	id?: number | string;
+	id?: number;
 	name?: string;
 }
 
@@ -27,7 +27,7 @@ const { id = "-", name = "Guest" } = Astro.props;
 	</div>
 
 	<!-- Pickup Window time  (current time is dummy)-->
-	<div class="bg-secondary-fixed rounded-default p-space-md flex items-center gap-gutter border border-outline-variant/40 shadow-sm lg:justify-center">
+	<div class="bg-secondary-fixed rounded-default p-space-md flex items-center gap-gutter border border-outline-variant/40 shadow-sm">
 		<div class="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center text-xl shrink-0">
 			⏱️
 		</div>
