@@ -12,7 +12,8 @@
     role="status"
     aria-live="polite"
     class="min-h-5 text-sm text-on-surface-variant"
-  ></p>
+  >
+  </p>
 </div>
 
 <script>
@@ -38,9 +39,7 @@
     let hasItems = false;
 
     cart.get().forEach((item) => {
-      const product = products.find(
-        (product) => product.id === item.productId
-      );
+      const product = products.find((product) => product.id === item.productId);
 
       if (!product) return;
 
@@ -66,7 +65,7 @@
 
   button?.addEventListener("click", async () => {
     const nameInput = document.querySelector<HTMLInputElement>(
-      "#customer-name-input"
+      "#customer-name-input",
     );
     const nameError = document.querySelector("#customer-name-error");
 
@@ -75,9 +74,7 @@
     const customerName = nameInput.value.trim();
     const hasName = customerName.length > 0;
 
-    nameInput.setCustomValidity(
-      hasName ? "" : "Please enter your name."
-    );
+    nameInput.setCustomValidity(hasName ? "" : "Please enter your name.");
     nameInput.setAttribute("aria-invalid", String(!hasName));
 
     if (nameError) {

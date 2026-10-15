@@ -4,13 +4,15 @@ import dotenv from "dotenv";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { registerOrderSockets } from "./sockets/orderSocket";
+import orderRoutes from "./routes/orders";
 
 dotenv.config();
 const app = express();
 
 app.use(cors({ origin: "http://localhost:4321", credentials: true }));
+app.use("/orders", orderRoutes);
 
-const port = process.env.POR || 3000;
+const port = process.env.PORT || 3000;
 
 const server = createServer(app);
 
