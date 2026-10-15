@@ -138,7 +138,7 @@ import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
 
 <script>
   import { socket } from "../../lib/socket";
-  import type { Order } from "../../../../shared/types";
+  import type { Order, OrderStatus } from "../../../../shared/types";
   import { fetchOrders } from "../../lib/order";
   import { getMe, logout } from "../../lib/auth";
   import { showErrorToast } from "../../lib/toast";
@@ -223,6 +223,99 @@ import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
     else return rtf.format(-diffMinutes, "minute");
   }
 
+  function applyStatusStyle(
+    cardElem: HTMLElement | DocumentFragment,
+    status: OrderStatus,
+  ) {
+    const statusElem = cardElem.querySelector(".statusReceived");
+    const borderElem = cardElem.querySelector(".cardBorder");
+    const containerElem = cardElem.querySelector(".cardContainer");
+    const prepBtn = cardElem.querySelector<HTMLButtonElement>(".prepareBtn");
+    const readyBtn = cardElem.querySelector<HTMLButtonElement>(".readyBtn");
+    const deliverBtn = cardElem.querySelector<HTMLButtonElement>(".deliverBtn");
+
+    if (
+      !prepBtn ||
+      !readyBtn ||
+      !deliverBtn ||
+      !statusElem ||
+      !borderElem ||
+      !containerElem
+    )
+      return;
+
+    if (status === "Preparing") {
+      statusElem.textContent = "Preparing";
+      statusElem.classList.remove("bg-error-container");
+      statusElem.classList.add("bg-secondary-fixed");
+
+      borderElem.classList.remove("border-primary-container");
+      borderElem.classList.add("border-secondary-fixed-dim");
+
+      containerElem.classList.remove("hover:border-primary-container");
+      containerElem.classList.add("hover:border-secondary-fixed-dim");
+
+      prepBtn.disabled = true;
+      prepBtn.classList.remove("bg-surface-container", "cursor-pointer");
+      prepBtn.classList.add("cursor-not-allowed", "bg-secondary-fixed-dim");
+
+      readyBtn.disabled = false;
+      readyBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      readyBtn.classList.add("cursor-pointer");
+    } else if (status === "Ready") {
+      statusElem.textContent = "Ready";
+      statusElem.classList.remove("bg-secondary-fixed");
+      statusElem.classList.add("bg-tertiary-fixed-dim");
+
+      borderElem.classList.remove("border-secondary-fixed-dim");
+      borderElem.classList.add("border-tertiary-container");
+
+      containerElem.classList.remove("hover:border-secondary-fixed-dim");
+      containerElem.classList.add("hover:border-tertiary-container");
+
+      prepBtn.classList.remove("cursor-pointer");
+      prepBtn.classList.add("opacity-50", "cursor-not-allowed");
+
+      prepBtn.disabled = true;
+      readyBtn.disabled = true;
+      readyBtn.classList.remove(
+        "bg-surface-container",
+        "text-on-surface-variant",
+      );
+      readyBtn.classList.add(
+        "cursor-not-allowed",
+        "bg-tertiary-container",
+        "text-white",
+      );
+
+      deliverBtn.disabled = false;
+      deliverBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      deliverBtn.classList.add("cursor-pointer");
+    } else if (status === "Delivered") {
+      statusElem.textContent = "Delivered";
+      statusElem.classList.remove("bg-tertiary-fixed-dim");
+      statusElem.classList.add("bg-gray-200");
+
+      borderElem.classList.remove("border-tertiary-container");
+      borderElem.classList.add("border-black");
+
+      containerElem.classList.remove("hover:border-tertiary-container");
+      containerElem.classList.add("hover:border-black");
+
+      readyBtn.classList.remove("cursor-pointer");
+      readyBtn.classList.add("opacity-50", "cursor-not-allowed");
+
+      prepBtn.disabled = true;
+      readyBtn.disabled = true;
+      deliverBtn.disabled = true;
+      deliverBtn.classList.remove(
+        "bg-surface-container",
+        "text-on-surface-variant",
+      );
+      deliverBtn.classList.add("bg-black", "text-white");
+    }
+  }
+
   function renderOrders(orders: Order[]) {
     if (!receivedCardTemplate || !finishedOrdersTemplate) return;
     receivedOrdersContainer?.replaceChildren();
@@ -293,6 +386,8 @@ import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
 
           itemsContainer.appendChild(cloneItemList);
         });
+
+        applyStatusStyle(cloneCard, order.status);
 
         receivedOrdersContainer?.appendChild(cloneCard);
       }
