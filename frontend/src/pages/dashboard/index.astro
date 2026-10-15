@@ -23,6 +23,14 @@ import { OrderStatus } from "../../lib/constant";
 
       <span class="font-bold text-primary sm:text-2xl">Awshaf BBB</span>
     </div>
+    <button
+      id="logout-button"
+      type="button"
+      class="rounded-lg bg-primary-container px-4 py-2 font-bold text-on-primary-container"
+      hidden
+    >
+      Log Out
+    </button>
   </header>
 
   <main id="dashboard" class="pt-5 px-5 pb-10" hidden>
@@ -129,24 +137,37 @@ import { OrderStatus } from "../../lib/constant";
 </Layout>
 
 <script>
-  import { getMe } from "../../lib/auth";
   import { socket } from "../../lib/socket";
   import type { Order } from "../../../../shared/types";
   import { fetchOrders } from "../../lib/order";
+  import { getMe, logout } from "../../lib/auth";
+
+  const logoutButton =
+    document.querySelector<HTMLButtonElement>("#logout-button");
 
   function showDashboard() {
     document.getElementById("dashboard")!.hidden = false;
+
+    if (logoutButton) {
+      logoutButton.hidden = false;
+    }
   }
 
   // On page load: check the existing session
-  // const me = await getMe();
-  // if (me) showDashboard();
-  // else window.location.href = "/login";
-
-  // HACK
-  showDashboard();
+  const me = await getMe();
+  if (me) showDashboard();
+  else window.location.href = "/login";
 
   // Render orders
+  logoutButton?.addEventListener("click", async () => {
+    try {
+      await logout();
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed.", error);
+    }
+  });
+
   const receivedCounter = document.getElementById("receivedCounter");
   const preparingCounter = document.getElementById("preparingCounter");
   const readyCounter = document.getElementById("readyCounter");
@@ -286,7 +307,6 @@ import { OrderStatus } from "../../lib/constant";
   }, 30_000);
 
   const orders = await fetchOrders();
-  console.log(orders);
   renderOrders(orders);
   updateCounters(orders);
 

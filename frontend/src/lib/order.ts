@@ -18,8 +18,8 @@ export async function sendStatusUpdate(orderId: number, status: string) {
 
 export async function fetchOrders(): Promise<Order[]> {
   try {
-    const res = await fetch(`${API_URL}/orders`);
-    if (!res.ok) throw new Error("Failed to fetch orders");
+    const res = await fetch(`${API_URL}/orders/`);
+    if (!res.ok) console.error("Failed to fetch orders:", res.statusText);
     return res.json();
   } catch (err) {
     console.error("Network error:", err);

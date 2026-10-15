@@ -1,0 +1,252 @@
+---
+import Layout from "../../layouts/layout.astro";
+---
+
+<Layout title="Login | Awshaf BBB">
+  <main class="min-h-screen bg-background px-4 py-8 sm:px-6">
+    <section
+      class="mx-auto flex min-h-screen w-full max-w-[430px] flex-col items-center"
+    >
+      <!-- Top Brand Area -->
+      <div class="mb-6 flex flex-col items-center pt-4">
+        <div
+          class="relative mb-5 flex h-[132px] w-[132px] items-center justify-center rounded-full bg-primary-container shadow-lg"
+        >
+          <span
+            class="material-symbols-outlined fill-icon text-on-primary-container"
+            style="font-size: 64px;"
+            aria-hidden="true"
+          >
+            local_fire_department
+          </span>
+
+          <div
+            class="absolute bottom-[10px] right-[2px] flex h-[38px] w-[38px] items-center justify-center rounded-full bg-secondary-container shadow-md"
+          >
+            <span
+              class="material-symbols-outlined fill-icon text-on-secondary-container"
+              style="font-size: 20px;"
+              aria-hidden="true"
+            >
+              bolt
+            </span>
+          </div>
+        </div>
+
+        <h1
+          class="mb-2 text-center font-headline text-[34px] font-bold leading-none text-primary"
+        >
+          Awshaf BBB
+        </h1>
+
+        <p
+          class="text-center text-[16px] font-medium text-on-surface-variant sm:text-[17px]"
+        >
+          Flame-Grilled Flavor, Delivered Fast
+        </p>
+      </div>
+
+      <!-- Login Card -->
+      <section
+        class="w-full rounded-[36px] border border-outline-variant bg-surface-container-lowest px-6 pb-8 pt-8 shadow-sm sm:px-8"
+      >
+        <!-- Error Message -->
+        <div
+          id="login-error"
+          class="mb-5 hidden rounded-default bg-error-container px-4 py-3 text-body-sm text-on-error-container"
+          role="alert"
+          aria-live="polite"
+        ></div>
+
+        <form id="login-form" class="space-y-6">
+          <!-- Email -->
+          <div>
+            <label
+              for="email"
+              class="mb-3 block font-headline text-[18px] font-semibold text-on-surface"
+            >
+              Email
+            </label>
+
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-outline"
+                style="font-size: 26px;"
+                aria-hidden="true"
+              >
+                account_circle
+              </span>
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                required
+                placeholder="e.g. alex@example.com"
+                class="h-[78px] w-full rounded-[24px] border border-outline-variant bg-surface pl-[74px] pr-5 text-[18px] text-on-surface placeholder:text-outline outline-none transition focus:border-primary-container focus:ring-2 focus:ring-primary-fixed"
+              />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <div class="mb-3 flex items-center justify-between gap-4">
+              <label
+                for="password"
+                class="block font-headline text-[18px] font-semibold text-on-surface"
+              >
+                Password
+              </label>
+
+              <button
+                type="button"
+                class="text-[14px] font-bold text-primary"
+              >
+                Forgot Password?
+              </button>
+            </div>
+
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-outline"
+                style="font-size: 24px;"
+                aria-hidden="true"
+              >
+                lock
+              </span>
+
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+                placeholder="••••••••••"
+                class="h-[78px] w-full rounded-[24px] border border-outline-variant bg-surface pl-[74px] pr-[68px] text-[18px] tracking-[0.18em] text-on-surface placeholder:text-outline outline-none transition focus:border-primary-container focus:ring-2 focus:ring-primary-fixed"
+              />
+
+              <button
+                id="toggle-password"
+                type="button"
+                class="absolute right-5 top-1/2 -translate-y-1/2 text-outline"
+                aria-label="Show password"
+              >
+                <span
+                  class="material-symbols-outlined"
+                  style="font-size: 26px;"
+                  aria-hidden="true"
+                >
+                  visibility
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Remember Me -->
+          <label class="flex items-center gap-3 pt-1">
+            <input
+              id="remember"
+              name="remember"
+              type="checkbox"
+              class="h-5 w-5 accent-primary"
+            />
+
+            <span class="text-[18px] font-medium text-on-surface">
+              Remember me
+            </span>
+          </label>
+
+          <!-- Login Button -->
+          <button
+            type="submit"
+            class="mt-2 flex h-[82px] w-full items-center justify-center gap-3 rounded-full bg-primary-container px-6 text-[22px] font-bold text-on-primary-container transition hover:bg-primary active:scale-[0.99]"
+          >
+            <span>Log In</span>
+
+            <span
+              class="material-symbols-outlined"
+              style="font-size: 30px;"
+              aria-hidden="true"
+            >
+              arrow_right_alt
+            </span>
+          </button>
+        </form>
+      </section>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  import { login } from "../../lib/auth";
+
+  const form = document.querySelector("#login-form");
+  const errorBox = document.querySelector("#login-error");
+
+  const passwordInput =
+    document.querySelector<HTMLInputElement>("#password");
+
+  const togglePassword =
+    document.querySelector<HTMLButtonElement>("#toggle-password");
+
+  togglePassword?.addEventListener("click", () => {
+    if (!passwordInput) return;
+
+    const isHidden = passwordInput.type === "password";
+
+    passwordInput.type = isHidden ? "text" : "password";
+
+    const icon = togglePassword.querySelector(
+      ".material-symbols-outlined",
+    );
+
+    if (icon) {
+      icon.textContent = isHidden ? "visibility_off" : "visibility";
+    }
+
+    togglePassword.setAttribute(
+      "aria-label",
+      isHidden ? "Hide password" : "Show password",
+    );
+  });
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!errorBox || !(form instanceof HTMLFormElement)) return;
+
+    errorBox.classList.add("hidden");
+    errorBox.textContent = "";
+
+    const formData = new FormData(form);
+
+    const email = String(formData.get("email") || "").trim();
+    const password = String(formData.get("password") || "");
+
+    try {
+      await login(email, password);
+
+      window.location.href = "/dashboard";
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Invalid email or password."
+      ) {
+        errorBox.textContent =
+          "Invalid email or password. Please try again.";
+      } else if (
+        error instanceof Error &&
+        error.message === "Login failed."
+      ) {
+        errorBox.textContent =
+          "Login failed. Please try again.";
+      } else {
+        errorBox.textContent =
+          "Unable to connect to the server.";
+      }
+
+      errorBox.classList.remove("hidden");
+    }
+  });
+</script>

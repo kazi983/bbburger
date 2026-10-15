@@ -59,13 +59,13 @@ import "../../styles/tracking.css";
       <h2
         class="mt-1 text-headline-md font-headline-md font-bold text-on-surface"
       >
-        In-Store &amp; Counter Status
+        Your Order Status
       </h2>
 
       <p
         class="mt-1 max-w-sm text-body-md font-body-md text-on-surface-variant"
       >
-        Check your counter or dine-in order status in real-time right from our
+        Check your order status in real-time right from our
         kitchen to the pickup counter.
       </p>
     </section>
@@ -210,6 +210,8 @@ import "../../styles/tracking.css";
         throw new Error(data.message || "Order not found.");
       }
 
+      // for show order button after get orderId
+      sessionStorage.setItem("orderNum", orderNum);
       // Navigate to the order page
       window.location.href = `/tracking?orderNum=${encodeURIComponent(orderNum)}`;
     } catch (error) {
