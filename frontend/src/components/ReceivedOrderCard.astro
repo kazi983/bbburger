@@ -112,102 +112,120 @@ const { orderID, customerName, status, createdAt } = Astro.props;
 </div>
 
 <script>
-  import { socket } from "../lib/socket";
-
-  function sendStatusUpdate(status: string) {
-    socket.emit("updated_status", status);
+  function sendStatusUpdate(orderId: number, status: string) {
+    fetch("/api/orders/update-status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderId,
+        status,
+      }),
+    });
   }
 
-  const cards = document.querySelectorAll(".receivedCard");
+  // Event delegation: cards are cloned from a <template> and rebuilt on every
+  // socket update, so a single listener on document handles all of them.
+  document.addEventListener("click", (e) => {
+    const btn = (e.target as Element).closest<HTMLButtonElement>(
+      ".prepareBtn, .readyBtn, .deliverBtn",
+    );
+    if (!btn || btn.disabled) return;
 
-  cards.forEach((card) => {
-    const prepBtn = card.querySelector(".prepareBtn") as HTMLButtonElement;
-    const readyBtn = card.querySelector(".readyBtn") as HTMLButtonElement;
-    const deliverBtn = card.querySelector(".deliverBtn") as HTMLButtonElement;
+    const card = btn.closest<HTMLElement>(".receivedCard");
+    if (!card) return;
+
+    const prepBtn = card.querySelector<HTMLButtonElement>(".prepareBtn");
+    const readyBtn = card.querySelector<HTMLButtonElement>(".readyBtn");
+    const deliverBtn = card.querySelector<HTMLButtonElement>(".deliverBtn");
     const status = card.querySelector(".statusReceived");
     const border = card.querySelector(".cardBorder");
     const container = card.querySelector(".cardContainer");
+    if (
+      !prepBtn ||
+      !readyBtn ||
+      !deliverBtn ||
+      !status ||
+      !border ||
+      !container
+    )
+      return;
 
-    prepBtn?.addEventListener("click", () => {
-      if (status && border && container && prepBtn) {
-        status.textContent = "Preparing";
-        status.classList.remove("bg-bg-error-container");
-        status.classList.add("bg-secondary-fixed");
+    const orderId = Number(card.dataset.orderId);
 
-        border.classList.remove("border-primary-container");
-        border.classList.add("border-secondary-fixed-dim");
+    if (btn === prepBtn) {
+      status.textContent = "Preparing";
+      status.classList.remove("bg-error-container");
+      status.classList.add("bg-secondary-fixed");
 
-        container.classList.remove("hover:border-primary-container");
-        container.classList.add("hover:border-secondary-fixed-dim");
+      border.classList.remove("border-primary-container");
+      border.classList.add("border-secondary-fixed-dim");
 
-        prepBtn.disabled = true;
-        prepBtn.classList.remove("bg-surface-container", "cursor-pointer");
-        prepBtn.classList.add("cursor-not-allowed", "bg-secondary-fixed-dim");
+      container.classList.remove("hover:border-primary-container");
+      container.classList.add("hover:border-secondary-fixed-dim");
 
-        readyBtn.disabled = false;
-        readyBtn.classList.remove("opacity-50", "cursor-not-allowed");
-        readyBtn.classList.add("cursor-pointer");
-      }
+      prepBtn.disabled = true;
+      prepBtn.classList.remove("bg-surface-container", "cursor-pointer");
+      prepBtn.classList.add("cursor-not-allowed", "bg-secondary-fixed-dim");
 
-      sendStatusUpdate("Preparing");
-    });
+      readyBtn.disabled = false;
+      readyBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      readyBtn.classList.add("cursor-pointer");
 
-    readyBtn?.addEventListener("click", () => {
-      if (status && border && container && readyBtn && prepBtn) {
-        status.textContent = "Ready";
-        status.classList.remove("bg-secondary-fixed");
-        status.classList.add("bg-tertiary-fixed-dim");
+      sendStatusUpdate(orderId, "Preparing");
+    } else if (btn === readyBtn) {
+      status.textContent = "Ready";
+      status.classList.remove("bg-secondary-fixed");
+      status.classList.add("bg-tertiary-fixed-dim");
 
-        border.classList.remove("border-secondary-fixed-dim");
-        border.classList.add("border-tertiary-container");
+      border.classList.remove("border-secondary-fixed-dim");
+      border.classList.add("border-tertiary-container");
 
-        container.classList.remove("hover:border-[#FFAA01]");
-        container.classList.add("hover:border-tertiary-container");
+      container.classList.remove("hover:border-secondary-fixed-dim");
+      container.classList.add("hover:border-tertiary-container");
 
-        prepBtn.classList.remove("cursor-pointer");
-        prepBtn.classList.add("opacity-50", "cursor-not-allowed");
+      prepBtn.classList.remove("cursor-pointer");
+      prepBtn.classList.add("opacity-50", "cursor-not-allowed");
 
-        readyBtn.disabled = true;
-        readyBtn.classList.remove(
-          "bg-surface-container",
-          "text-on-surface-variant",
-        );
-        readyBtn.classList.add(
-          "cursor-not-allowed",
-          "bg-tertiary-container",
-          "text-white",
-        );
+      readyBtn.disabled = true;
+      readyBtn.classList.remove(
+        "bg-surface-container",
+        "text-on-surface-variant",
+      );
+      readyBtn.classList.add(
+        "cursor-not-allowed",
+        "bg-tertiary-container",
+        "text-white",
+      );
 
-        deliverBtn.disabled = false;
-        deliverBtn.classList.remove("opacity-50", "cursor-not-allowed");
-        deliverBtn.classList.add("cursor-pointer");
-      }
+      deliverBtn.disabled = false;
+      deliverBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      deliverBtn.classList.add("cursor-pointer");
 
-      sendStatusUpdate("Ready");
-    });
+      sendStatusUpdate(orderId, "Ready");
+    } else if (btn === deliverBtn) {
+      status.textContent = "Delivered";
+      status.classList.remove("bg-tertiary-fixed-dim");
+      status.classList.add("bg-gray-200");
 
-    deliverBtn?.addEventListener("click", () => {
-      if (status && border && container && deliverBtn && readyBtn) {
-        status.textContent = "Delivered";
-        status.classList.remove("bg-tertiary-fixed-dim");
-        status.classList.add("bg-gray-200");
+      border.classList.remove("border-tertiary-container");
+      border.classList.add("border-black");
 
-        border.classList.remove("border-tertiary-container");
-        border.classList.add("border-black");
+      container.classList.remove("hover:border-tertiary-container");
+      container.classList.add("hover:border-black");
 
-        container.classList.remove("hover:border-tertiary-container");
-        container.classList.add("hover:border-black");
+      readyBtn.classList.remove("cursor-pointer");
+      readyBtn.classList.add("opacity-50", "cursor-not-allowed");
 
-        readyBtn.classList.remove("cursor-pointer");
-        readyBtn.classList.add("opacity-50", "cursor-not-allowed");
+      deliverBtn.disabled = true;
+      deliverBtn.classList.remove(
+        "bg-surface-container",
+        "text-on-surface-variant",
+      );
+      deliverBtn.classList.add("bg-black", "text-white");
 
-        deliverBtn.disabled = true;
-        deliverBtn.classList.remove(
-          "bg-surface-container",
-          "text-on-surface-variant",
-        );
-        deliverBtn.classList.add("bg-black", "text-white");
-      }
-    });
+      sendStatusUpdate(orderId, "Delivered");
+    }
   });
 </script>
