@@ -1,8 +1,12 @@
-import type { Socket } from "socket.io";
-
 import type { Request, Response } from "express";
-import type { Order, OrderStatus } from "../../../shared/types";
-import { validateOrder, saveOrder } from "../models/orderModel";
+import type { OrderStatus } from "../../../shared/types";
+import {
+  validateOrder,
+  saveOrder,
+  findAllOrders,
+  findOrderById,
+  setOrderStatus,
+} from "../models/orderModel";
 import { orders } from "../models/orderModel";
 
 const STATUS_MAP: Record<OrderStatus, true> = {
@@ -34,6 +38,10 @@ export function placeOrder(req: Request, res: Response) {
     // Save the order in memory (this also gives it an order number)
     const order = saveOrder(result);
 
+    // notify all connected clients after the update succeeded
+    console.log([...orders.values()]);
+    req.app.get("io").emit("new_order", [...orders.values()]);
+
     // Succesfull response
     res.status(200).json({
       success: true,
@@ -64,7 +72,7 @@ export function getOrder(req: Request, res: Response) {
     return;
   }
 
-  const order = orders.get(orderId);
+  const order = findOrderById(orderId);
 
   if (!order) {
     res.status(404).json({ message: "Order not found." });
@@ -74,8 +82,8 @@ export function getOrder(req: Request, res: Response) {
   res.json(order);
 }
 
-export function getAllOrders(req: Request, res: Response) {
-  res.json([...orders.values()]);
+export function getAllOrders(_req: Request, res: Response) {
+  res.json(findAllOrders());
 }
 
 export function updateOrderStatus(req: Request, res: Response) {
@@ -93,18 +101,15 @@ export function updateOrderStatus(req: Request, res: Response) {
     return;
   }
 
-  const order = orders.get(orderId);
+  const order = setOrderStatus(orderId, status);
 
   if (!order) {
     res.status(404).json({ message: "Order not found." });
     return;
   }
 
-  order.status = status;
-  order.completedAt = Date.now();
-
   // notify all connected clients after the update succeeded
-  req.app.get("io").emit("status_updated", [...orders.values()]);
+  req.app.get("io").emit("status_updated", findAllOrders());
 
   res.json(order);
 }
