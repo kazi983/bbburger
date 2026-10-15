@@ -10,7 +10,7 @@ const { id = "-", name = "Guest" } = Astro.props;
 
 <div id="order-confirmed-view" class="space-y-space-md">
 	<!-- Check the main card -->
-	<div class="bg-surface-container-lowest rounded-lg p-space-lg text-center shadow-sm border border-outline-variant">
+	<div class="bg-surface-container-lowest rounded-lg p-space-lg text-center shadow-sm border border-outline-variant mt-10">
 		<div class="w-16 h-16 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full flex items-center justify-center text-3xl mx-auto mb-space-md">
 			✓
 		</div>
@@ -27,7 +27,7 @@ const { id = "-", name = "Guest" } = Astro.props;
 	</div>
 
 	<!-- Pickup Window time  (current time is dummy)-->
-	<div class="bg-secondary-fixed rounded-default p-space-md flex items-center gap-gutter border border-outline-variant/40 shadow-sm">
+	<div class="bg-secondary-fixed rounded-default p-space-md flex items-center gap-gutter border border-outline-variant/40 shadow-sm lg:max-w-1/2">
 		<div class="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center text-xl shrink-0">
 			⏱️
 		</div>
