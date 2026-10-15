@@ -11,12 +11,12 @@ const { orderID, customerName, completedAt, total } = Astro.props;
 ---
 
 <div
-  class="grid grid-cols-2 p-5 border-b border-[#f4e2dc] md:grid-cols-6 md:items-center md:gap-2 bg-white md:p-3 hover:bg-[#fbede3] shadow-xl"
+  class="grid grid-cols-2 p-5 border-b border-outline-variant md:grid-cols-6 md:items-center md:gap-2 bg-white md:p-3 hover:bg-surface-container-low shadow-xl"
 >
   <p class="js-order-id font-bold text-xl">#{orderID}</p>
 
   <div
-    class="flex flex-row justify-center items-center gap-2 bg-[#A3F69C] text-[#005312] px-3 py-1 rounded-full w-fit ml-auto md:ml-0"
+    class="flex flex-row justify-center items-center gap-2 bg-tertiary-fixed text-tertiary px-3 py-1 rounded-full w-fit ml-auto md:ml-0"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

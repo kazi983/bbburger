@@ -12,16 +12,15 @@
     role="status"
     aria-live="polite"
     class="min-h-5 text-sm text-on-surface-variant"
-  ></p>
+  >
+  </p>
 </div>
 
 <script>
   import { cart } from "../stores/cartStore";
   import products from "../../../backend/data/product.json";
 
-  const button = document.querySelector<HTMLButtonElement>(
-    "#place-order-btn"
-  );
+  const button = document.querySelector<HTMLButtonElement>("#place-order-btn");
 
   const message = document.querySelector("#place-order-message");
 
@@ -36,9 +35,7 @@
     let hasItems = false;
 
     cart.get().forEach((item) => {
-      const product = products.find(
-        (product) => product.id === item.productId
-      );
+      const product = products.find((product) => product.id === item.productId);
 
       if (!product) return;
 
@@ -64,7 +61,7 @@
 
   button?.addEventListener("click", () => {
     const nameInput = document.querySelector<HTMLInputElement>(
-      "#customer-name-input"
+      "#customer-name-input",
     );
     const nameError = document.querySelector("#customer-name-error");
 
@@ -73,9 +70,7 @@
     const customerName = nameInput.value.trim();
     const hasName = customerName.length > 0;
 
-    nameInput.setCustomValidity(
-      hasName ? "" : "Please enter your name."
-    );
+    nameInput.setCustomValidity(hasName ? "" : "Please enter your name.");
     nameInput.setAttribute("aria-invalid", String(!hasName));
 
     if (nameError) {
@@ -89,7 +84,6 @@
 
     nameInput.value = customerName;
 
-    message.textContent =
-      "Ordering is currently unavailable. Your order has not been submitted.";
+    window.location.href = "/confirmed";
   });
 </script>

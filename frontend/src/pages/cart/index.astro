@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/layout.astro";
-import CartHeader from "../../components/CartHeader.astro";
+import Header from "../../components/Header.astro";
 import CustomerForm from "../../components/CustomerForm.astro";
 import Payment from "../../components/Payment.astro";
 import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
@@ -8,15 +8,13 @@ import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
 
 <Layout title="BBB - Order Summary">
   <div class="font-body text-on-background">
-    <CartHeader />
+    <Header title="Order Summary" />
 
     <main class="mx-auto max-w-xl space-y-5 px-4 pt-5 pb-10">
       <div class="flex items-center justify-between gap-3">
         <h1 class="font-headline text-xl font-bold">Items Ordered</h1>
 
-        <a href="/home" class="text-sm font-bold text-primary">
-          + Add More
-        </a>
+        <a href="/home" class="text-sm font-bold text-primary"> + Add More </a>
       </div>
 
       <p id="cart-item-count" class="text-sm text-on-surface-variant"></p>
@@ -37,11 +35,7 @@ import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
 
       <ul id="cart-list" class="space-y-4"></ul>
 
-      <p
-        id="quantity-message"
-        role="status"
-        class="text-sm text-tertiary"
-      ></p>
+      <p id="quantity-message" role="status" class="text-sm text-tertiary"></p>
 
       <div id="checkout-details" class="hidden space-y-5">
         <CustomerForm />
@@ -89,7 +83,7 @@ import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
     text: string,
     label: string,
     itemKey: string,
-    action: string
+    action: string,
   ) {
     const button = document.createElement("button");
     button.type = "button";
@@ -123,14 +117,11 @@ import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
     let subtotalCents = 0;
 
     cart.get().forEach((item) => {
-      const product = products.find(
-        (product) => product.id === item.productId
-      );
+      const product = products.find((product) => product.id === item.productId);
 
       if (!product) return;
 
-      const itemTotalCents =
-        Math.round(product.price * 100) * item.quantity;
+      const itemTotalCents = Math.round(product.price * 100) * item.quantity;
 
       count += item.quantity;
       subtotalCents += itemTotalCents;
@@ -195,31 +186,23 @@ import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
       quantity.className = "min-w-6 text-center font-semibold";
       quantity.setAttribute("aria-label", `Quantity: ${item.quantity}`);
 
-      const itemDescription = [
-        product.name,
-        ...optionLabels,
-      ].join(", ");
+      const itemDescription = [product.name, ...optionLabels].join(", ");
 
       controls.append(
         makeButton(
           "−",
           `Decrease quantity of ${itemDescription}`,
           item.key,
-          "decrease"
+          "decrease",
         ),
         quantity,
         makeButton(
           "+",
           `Increase quantity of ${itemDescription}`,
           item.key,
-          "increase"
+          "increase",
         ),
-        makeButton(
-          "Remove",
-          `Remove ${itemDescription}`,
-          item.key,
-          "remove"
-        )
+        makeButton("Remove", `Remove ${itemDescription}`, item.key, "remove"),
       );
 
       details.append(total, controls);
@@ -228,8 +211,7 @@ import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
     });
 
     if (itemCount) {
-      itemCount.textContent =
-        `${count} ${count === 1 ? "item" : "items"}`;
+      itemCount.textContent = `${count} ${count === 1 ? "item" : "items"}`;
     }
 
     emptyCart?.classList.toggle("hidden", count > 0);
@@ -255,19 +237,19 @@ import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
 
     if (focusedKey && focusedAction) {
       const replacement = Array.from(
-        cartList.querySelectorAll<HTMLButtonElement>("button")
+        cartList.querySelectorAll<HTMLButtonElement>("button"),
       ).find(
         (button) =>
           button.dataset.itemKey === focusedKey &&
-          button.dataset.action === focusedAction
+          button.dataset.action === focusedAction,
       );
 
       if (replacement) {
         replacement.focus();
       } else {
-        document.querySelector<HTMLAnchorElement>(
-          'main a[href="/home"]'
-        )?.focus();
+        document
+          .querySelector<HTMLAnchorElement>('main a[href="/home"]')
+          ?.focus();
       }
     }
   }
@@ -277,16 +259,12 @@ import PlaceOrderButton from "../../components/PlaceOrderButton.astro";
 
     if (!(target instanceof Element)) return;
 
-    const button = target.closest<HTMLButtonElement>(
-      "button[data-action]"
-    );
+    const button = target.closest<HTMLButtonElement>("button[data-action]");
 
     if (!button) return;
 
     const itemKey = button.dataset.itemKey;
-    const item = cart.get().find(
-      (item) => item.key === itemKey
-    );
+    const item = cart.get().find((item) => item.key === itemKey);
 
     if (!item) return;
 
