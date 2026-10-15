@@ -126,6 +126,14 @@ import { OrderStatus } from "../../lib/constant";
       <FinishedOrderCard orderID={0} customerName="" completedAt="" total="" />
     </template>
   </main>
+
+  <div
+    id="error-toast"
+    role="alert"
+    aria-atomic="true"
+    class="pointer-events-none fixed top-24 left-1/2 z-60 w-max max-w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-2 rounded-xl bg-error px-5 py-3 text-center text-sm text-on-error opacity-0 shadow-lg transition duration-200 motion-reduce:transition-none"
+  >
+  </div>
 </Layout>
 
 <script>
@@ -133,6 +141,7 @@ import { OrderStatus } from "../../lib/constant";
   import type { Order } from "../../../../shared/types";
   import { fetchOrders } from "../../lib/order";
   import { getMe, logout } from "../../lib/auth";
+  import { showErrorToast } from "../../lib/toast";
 
   const logoutButton =
     document.querySelector<HTMLButtonElement>("#logout-button");
@@ -157,6 +166,7 @@ import { OrderStatus } from "../../lib/constant";
       window.location.href = "/login";
     } catch (error) {
       console.error("Logout failed.", error);
+      showErrorToast("Logout failed. Please try again.");
     }
   });
 
@@ -299,9 +309,18 @@ import { OrderStatus } from "../../lib/constant";
   }, 30_000);
 
   socket.on("connect", async () => {
-    const orders = await fetchOrders();
-    renderOrders(orders);
-    updateCounters(orders);
+    try {
+      const orders = await fetchOrders();
+      renderOrders(orders);
+      updateCounters(orders);
+    } catch (err) {
+      console.error("Failed to fetch orders:", err);
+      showErrorToast("Failed to load orders. Please reload the page.");
+    }
+  });
+
+  socket.on("connect_error", () => {
+    showErrorToast("Cannot connect to the server. Retrying...");
   });
 
   socket.on("new_order", (orders: Order[]) => {
