@@ -185,7 +185,6 @@ export function getOrder(req: Request, res: Response) {
 }
 
 export function getAllOrders(req: Request, res: Response) {
-  console.log("orders :>> ", orders);
   res.json([...orders.values()]);
 }
 
