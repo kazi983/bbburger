@@ -284,13 +284,21 @@ import { OrderStatus } from "../../lib/constant";
       });
   }, 30_000);
 
+  // ==========================================================================
   // HACK: render orders on page load
   // socket.io: subscribe to order updates
   import { socket } from "../../lib/socket";
-  socket.on("order_update", (orders: Order[]) => {
+  socket.on("updated_status", (orders: Order[]) => {
     renderOrders(orders);
     updateCounters(orders);
   });
+
+  socket.on("updated_status", (orders: Order[]) => {
+    renderOrders(orders);
+    updateCounters(orders);
+  });
+
+  // ==========================================================================
 
   // ==========================================================================
   // STUB
