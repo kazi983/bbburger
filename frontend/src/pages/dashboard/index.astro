@@ -23,6 +23,14 @@ import { OrderStatus } from "../../lib/constant";
 
       <span class="font-bold text-primary sm:text-2xl">Awshaf BBB</span>
     </div>
+    <button
+      id="logout-button"
+      type="button"
+      class="rounded-lg bg-primary-container px-4 py-2 font-bold text-on-primary-container"
+      hidden
+    >
+      Log Out
+    </button>
   </header>
   
   <main id="dashboard" class="pt-20" hidden>
@@ -122,16 +130,35 @@ import { OrderStatus } from "../../lib/constant";
 </Layout>
 
 <script>
-  import { getMe } from "../../lib/auth";
+  import { getMe, logout } from "../../lib/auth";
 
   function showDashboard() {
     document.getElementById("dashboard")!.hidden = false;
+
+    const logoutButton =
+      document.querySelector<HTMLButtonElement>("#logout-button");
+
+    if (logoutButton) {
+      logoutButton.hidden = false;
+    }
   }
 
   // On page load: check the existing session
   const me = await getMe();
   if (me) showDashboard();
   else window.location.href = "/login";
+
+  const logoutButton =
+    document.querySelector<HTMLButtonElement>("#logout-button");
+
+  logoutButton?.addEventListener("click", async () => {
+    try {
+      await logout();
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed.", error);
+    }
+  });
 
   // render orders
   import { $orders } from "../../stores/order";
