@@ -1,7 +1,7 @@
 import type { Socket } from "socket.io";
 
 import type { Request, Response } from "express";
-import type { Order } from "../../../shared/types";
+import type { Order, OrderStatus } from "../../../shared/types";
 
 type Items = {
   quantity: number;
@@ -166,6 +166,18 @@ const orders = new Map<number, Order>(
   mockOrders.map((order) => [order.orderId, order] as const),
 );
 
+const STATUS_MAP: Record<OrderStatus, true> = {
+  Received: true,
+  Preparing: true,
+  Ready: true,
+  Delivered: true,
+  // NOTE: The value `true` is just a conventional placeholder meaning "exists"
+};
+
+function isOrderStatus(value: unknown): value is OrderStatus {
+  return typeof value === "string" && value in STATUS_MAP;
+}
+
 export function getOrder(req: Request, res: Response) {
   const orderId = Number(req.params.orderId);
 
@@ -195,6 +207,11 @@ export function updateOrderStatus(req: Request, res: Response) {
 
   if (!Number.isInteger(orderId)) {
     res.status(400).json({ message: "Invalid order ID." });
+    return;
+  }
+
+  if (!isOrderStatus(status)) {
+    res.status(400).json({ message: "Invalid status." });
     return;
   }
 
