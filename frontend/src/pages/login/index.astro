@@ -179,6 +179,8 @@ import Layout from "../../layouts/layout.astro";
 </Layout>
 
 <script>
+  import { login } from "../../lib/auth";
+
   const form = document.querySelector("#login-form");
   const errorBox = document.querySelector("#login-error");
 
@@ -223,39 +225,27 @@ import Layout from "../../layouts/layout.astro";
     const password = String(formData.get("password") || "");
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        },
-      );
+      await login(email, password);
 
-      if (response.status === 200) {
-        window.location.href = "/dashboard";
-        return;
-      }
-
-      if (response.status === 401) {
+      window.location.href = "/dashboard";
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Invalid email or password."
+      ) {
         errorBox.textContent =
           "Invalid email or password. Please try again.";
-        errorBox.classList.remove("hidden");
-        return;
+      } else if (
+        error instanceof Error &&
+        error.message === "Login failed."
+      ) {
+        errorBox.textContent =
+          "Login failed. Please try again.";
+      } else {
+        errorBox.textContent =
+          "Unable to connect to the server.";
       }
 
-      errorBox.textContent =
-        "Login failed. Please try again.";
-      errorBox.classList.remove("hidden");
-    } catch {
-      errorBox.textContent =
-        "Unable to connect to the server.";
       errorBox.classList.remove("hidden");
     }
   });
