@@ -5,10 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const OrderController_1 = require("../controllers/OrderController");
-const CartController_1 = require("../controllers/CartController");
 const router = express_1.default.Router();
 //Place Order
-router.post("/api/orders", CartController_1.placeOrder);
+router.post("/api/orders", OrderController_1.placeOrder);
 // Get all orders
 router.get("/", OrderController_1.getAllOrders);
 // Get order by order id

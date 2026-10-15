@@ -2,9 +2,9 @@ import express from "express";
 import {
   getAllOrders,
   getOrder,
+  placeOrder,
   updateOrderStatus,
 } from "../controllers/OrderController";
-import { placeOrder } from "../controllers/CartController";
 
 const router = express.Router();
 
