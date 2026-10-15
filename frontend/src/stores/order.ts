@@ -17,7 +17,8 @@ export type Order = {
   orderId: number;
   customerName: string;
   orderedAt: number;
-  status: "Received" | "Preparing" | "Ready"| "Delivered";
+  completedAt?: number;
+  status: string;
   items: OrderItem[];
   total: number;
 };
@@ -25,3 +26,4 @@ export type Order = {
 
 export const $orderId = atom<number>(0);
 export const $order = atom<Order | null>(null);
+export const $orders = atom<Order[]>([]);
