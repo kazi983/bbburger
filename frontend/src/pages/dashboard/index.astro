@@ -151,7 +151,8 @@ import { OrderStatus } from "../../lib/constant";
   );
 
   function setText(root: ParentNode, selector: string, text: string) {
-    root.querySelector(selector)!.textContent = text;
+    const elem = root.querySelector(selector);
+    if (elem) elem.textContent = text;
   }
 
   function formatMinutesAgo(orderedAt: number) {
@@ -209,9 +210,10 @@ import { OrderStatus } from "../../lib/constant";
         setText(cloneCard, ".js-ordered-at", formatMinutesAgo(order.orderedAt));
 
         // Keep the raw timestamp on the element for periodic re-rendering
-        cloneCard.querySelector<HTMLElement>(
-          ".js-ordered-at",
-        )!.dataset.orderedAt = String(order.orderedAt);
+        const orderedAtElem =
+          cloneCard.querySelector<HTMLElement>(".js-ordered-at");
+        if (orderedAtElem)
+          orderedAtElem.dataset.orderedAt = String(order.orderedAt);
 
         const itemsTemplate =
           cloneCard.querySelector<HTMLTemplateElement>(".js-items-template")!;
