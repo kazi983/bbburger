@@ -210,6 +210,8 @@ import "../../styles/tracking.css";
         throw new Error(data.message || "Order not found.");
       }
 
+      // for show order button after get orderId
+      sessionStorage.setItem("orderNum", orderNum);
       // Navigate to the order page
       window.location.href = `/tracking?orderNum=${encodeURIComponent(orderNum)}`;
     } catch (error) {

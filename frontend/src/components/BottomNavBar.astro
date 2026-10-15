@@ -42,6 +42,8 @@ const navItems = [
 
       return (
         <a
+          id={item.id === "order" ? "order-nav-link" : undefined}
+          style={item.id === "order" ? "display: none;" : undefined}
           href={item.href}
           aria-current={isActive ? "page" : undefined}
           class:list={[
@@ -67,3 +69,13 @@ const navItems = [
     })
   }
 </nav>
+<script>
+  const orderLink =
+    document.querySelector<HTMLAnchorElement>("#order-nav-link");
+  const orderNum = sessionStorage.getItem("orderNum");
+
+  if (orderLink && orderNum) {
+    orderLink.href = `/tracking?orderNum=${encodeURIComponent(orderNum)}`;
+    orderLink.style.display = "flex";
+  }
+</script>
