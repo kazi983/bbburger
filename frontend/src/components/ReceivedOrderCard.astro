@@ -1,16 +1,10 @@
 ---
 import type { OrderStatus } from "../lib/constant";
 
-type Items = {
-  quantity: number;
-  name: string;
-};
-
 type Props = {
   orderID: number;
   customerName: string;
   status: OrderStatus;
-  //   items: Items[];
   createdAt: number;
 };
 const { orderID, customerName, status, createdAt } = Astro.props;
@@ -113,10 +107,24 @@ const { orderID, customerName, status, createdAt } = Astro.props;
 
 <script>
   import { sendStatusUpdate } from "../lib/order";
+  import { showErrorToast } from "../lib/toast";
+
+  // Returns true only when the server accepted the new status
+  async function updateStatus(orderId: number, status: string) {
+    try {
+      await sendStatusUpdate(orderId, status);
+      return true;
+    } catch (err) {
+      console.error("Failed to update order status:", err);
+      const reason = err instanceof Error ? err.message : String(err);
+      showErrorToast(`Order #${orderId}: could not set "${status}". ${reason}`);
+      return false;
+    }
+  }
 
   // Event delegation: cards are cloned from a <template> and rebuilt on every
   // socket update, so a single listener on document handles all of them.
-  document.addEventListener("click", (e) => {
+  document.addEventListener("click", async (e) => {
     const btn = (e.target as Element).closest<HTMLButtonElement>(
       ".prepareBtn, .readyBtn, .deliverBtn",
     );
@@ -142,6 +150,17 @@ const { orderID, customerName, status, createdAt } = Astro.props;
       return;
 
     const orderId = Number(card.dataset.orderId);
+    const nextStatus =
+      btn === prepBtn ? "Preparing" : btn === readyBtn ? "Ready" : "Delivered";
+
+    // Update the UI only after the server accepts the change.
+    // Disable the button while waiting to prevent double submits.
+    btn.disabled = true;
+    const ok = await updateStatus(orderId, nextStatus);
+    if (!ok) {
+      btn.disabled = false;
+      return;
+    }
 
     if (btn === prepBtn) {
       status.textContent = "Preparing";
@@ -161,8 +180,6 @@ const { orderID, customerName, status, createdAt } = Astro.props;
       readyBtn.disabled = false;
       readyBtn.classList.remove("opacity-50", "cursor-not-allowed");
       readyBtn.classList.add("cursor-pointer");
-
-      sendStatusUpdate(orderId, "Preparing");
     } else if (btn === readyBtn) {
       status.textContent = "Ready";
       status.classList.remove("bg-secondary-fixed");
@@ -191,8 +208,6 @@ const { orderID, customerName, status, createdAt } = Astro.props;
       deliverBtn.disabled = false;
       deliverBtn.classList.remove("opacity-50", "cursor-not-allowed");
       deliverBtn.classList.add("cursor-pointer");
-
-      sendStatusUpdate(orderId, "Ready");
     } else if (btn === deliverBtn) {
       status.textContent = "Delivered";
       status.classList.remove("bg-tertiary-fixed-dim");
@@ -213,8 +228,6 @@ const { orderID, customerName, status, createdAt } = Astro.props;
         "text-on-surface-variant",
       );
       deliverBtn.classList.add("bg-black", "text-white");
-
-      sendStatusUpdate(orderId, "Delivered");
     }
   });
 </script>
