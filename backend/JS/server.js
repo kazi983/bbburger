@@ -11,6 +11,7 @@ const socket_io_1 = require("socket.io");
 const http_1 = require("http");
 const orderSocket_1 = require("./sockets/orderSocket");
 const orders_1 = __importDefault(require("./routes/orders"));
+const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const UserModel_1 = require("./models/UserModel");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -41,6 +42,7 @@ app.use((0, cors_1.default)({
 }));
 app.use(express_1.default.json());
 app.use(sessionMiddleware);
+app.use("/api/auth", authRoutes_1.default);
 app.use("/orders", orders_1.default);
 const port = process.env.PORT || 3000;
 const server = (0, http_1.createServer)(app);

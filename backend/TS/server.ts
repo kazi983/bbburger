@@ -6,6 +6,7 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import { registerOrderSockets } from "./sockets/orderSocket";
 import orderRoutes from "./routes/orders";
+import authRoutes from "./routes/authRoutes";
 import { seedAdmin } from "./models/UserModel";
 
 dotenv.config();
@@ -48,6 +49,7 @@ app.use(
 app.use(express.json());
 app.use(sessionMiddleware);
 
+app.use("/api/auth", authRoutes);
 app.use("/orders", orderRoutes);
 
 const port = process.env.PORT || 3000;
