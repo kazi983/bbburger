@@ -1,4 +1,6 @@
 ---
+import type { OrderStatus } from "../lib/constant";
+
 type Items = {
   quantity: number;
   name: string;
@@ -7,7 +9,7 @@ type Items = {
 type Props = {
   orderID: number;
   customerName: string;
-  status: number;
+  status: OrderStatus;
   //   items: Items[];
   createdAt: number;
 };
@@ -48,7 +50,7 @@ const { orderID, customerName, status, createdAt } = Astro.props;
               <path d="m15 16l-2.414-2.414A2 2 0 0 1 12 12.172V6"></path>
             </g>
           </svg>
-          <p class="js-created-at">{createdAt} min ago</p>
+          <p class="js-ordered-at">{createdAt} min ago</p>
         </div>
 
         <p
