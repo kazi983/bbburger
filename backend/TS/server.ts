@@ -63,6 +63,8 @@ const io = new Server(server, {
   },
 });
 
+io.engine.use(sessionMiddleware);
+
 registerOrderSockets(io);
 
 server.listen(port, async () => {

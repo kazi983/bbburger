@@ -52,6 +52,7 @@ const io = new socket_io_1.Server(server, {
         credentials: true,
     },
 });
+io.engine.use(sessionMiddleware);
 (0, orderSocket_1.registerOrderSockets)(io);
 server.listen(port, async () => {
     try {
