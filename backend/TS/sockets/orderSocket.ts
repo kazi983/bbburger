@@ -25,7 +25,7 @@ export function registerOrderSockets(io: Server) {
     socket.emit("actual_order_status", currentOrderStatus);
 
     // Only authenticated staff can update the order status.
-    socket.on("updated_status", (newStatus: string) => {
+    socket.on("status_updated", (newStatus: string) => {
       if (!isStaff) {
         return;
       }
