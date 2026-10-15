@@ -2,6 +2,7 @@ import type { Socket } from "socket.io";
 
 import type { Request, Response } from "express";
 import type { Order, OrderStatus } from "../../../shared/types";
+import { validateOrder, saveOrder } from "../models/orderModel";
 
 type Items = {
   quantity: number;
@@ -176,6 +177,45 @@ const STATUS_MAP: Record<OrderStatus, true> = {
 
 function isOrderStatus(value: unknown): value is OrderStatus {
   return typeof value === "string" && value in STATUS_MAP;
+}
+
+//Place order: check the order, save it, and send back the result
+export function placeOrder(req: Request, res: Response) {
+  try {
+    // req.body is undefined when no JSON body is sent (Express 5)
+    const result = validateOrder(req.body);
+
+    if ("error" in result) {
+      res.status(400).json({
+        success: false,
+        message: result.error,
+      });
+      return;
+    }
+
+    // Save the order in memory (this also gives it an order number)
+    const order = saveOrder(result);
+
+    // Succesfull response
+    res.status(200).json({
+      success: true,
+      message: "Order placed successfully!",
+      orderId: order.orderId,
+      name: order.customerName,
+      orderedAt: order.orderedAt,
+      status: order.status,
+      items: order.items,
+      subtotal: result.subtotal,
+      tax: result.tax,
+      total: order.total,
+    });
+  } catch (error) {
+    console.error("Error processing order:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to process the order.",
+    });
+  }
 }
 
 export function getOrder(req: Request, res: Response) {

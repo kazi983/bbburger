@@ -2,10 +2,14 @@ import express from "express";
 import {
   getAllOrders,
   getOrder,
+  placeOrder,
   updateOrderStatus,
 } from "../controllers/OrderController";
 
 const router = express.Router();
+
+//Place Order
+router.post("/api/orders", placeOrder);
 
 // Get all orders
 router.get("/", getAllOrders);

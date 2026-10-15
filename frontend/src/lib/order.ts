@@ -9,7 +9,7 @@ async function toError(res: Response, fallback: string) {
 }
 
 export async function sendStatusUpdate(orderId: number, status: string) {
-  const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
+  const res = await fetch(`${API_URL}/orders/${orderId}/status`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status }),
