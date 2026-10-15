@@ -17,10 +17,14 @@
 </div>
 
 <script>
-  import { cart } from "../stores/cartStore";
+  import { cart, clearCart } from "../stores/cartStore";
   import products from "../../../backend/data/product.json";
 
-  const button = document.querySelector<HTMLButtonElement>("#place-order-btn");
+  const API_URL = "http://localhost:4000";
+
+  const button = document.querySelector<HTMLButtonElement>(
+    "#place-order-btn"
+  );
 
   const message = document.querySelector("#place-order-message");
 
@@ -59,7 +63,7 @@
 
   cart.subscribe(updateOrderButton);
 
-  button?.addEventListener("click", () => {
+  button?.addEventListener("click", async () => {
     const nameInput = document.querySelector<HTMLInputElement>(
       "#customer-name-input",
     );
@@ -84,6 +88,45 @@
 
     nameInput.value = customerName;
 
-    window.location.href = "/confirmed";
+        // 1. Build the data to send (only what the server needs)
+    const items = cart.get().map((item) => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      options: item.options,
+    }));
+
+    // 2. Prevent double clicks while waiting for the server
+    if (button) button.disabled = true;
+    message.textContent = "Placing your order...";
+
+    try {
+      // 3. Send the order to the backend
+      const res = await fetch(`${API_URL}/api/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerName, items }),
+      });
+      const data = await res.json();
+
+      // 4. The server rejected the order (400): show its message
+      if (!res.ok || !data.success) {
+        message.textContent = data.message ?? "Could not place the order.";
+        if (button) button.disabled = false;
+        return;
+      }
+
+      // 5. Success: save the result, empty the cart, go to the confirmation page
+      sessionStorage.setItem("lastOrder", JSON.stringify(data));
+      clearCart();
+      window.location.href = "/confirmed";
+    } catch (error) {
+      // 6. The server isn't running, or the network failed
+      console.error("Error placing order:", error);
+      message.textContent = "Could not connect to the server. Please try again.";
+      if (button) button.disabled = false;
+    }
+
+    message.textContent =
+      "Ordering is currently unavailable. Your order has not been submitted.";
   });
 </script>

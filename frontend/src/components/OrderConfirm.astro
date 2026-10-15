@@ -4,6 +4,7 @@ export interface Props {
   name: string;
 }
 
+// Initial text, replaced by the real order in the script below
 const { id, name } = Astro.props;
 ---
 
@@ -21,7 +22,7 @@ const { id, name } = Astro.props;
       Order Confirmed!
     </h2>
     <p class="font-body text-body text-on-surface-variant mb-space-lg">
-      Thanks <span class="font-bold text-on-surface">{name}</span>, our kitchen
+      Thanks <span id="confirm-name" class="font-bold text-on-surface">{name}</span>, our kitchen
       has received your order and is firing up the grill.
     </p>
 
@@ -32,7 +33,7 @@ const { id, name } = Astro.props;
       <span class="font-body text-body text-on-surface-variant font-bold"
         >Order Number:</span
       >
-      <span class="font-label-lg text-label-lg text-primary text-2xl">{id}</span
+      <span id="confirm-order-id" class="font-label-lg text-label-lg text-primary text-2xl">{id}</span
       >
     </div>
   </div>
@@ -42,7 +43,7 @@ const { id, name } = Astro.props;
     class="bg-secondary-fixed rounded-default p-space-md flex items-center gap-gutter border border-outline-variant/40 shadow-sm"
   >
     <div
-      class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center flex-shrink-0"
+      class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0"
     >
       <span class="material-symbols-outlined" data-icon="timer">timer</span>
     </div>
@@ -58,3 +59,26 @@ const { id, name } = Astro.props;
     </div>
   </div>
 </div>
+
+<script>
+	// Show the order that was just placed (PlaceOrderButton saves it as "lastOrder")
+	try {
+		const savedOrder = sessionStorage.getItem("lastOrder");
+
+		if (savedOrder) {
+			const order = JSON.parse(savedOrder);
+			const nameText = document.querySelector("#confirm-name");
+			const orderIdText = document.querySelector("#confirm-order-id");
+
+			if (nameText && order.name) {
+				nameText.textContent = order.name;
+			}
+
+			if (orderIdText && order.orderId) {
+				orderIdText.textContent = String(order.orderId);
+			}
+		}
+	} catch {
+		// Keep the default text if sessionStorage is not available
+	}
+</script>
