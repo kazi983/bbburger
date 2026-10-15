@@ -105,17 +105,23 @@ import { OrderStatus } from "../../lib/constant";
       </span> Finished Orders
     </h2>
 
-    <div
-      class="hidden md:grid md:grid-cols-6 md:items-center md:gap-2 md:p-5 md:bg-surface-variant md:font-bold"
-    >
-      <h3>ORDER #</h3>
-      <h3>STATUS</h3>
-      <h3>CUSTOMER</h3>
-      <h3>ITEM SUMMARY</h3>
-      <h3>COMPLETED AT</h3>
-      <h3>TOTAL</h3>
+    <div class="md:grid md:grid-cols-[auto_auto_auto_1fr_auto_auto] md:gap-x-6">
+      <div
+        class="hidden md:grid md:grid-cols-subgrid md:col-span-6 md:items-center md:px-3 md:py-5 md:bg-surface-variant md:font-bold"
+      >
+        <h3>ORDER #</h3>
+        <h3>STATUS</h3>
+        <h3>CUSTOMER</h3>
+        <h3>ITEM SUMMARY</h3>
+        <h3>COMPLETED AT</h3>
+        <h3>TOTAL</h3>
+      </div>
+      <div
+        id="finishedOrdersContainer"
+        class="md:grid md:grid-cols-subgrid md:col-span-6"
+      >
+      </div>
     </div>
-    <div id="finishedOrdersContainer"></div>
 
     <template id="finishedOrdersTemplate">
       <FinishedOrderCard />
