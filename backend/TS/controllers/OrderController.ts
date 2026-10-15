@@ -3,36 +3,7 @@ import type { Socket } from "socket.io";
 import type { Request, Response } from "express";
 import type { Order, OrderStatus } from "../../../shared/types";
 import { validateOrder, saveOrder } from "../models/orderModel";
-
-type Items = {
-  quantity: number;
-  name: string;
-};
-
-type ReceivedOrder = {
-  id: number;
-  orderId: number;
-  customerName: string;
-  orderedAt: number;
-  items: Items[];
-};
-
-export function handleReceivedOrder(socket: Socket, payload: ReceivedOrder) {
-  const { orderId, customerName, orderedAt, items } = payload;
-
-  if (!orderId) {
-    console.error("Invalid order!");
-    return;
-  }
-
-  //storing the info in the socket data itself
-  socket.data.orderId = orderId;
-  socket.data.customerName = customerName;
-  socket.data.orderedAt = orderedAt;
-  socket.data.items = items;
-}
-
-const orders = new Map<number, Order>();
+import { orders } from "../models/orderModel";
 
 const STATUS_MAP: Record<OrderStatus, true> = {
   Received: true,
