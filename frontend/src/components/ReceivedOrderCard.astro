@@ -112,18 +112,7 @@ const { orderID, customerName, status, createdAt } = Astro.props;
 </div>
 
 <script>
-  function sendStatusUpdate(orderId: number, status: string) {
-    fetch("/api/orders/update-status", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        orderId,
-        status,
-      }),
-    });
-  }
+  import { sendStatusUpdate } from "../lib/order";
 
   // Event delegation: cards are cloned from a <template> and rebuilt on every
   // socket update, so a single listener on document handles all of them.

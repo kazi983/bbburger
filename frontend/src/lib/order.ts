@@ -1,12 +1,22 @@
-import type { OrderMessage } from "../stores/order";
 import { socket } from "./socket";
 
-socket.on("connect", () => {
-  console.log("Connected to server");
-});
+const API_URL = import.meta.env.PUBLIC_API_URL;
 
-socket.on("disconnect", () => {
-  console.log("Disconnected from server");
-});
-
-socket.on("send_order", (message: OrderMessage) => {});
+export function sendStatusUpdate(orderId: number, status: string) {
+  fetch(`${API_URL}/api/orders/update-status`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      orderId,
+      status,
+    }),
+  }).then((res) => {
+    if (!res.ok) {
+      console.error("Failed to update order status");
+    } else {
+      socket.emit("updated_status", status);
+    }
+  });
+}
