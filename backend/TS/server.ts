@@ -6,6 +6,7 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import { registerOrderSockets } from "./sockets/orderSocket";
 import orderRoutes from "./routes/orders";
+import { seedAdmin } from "./models/UserModel";
 
 dotenv.config();
 
@@ -15,6 +16,17 @@ const sessionSecret = process.env.SESSION_SECRET;
 
 if (!sessionSecret) {
   console.error("SESSION_SECRET is not configured.");
+  process.exit(1);
+}
+
+try {
+  seedAdmin();
+} catch (error) {
+  console.error(
+    error instanceof Error
+      ? error.message
+      : "Failed to seed admin account.",
+  );
   process.exit(1);
 }
 

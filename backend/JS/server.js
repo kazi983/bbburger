@@ -11,11 +11,21 @@ const socket_io_1 = require("socket.io");
 const http_1 = require("http");
 const orderSocket_1 = require("./sockets/orderSocket");
 const orders_1 = __importDefault(require("./routes/orders"));
+const UserModel_1 = require("./models/UserModel");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const sessionSecret = process.env.SESSION_SECRET;
 if (!sessionSecret) {
     console.error("SESSION_SECRET is not configured.");
+    process.exit(1);
+}
+try {
+    (0, UserModel_1.seedAdmin)();
+}
+catch (error) {
+    console.error(error instanceof Error
+        ? error.message
+        : "Failed to seed admin account.");
     process.exit(1);
 }
 const sessionMiddleware = (0, cookie_session_1.default)({
