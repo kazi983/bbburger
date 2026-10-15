@@ -14,24 +14,24 @@ const { id = "-", name = "Guest" } = Astro.props;
 		<div class="w-16 h-16 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full flex items-center justify-center text-3xl mx-auto mb-space-md">
 			✓
 		</div>
-		<h2 class="font-headline-lg-mobile text-headline-lg-mobile mb-space-sm">Order Confirmed!</h2>
+		<h2 class="font-headline-lg-mobile text-headline-lg-mobile mb-space-sm lg:text-headline-lg">Order Confirmed!</h2>
 		<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-lg">
-			Thanks <span id="confirm-name" class="font-bold text-on-surface">{name}</span>, our kitchen has received your order and is firing up the grill.
+			Thanks <span id="confirm-name" class="font-bold text-on-surface lg:text-body-lg">{name}</span>, our kitchen has received your order and is firing up the grill.
 		</p>
 
 		<!-- Show order number  -->
 		<div class="bg-surface-container-low rounded-default py-3 px-space-md border border-outline-variant flex items-center justify-center gap-space-sm">
-			<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Order Number:</span>
-			<span id="confirm-order-id" class="font-label-lg text-label-lg text-primary">{id}</span>
+			<span class="font-body-sm text-body-sm text-on-surface-variant font-medium lg:text-body-lg">Order Number:</span>
+			<span id="confirm-order-id" class="font-label-lg text-label-lg text-primary lg:text-headline-sm">{id}</span>
 		</div>
 	</div>
 
 	<!-- Pickup Window time  (current time is dummy)-->
-	<div class="bg-secondary-fixed rounded-default p-space-md flex items-center gap-gutter border border-outline-variant/40 shadow-sm lg:max-w-1/2">
+	<div class="bg-secondary-fixed rounded-default p-space-md flex items-center gap-gutter border border-outline-variant/40 shadow-sm lg:justify-center">
 		<div class="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center text-xl shrink-0">
 			⏱️
 		</div>
-		<div>
+		<div >
 			<div class="font-label-sm text-label-sm text-on-secondary-fixed-variant uppercase">Pickup Window</div>
 			<div class="font-label-lg text-label-lg text-on-secondary-fixed">Estimated time: 12-15 mins</div>
 		</div>
