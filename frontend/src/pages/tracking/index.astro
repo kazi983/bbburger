@@ -329,6 +329,8 @@ import "../../styles/tracking.css";
   </script>
 </Layout>
 <script>
+  const API_URL = import.meta.env.PUBLIC_API_URL;
+
   // Get the order number from the URL
   const params = new URLSearchParams(window.location.search);
   const orderNum = params.get("orderNum");
@@ -342,7 +344,7 @@ import "../../styles/tracking.css";
   async function loadOrder() {
     try {
       // Fetch order data from the backend
-      const response = await fetch(`http://localhost:3000/orders/${orderNum}`);
+      const response = await fetch(`${API_URL}/orders/${orderNum}`);
       const order = await response.json();
 
       if (!response.ok) {
