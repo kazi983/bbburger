@@ -17,7 +17,7 @@ export type Order = {
   orderId: number;
   customerName: string;
   orderedAt: number;
-  completedAt: number;
+  completedAt?: number;
   status: OrderStatus;
   items: OrderItem[];
   total: number;
