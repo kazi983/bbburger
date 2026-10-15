@@ -6,7 +6,6 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import { registerOrderSockets } from "./sockets/orderSocket";
 import orderRoutes from "./routes/orders";
-import { placeOrder } from "./controllers/CartController";
 
 import authRoutes from "./routes/authRoutes";
 import { seedAdmin } from "./models/UserModel";
@@ -51,9 +50,6 @@ app.use(sessionMiddleware);
 
 app.use("/api/auth", authRoutes);
 app.use("/orders", orderRoutes);
-
-//Place Order
-app.post("/api/orders", placeOrder);
 
 const port = process.env.PORT || 3000;
 

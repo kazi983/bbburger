@@ -4,8 +4,12 @@ import {
   getOrder,
   updateOrderStatus,
 } from "../controllers/OrderController";
+import { placeOrder } from "../controllers/CartController";
 
 const router = express.Router();
+
+//Place Order
+router.post("/api/orders", placeOrder);
 
 // Get all orders
 router.get("/", getAllOrders);
