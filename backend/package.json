@@ -7,7 +7,7 @@
     "build": "tsc",
     "dev": "nodemon JS/server.js",
     "cart": "npm run build && node JS/cart-server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node JS/server.js"
   },
   "repository": {
     "type": "git",
