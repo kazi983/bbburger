@@ -6,7 +6,7 @@ import { OrderStatus } from "../../lib/constant";
 ---
 
 <Layout title="Kitchen Dashboard">
-  <main class="pt-20">
+  <main id="dashboard" class="pt-20" hidden>
     <div class="bg-white p-3 shadow-lg">
       <div class="lg:grid lg:grid-cols-2">
         <h1 class="text-4xl font-bold mt-5 mb-8">Kitchen Operation</h1>
@@ -120,6 +120,7 @@ import { OrderStatus } from "../../lib/constant";
 <script>
   import { $orders } from "../../stores/order";
   import type { Order } from "../../../../shared/types";
+  import { getMe } from "../../lib/auth";
 
   const receivedCardTemplate = document.querySelector<HTMLTemplateElement>(
     "#receivedCardTemplate",
@@ -349,6 +350,14 @@ import { OrderStatus } from "../../lib/constant";
   testOrders.forEach((order) => {
     $orders.set([...$orders.get(), order]);
   });
-
   // ==========================================================================
+
+  function showDashboard() {
+    document.getElementById("dashboard")!.hidden = false;
+  }
+
+  // On page load: check the existing session
+  const me = await getMe();
+  if (me) showDashboard();
+  else window.location.href = "/login";
 </script>
