@@ -31,75 +31,76 @@ const products: Product[] = JSON.parse(
 
 const roundMoney = (value: number) => Math.round(value * 100) / 100;
 
+
 // Validate the order body and recalculate prices from product.json.
 // Returns a list of error messages, or the validated order.
-function validateOrder(body: unknown):
-    | { errors: string[] }
-    | { customerName: string; lines: OrderLine[]; subtotal: number; tax: number; total: number } {
-    const errors: string[] = [];
-    const { customerName, items } = (body ?? {}) as { customerName?: unknown; items?: unknown };
+// function validateOrder(body: unknown):
+//     | { errors: string[] }
+//     | { customerName: string; lines: OrderLine[]; subtotal: number; tax: number; total: number } {
+//     const errors: string[] = [];
+//     const { customerName, items } = (body ?? {}) as { customerName?: unknown; items?: unknown };
 
-    // Customer name
-    const name = typeof customerName === "string" ? customerName.trim() : "";
-    if (!name) {
-        errors.push("Customer name is required.");
-    } else if (name.length > MAX_NAME_LENGTH) {
-        errors.push(`Customer name must be ${MAX_NAME_LENGTH} characters or less.`);
-    }
+//     // Customer name
+//     const name = typeof customerName === "string" ? customerName.trim() : "";
+//     if (!name) {
+//         errors.push("Customer name is required.");
+//     } else if (name.length > MAX_NAME_LENGTH) {
+//         errors.push(`Customer name must be ${MAX_NAME_LENGTH} characters or less.`);
+//     }
 
-    // Cart items
-    if (!Array.isArray(items) || items.length === 0) {
-        errors.push("Cart is empty.");
-        return { errors };
-    }
+//     // Cart items
+//     if (!Array.isArray(items) || items.length === 0) {
+//         errors.push("Cart is empty.");
+//         return { errors };
+//     }
 
-    const lines: OrderLine[] = [];
-    const seenIds = new Set<number>();
+//     const lines: OrderLine[] = [];
+//     const seenIds = new Set<number>();
 
-    items.forEach((item: unknown, index: number) => {
-        const { productId, quantity } = (item ?? {}) as { productId?: unknown; quantity?: unknown };
-        const label = `Item ${index + 1}`;
+//     items.forEach((item: unknown, index: number) => {
+//         const { productId, quantity } = (item ?? {}) as { productId?: unknown; quantity?: unknown };
+//         const label = `Item ${index + 1}`;
 
-        if (typeof productId !== "number" || !Number.isInteger(productId)) {
-            errors.push(`${label}: productId must be an integer.`);
-            return;
-        }
-        const product = products.find((p) => p.id === productId);
-        if (!product) {
-            errors.push(`${label}: product ${productId} does not exist.`);
-            return;
-        }
-        if (seenIds.has(productId)) {
-            errors.push(`${label}: product ${productId} is duplicated.`);
-            return;
-        }
-        seenIds.add(productId);
+//         if (typeof productId !== "number" || !Number.isInteger(productId)) {
+//             errors.push(`${label}: productId must be an integer.`);
+//             return;
+//         }
+//         const product = products.find((p) => p.id === productId);
+//         if (!product) {
+//             errors.push(`${label}: product ${productId} does not exist.`);
+//             return;
+//         }
+//         if (seenIds.has(productId)) {
+//             errors.push(`${label}: product ${productId} is duplicated.`);
+//             return;
+//         }
+//         seenIds.add(productId);
 
-        if (typeof quantity !== "number" || !Number.isInteger(quantity) || quantity < 1 || quantity > MAX_QUANTITY) {
-            errors.push(`${label}: quantity must be an integer between 1 and ${MAX_QUANTITY}.`);
-            return;
-        }
+//         if (typeof quantity !== "number" || !Number.isInteger(quantity) || quantity < 1 || quantity > MAX_QUANTITY) {
+//             errors.push(`${label}: quantity must be an integer between 1 and ${MAX_QUANTITY}.`);
+//             return;
+//         }
 
-        lines.push({
-            productId,
-            name: product.name,
-            price: product.price,
-            quantity,
-            lineTotal: roundMoney(product.price * quantity),
-        });
-    });
+//         lines.push({
+//             productId,
+//             name: product.name,
+//             price: product.price,
+//             quantity,
+//             lineTotal: roundMoney(product.price * quantity),
+//         });
+//     });
 
-    if (errors.length > 0) {
-        return { errors };
-    }
+//     if (errors.length > 0) {
+//         return { errors };
+//     }
 
-    // Never trust the total sent by the client; recalculate it here
-    const subtotal = roundMoney(lines.reduce((sum, line) => sum + line.lineTotal, 0));
-    const tax = roundMoney(subtotal * TAX_RATE);
-    const total = roundMoney(subtotal + tax);
+//     // Never trust the total sent by the client; recalculate it here
+//     const subtotal = roundMoney(lines.reduce((sum, line) => sum + line.lineTotal, 0));
+//     const tax = roundMoney(subtotal * TAX_RATE);
+//     const total = roundMoney(subtotal + tax);
 
-    return { customerName: name, lines, subtotal, tax, total };
-}
+//     return { customerName: name, lines, subtotal, tax, total };
+// }
 
 // Setting middleware
 app.use(express.json());
