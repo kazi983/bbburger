@@ -24,3 +24,7 @@ export type Order = {
 };
 
 // TODO: Replace the contents of frontend/src/stores/order.ts and frontend/src/lib/order.ts with these types
+
+export type PublicUser = {
+  email: string;
+};
