@@ -1,21 +1,28 @@
 import { atom } from "nanostores";
 
-type Items = {
+export type BurgerOptions = {
+  doneness: "Medium rare" | "Medium" | "Well done";
+  removedIngredients: string[];
+};
+
+type OrderItem = {
   productId: number;
-  unitPrice: number;
   productName: string;
+  unitPrice: number;
   quantity: number;
+  options?: BurgerOptions;
 };
 
 export type Order = {
   orderId: number;
   customerName: string;
-  status: string;
   orderedAt: number;
   completedAt?: number;
+  status: string;
+  items: OrderItem[];
   total: number;
-  items: Items[];
 };
+
 
 export const $orderId = atom<number>(0);
 export const $order = atom<Order | null>(null);
