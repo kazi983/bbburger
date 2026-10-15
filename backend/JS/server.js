@@ -14,7 +14,7 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({ origin: "http://localhost:4321", credentials: true }));
 app.use("/orders", orders_1.default);
-const port = process.env.POR || 3000;
+const port = process.env.PORT || 3000;
 const server = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(server, {
     cors: { origin: "http://localhost:4321" },
