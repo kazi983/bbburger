@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const ordersController_1 = require("../controllers/ordersController");
+const OrderController_1 = require("../controllers/OrderController");
 const router = express_1.default.Router();
 // Get order by order number
-router.get("/:orderNum", ordersController_1.getOrder);
+router.get("/:orderId", OrderController_1.getOrder);
 exports.default = router;

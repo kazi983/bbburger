@@ -1,9 +1,9 @@
 import express from "express";
-import { getOrder } from "../controllers/ordersController";
+import { getOrder } from "../controllers/OrderController";
 
 const router = express.Router();
 
 // Get order by order number
-router.get("/:orderNum", getOrder);
+router.get("/:orderId", getOrder);
 
 export default router;
