@@ -1,0 +1,89 @@
+<div class="space-y-3">
+  <button
+    id="place-order-btn"
+    type="button"
+    class="w-full rounded-full bg-primary-container px-6 py-4 font-bold text-on-primary-container shadow-md hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+  >
+    Place Order
+  </button>
+
+  <p
+    id="place-order-message"
+    role="status"
+    aria-live="polite"
+    class="min-h-5 text-sm text-on-surface-variant"
+  >
+  </p>
+</div>
+
+<script>
+  import { cart } from "../stores/cartStore";
+  import products from "../../../backend/data/product.json";
+
+  const button = document.querySelector<HTMLButtonElement>("#place-order-btn");
+
+  const message = document.querySelector("#place-order-message");
+
+  const currency = new Intl.NumberFormat("en-CA", {
+    style: "currency",
+    currency: "CAD",
+    currencyDisplay: "code",
+  });
+
+  function updateOrderButton() {
+    let subtotalCents = 0;
+    let hasItems = false;
+
+    cart.get().forEach((item) => {
+      const product = products.find((product) => product.id === item.productId);
+
+      if (!product) return;
+
+      hasItems = true;
+      subtotalCents += Math.round(product.price * 100) * item.quantity;
+    });
+
+    // Matches the team's provisional estimate.
+    const taxCents = Math.round(subtotalCents * 0.08);
+    const total = (subtotalCents + taxCents) / 100;
+
+    if (button) {
+      button.disabled = !hasItems;
+      button.textContent = `Place Order · ${currency.format(total)} →`;
+    }
+
+    if (message) {
+      message.textContent = "";
+    }
+  }
+
+  cart.subscribe(updateOrderButton);
+
+  button?.addEventListener("click", () => {
+    const nameInput = document.querySelector<HTMLInputElement>(
+      "#customer-name-input",
+    );
+    const nameError = document.querySelector("#customer-name-error");
+
+    if (!nameInput || !message) return;
+
+    const customerName = nameInput.value.trim();
+    const hasName = customerName.length > 0;
+
+    nameInput.setCustomValidity(hasName ? "" : "Please enter your name.");
+    nameInput.setAttribute("aria-invalid", String(!hasName));
+
+    if (nameError) {
+      nameError.textContent = hasName ? "" : "Please enter your name.";
+    }
+
+    if (!nameInput.reportValidity()) {
+      nameInput.focus();
+      return;
+    }
+
+    nameInput.value = customerName;
+
+    window.location.href = "/confirmed";
+  });
+</script>

@@ -11,12 +11,12 @@ const { orderID, customerName, completedAt, total } = Astro.props;
 ---
 
 <div
-  class="grid grid-cols-2 p-5 border-b border-[#f4e2dc] md:grid-cols-6 md:items-center md:gap-2 bg-white md:p-3 hover:bg-[#fbede3] shadow-xl"
+  class="grid grid-cols-2 p-5 border-b border-outline-variant md:grid-cols-6 md:items-center md:gap-2 bg-white md:p-3 hover:bg-surface-container-low shadow-xl"
 >
-  <p class="font-bold text-xl">#{orderID}</p>
+  <p class="js-order-id font-bold text-xl">#{orderID}</p>
 
   <div
-    class="flex flex-row justify-center items-center gap-2 bg-[#A3F69C] text-[#005312] px-3 py-1 rounded-full w-fit ml-auto md:ml-0"
+    class="flex flex-row justify-center items-center gap-2 bg-tertiary-fixed text-tertiary px-3 py-1 rounded-full w-fit ml-auto md:ml-0"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -33,12 +33,12 @@ const { orderID, customerName, completedAt, total } = Astro.props;
 
     <span>Complete</span>
   </div>
-  <p class="col-span-2 md:col-span-1">{customerName}</p>
-  <p class="col-span-2 md:col-span-1">
+  <p class="js-customer-name col-span-2 md:col-span-1">{customerName}</p>
+  <p class="js-items col-span-2 md:col-span-1">
     1x Smoky BBQ Bacon Combo, 1x Mega Fries, 1x Large Lemonade
   </p>
   <p class="md:hidden">Completed at:</p>
-  <p>{completedAt}</p>
+  <p class="js-completed-at">{completedAt}</p>
   <p class="font-bold md:hidden">TOTAL:</p>
-  <p class="font-bold">CAD {total}</p>
+  <p class="js-total font-bold">CAD {total}</p>
 </div>

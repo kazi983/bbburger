@@ -1,0 +1,133 @@
+---
+import products from "../../../backend/data/product.json";
+
+const burgers = products.filter(
+  (product) => product.category === "burguer"
+);
+
+const cookingOptions = ["Medium rare", "Medium", "Well done"];
+
+const meatIngredients = [
+  "Lean Minced Steak",
+  "Lamb",
+  "Lamb Mince",
+];
+---
+
+{
+  burgers.map((burger) => (
+    <dialog
+      data-burger-dialog={burger.id}
+      aria-labelledby={`burger-title-${burger.id}`}
+      class="burger-dialog rounded-2xl bg-surface-container-lowest p-5 text-on-surface shadow-xl"
+    >
+      <div class="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase text-primary">
+            Make it yours
+          </p>
+
+          <h2
+            id={`burger-title-${burger.id}`}
+            class="mt-1 font-headline text-xl font-bold"
+          >
+            {burger.name}
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          data-close-customizer
+          aria-label="Close customization"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full hover:bg-surface-container"
+        >
+          ✕
+        </button>
+      </div>
+
+      <form data-burger-form={burger.id} class="space-y-6">
+        <fieldset>
+          <legend class="mb-3 font-bold">
+            Remove ingredients
+          </legend>
+
+          <p class="mb-3 text-sm text-on-surface-variant">
+            Select anything you would like us to leave out.
+          </p>
+
+          <div class="grid gap-2 sm:grid-cols-2">
+            {
+              burger.ingredients
+                .filter(
+                  (ingredient) => !meatIngredients.includes(ingredient)
+                )
+                .map((ingredient) => (
+                  <label class="flex items-center gap-3 rounded-xl border border-outline-variant p-3 text-sm">
+                    <input
+                      type="checkbox"
+                      name="removedIngredients"
+                      value={ingredient}
+                      class="h-4 w-4 accent-primary"
+                    />
+
+                    <span>No {ingredient}</span>
+                  </label>
+                ))
+            }
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="mb-3 font-bold">
+            How would you like your burger cooked?
+          </legend>
+
+          <div class="space-y-2">
+            {
+              cookingOptions.map((option) => (
+                <label class="flex items-center gap-3 rounded-xl border border-outline-variant p-3 text-sm">
+                  <input
+                    type="radio"
+                    name="doneness"
+                    value={option}
+                    required
+                    checked={option === "Well done"}
+                    class="h-4 w-4 accent-primary"
+                  />
+
+                  <span>{option}</span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <div class="flex items-center justify-between gap-3 border-t border-outline-variant pt-4">
+          <p class="font-bold text-primary">
+            CAD {burger.price.toFixed(2)}
+          </p>
+
+          <button
+            type="submit"
+            class="rounded-full bg-primary-container px-5 py-3 font-bold text-on-primary-container hover:bg-primary"
+          >
+            Add to cart →
+          </button>
+        </div>
+      </form>
+    </dialog>
+  ))
+}
+
+<style>
+  .burger-dialog {
+    width: min(92vw, 560px);
+    max-height: 85vh;
+    margin: auto;
+    overflow-y: auto;
+  }
+
+  .burger-dialog::backdrop {
+    background: rgb(0 0 0 / 65%);
+  }
+</style>
