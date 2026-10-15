@@ -346,7 +346,9 @@ import { OrderStatus } from "../../lib/constant";
     },
   ];
 
-  renderOrders(testOrders);
+  testOrders.forEach((order) => {
+    $orders.set([...$orders.get(), order]);
+  });
 
   // ==========================================================================
 </script>
