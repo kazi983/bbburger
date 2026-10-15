@@ -223,6 +223,7 @@ export function updateOrderStatus(req: Request, res: Response) {
   }
 
   order.status = status;
+  order.completedAt = Date.now();
 
   // notify all connected clients after the update succeeded
   req.app.get("io").emit("status_updated", [...orders.values()]);
