@@ -7,7 +7,7 @@ import { OrderStatus } from "../../lib/constant";
 
 <Layout title="Kitchen Dashboard">
   <header
-    class="top-0 flex items-center justify-between gap-3 bg-background/95 backdrop-blur-sm p-10"
+    class="top-0 flex items-center justify-between gap-3 bg-background/95 backdrop-blur-sm p-5"
   >
     <div
       class="flex min-w-0 items-center gap-2 text-base font-bold text-primary sm:text-2xl"
@@ -24,8 +24,8 @@ import { OrderStatus } from "../../lib/constant";
       <span class="font-bold text-primary sm:text-2xl">Awshaf BBB</span>
     </div>
   </header>
-  
-  <main id="dashboard" class="pt-20" hidden>
+
+  <main id="dashboard" class="pt-5 px-5 pb-10" hidden>
     <div class="bg-white p-3 shadow-lg">
       <div class="lg:grid lg:grid-cols-2">
         <h1 class="text-4xl font-bold mt-5 mb-8">Kitchen Operation</h1>
@@ -34,29 +34,36 @@ import { OrderStatus } from "../../lib/constant";
           <div
             class="flex flex-col items-center bg-surface-container-low p-2 border border-outline-variant"
           >
-            <h2 class="text-on-surface-variant text-sm font-bold">RECEIVED</h2>
-            <p class="text-3xl font-bold text-primary">1</p>
+            <h2 class="text-on-surface-variant text-xs font-bold">RECEIVED</h2>
+            <p id="receivedCounter" class="text-3xl font-bold text-primary">
+              1
+            </p>
           </div>
 
           <div
             class="flex flex-col items-center bg-surface-container-low p-2 border border-outline-variant"
           >
-            <h2 class="text-on-surface-variant text-sm font-bold">PREPARING</h2>
-            <p class="text-3xl font-bold text-secondary-container">1</p>
+            <h2 class="text-on-surface-variant text-xs font-bold">PREPARING</h2>
+            <p
+              id="preparingCounter"
+              class="text-3xl font-bold text-secondary-container"
+            >
+              1
+            </p>
           </div>
 
           <div
             class="flex flex-col items-center bg-surface-container-low p-2 border border-outline-variant"
           >
-            <h2 class="text-on-surface-variant text-sm font-bold">READY</h2>
-            <p class="text-3xl font-bold text-tertiary">1</p>
+            <h2 class="text-on-surface-variant text-xs font-bold">READY</h2>
+            <p id="readyCounter" class="text-3xl font-bold text-tertiary">1</p>
           </div>
 
           <div
             class="flex flex-col items-center bg-surface-container-low p-2 border border-outline-variant"
           >
-            <h2 class="text-on-surface-variant text-sm font-bold">DELIVERED</h2>
-            <p class="text-3xl font-bold text-black">1</p>
+            <h2 class="text-on-surface-variant text-xs font-bold">DELIVERED</h2>
+            <p id="deliveredCounter" class="text-3xl font-bold text-black">1</p>
           </div>
         </div>
       </div>
@@ -129,14 +136,20 @@ import { OrderStatus } from "../../lib/constant";
   }
 
   // On page load: check the existing session
-  const me = await getMe();
-  if (me) showDashboard();
-  else window.location.href = "/login";
+  // const me = await getMe();
+  // if (me) showDashboard();
+  // else window.location.href = "/login";
+
+  // HACK
+  showDashboard();
 
   // render orders
-  import { $orders } from "../../stores/order";
   import type { Order } from "../../../../shared/types";
 
+  const receivedCounter = document.getElementById("receivedCounter");
+  const preparingCounter = document.getElementById("preparingCounter");
+  const readyCounter = document.getElementById("readyCounter");
+  const deliveredCounter = document.getElementById("deliveredCounter");
   const receivedCardTemplate = document.querySelector<HTMLTemplateElement>(
     "#receivedCardTemplate",
   );
@@ -151,11 +164,35 @@ import { OrderStatus } from "../../lib/constant";
   );
 
   function setText(root: ParentNode, selector: string, text: string) {
-    root.querySelector(selector)!.textContent = text;
+    const elem = root.querySelector(selector);
+    if (elem) elem.textContent = text;
+  }
+
+  function updateCounters(orders: readonly Order[]) {
+    const receivedCount = orders.filter(
+      (order) => order.status === "Received",
+    ).length;
+    const preparingCount = orders.filter(
+      (order) => order.status === "Preparing",
+    ).length;
+    const readyCount = orders.filter(
+      (order) => order.status === "Ready",
+    ).length;
+    const deliveredCount = orders.filter(
+      (order) => order.status === "Delivered",
+    ).length;
+
+    if (receivedCounter) receivedCounter.textContent = String(receivedCount);
+    if (preparingCounter) preparingCounter.textContent = String(preparingCount);
+    if (readyCounter) readyCounter.textContent = String(readyCount);
+    if (deliveredCounter) deliveredCounter.textContent = String(deliveredCount);
   }
 
   function formatMinutesAgo(orderedAt: number) {
-    const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    const rtf = new Intl.RelativeTimeFormat("en", {
+      numeric: "auto",
+      style: "short",
+    });
     const diffMinutes = Math.floor((Date.now() - orderedAt) / 60_000);
 
     if (diffMinutes === 0) return "Just now";
@@ -209,9 +246,10 @@ import { OrderStatus } from "../../lib/constant";
         setText(cloneCard, ".js-ordered-at", formatMinutesAgo(order.orderedAt));
 
         // Keep the raw timestamp on the element for periodic re-rendering
-        cloneCard.querySelector<HTMLElement>(
-          ".js-ordered-at",
-        )!.dataset.orderedAt = String(order.orderedAt);
+        const orderedAtElem =
+          cloneCard.querySelector<HTMLElement>(".js-ordered-at");
+        if (orderedAtElem)
+          orderedAtElem.dataset.orderedAt = String(order.orderedAt);
 
         const itemsTemplate =
           cloneCard.querySelector<HTMLTemplateElement>(".js-items-template")!;
@@ -242,7 +280,13 @@ import { OrderStatus } from "../../lib/constant";
       });
   }, 30_000);
 
-  $orders.subscribe(renderOrders);
+  // HACK: render orders on page load
+  // socket.io: subscribe to order updates
+  import { socket } from "../../lib/socket";
+  socket.on("order_update", (orders: Order[]) => {
+    renderOrders(orders);
+    updateCounters(orders);
+  });
 
   // ==========================================================================
   // STUB
@@ -362,8 +406,8 @@ import { OrderStatus } from "../../lib/constant";
     },
   ];
 
-  testOrders.forEach((order) => {
-    $orders.set([...$orders.get(), order]);
-  });
+  renderOrders(testOrders);
+  updateCounters(testOrders);
+
   // ==========================================================================
 </script>
