@@ -1,15 +1,41 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieSession from "cookie-session";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { registerOrderSockets } from "./sockets/orderSocket";
 import orderRoutes from "./routes/orders";
 
 dotenv.config();
+
 const app = express();
 
-app.use(cors({ origin: "http://localhost:4321", credentials: true }));
+const sessionSecret = process.env.SESSION_SECRET;
+
+if (!sessionSecret) {
+  console.error("SESSION_SECRET is not configured.");
+  process.exit(1);
+}
+
+const sessionMiddleware = cookieSession({
+  name: "session",
+  keys: [sessionSecret],
+  httpOnly: true,
+  sameSite: "lax",
+  secure: false,
+});
+
+app.use(
+  cors({
+    origin: "http://localhost:4321",
+    credentials: true,
+  }),
+);
+
+app.use(express.json());
+app.use(sessionMiddleware);
+
 app.use("/orders", orderRoutes);
 
 const port = process.env.PORT || 3000;
@@ -17,7 +43,10 @@ const port = process.env.PORT || 3000;
 const server = createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: "http://localhost:4321" },
+  cors: {
+    origin: "http://localhost:4321",
+    credentials: true,
+  },
 });
 
 registerOrderSockets(io);

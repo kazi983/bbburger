@@ -35,6 +35,8 @@
     "@types/cookie-session": "^2.0.49",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/node": "^26.6.4"
+    "@types/node": "^26.6.4",
+    "nodemon": "^3.1.14",
+    "typescript": "^7.0.2"
   }
 }
