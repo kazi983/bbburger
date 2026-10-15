@@ -1,21 +1,20 @@
 import { atom } from "nanostores";
 
 type Items = {
+  productId: number;
+  unitPrice: number;
+  productName: string;
   quantity: number;
-  name: string;
-};
-
-export type OrderMessage = {
-  id: number;
-  orderId: number;
-  customerName: string;
-  receivedAt: number;
-  items: Items[];
 };
 
 export type Order = {
-  kind: "message";
-  message: OrderMessage;
+  orderId: number;
+  customerName: string;
+  status: string;
+  orderedAt: number;
+  completedAt?: number;
+  total: number;
+  items: Items[];
 };
 
 export const $orderId = atom<number>(0);
