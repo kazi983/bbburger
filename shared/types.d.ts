@@ -11,7 +11,7 @@ type OrderItem = {
   options?: BurgerOptions;
 };
 
-export type OrderStatus = "Received" | "Preparing" | "Ready" | "Completed";
+export type OrderStatus = "Received" | "Preparing" | "Ready" | "Delivered";
 
 export type Order = {
   orderId: number;
