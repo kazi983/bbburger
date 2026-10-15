@@ -1,15 +1,3 @@
----
-import type { OrderStatus } from "../lib/constant";
-
-type Props = {
-  orderID: number;
-  customerName: string;
-  status: OrderStatus;
-  createdAt: number;
-};
-const { orderID, customerName, status, createdAt } = Astro.props;
----
-
 <div class="receivedCard mb-8 md:mb-5">
   <hr class="cardBorder border-t-8 border-primary-container" />
   <div
@@ -18,8 +6,8 @@ const { orderID, customerName, status, createdAt } = Astro.props;
     <div class="grid grid-cols-2">
       <div>
         <p class="text-on-surface-variant font-bold">ORDER NUMBER</p>
-        <p class="js-order-id text-primary font-bold text-3xl">#{orderID}</p>
-        <h2 class="js-customer-name font-bold">{customerName}</h2>
+        <p class="js-order-id text-primary font-bold text-3xl"></p>
+        <h2 class="js-customer-name font-bold"></h2>
       </div>
 
       <div class="flex flex-col items-end">
@@ -44,13 +32,12 @@ const { orderID, customerName, status, createdAt } = Astro.props;
               <path d="m15 16l-2.414-2.414A2 2 0 0 1 12 12.172V6"></path>
             </g>
           </svg>
-          <p class="js-ordered-at text-sm">{createdAt} min ago</p>
+          <p class="js-ordered-at text-sm"></p>
         </div>
 
         <p
           class="js-status statusReceived bg-error-container rounded-full w-fit py-1 px-4 mt-2"
         >
-          {status}
         </p>
       </div>
     </div>

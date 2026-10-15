@@ -84,12 +84,7 @@ import { OrderStatus } from "../../lib/constant";
     </h2>
 
     <template id="receivedCardTemplate">
-      <ReceivedOrderCard
-        orderID={0}
-        customerName=""
-        status={OrderStatus.Received}
-        createdAt={0}
-      />
+      <ReceivedOrderCard />
     </template>
 
     <div
@@ -123,7 +118,7 @@ import { OrderStatus } from "../../lib/constant";
     <div id="finishedOrdersContainer"></div>
 
     <template id="finishedOrdersTemplate">
-      <FinishedOrderCard orderID={0} customerName="" completedAt="" total="" />
+      <FinishedOrderCard />
     </template>
   </main>
 
