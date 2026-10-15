@@ -7,7 +7,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const orderModel_1 = require("./models/orderModel");
 const app = (0, express_1.default)();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 // Setting middleware
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
@@ -28,19 +28,21 @@ app.post("/api/orders", (req, res) => {
             });
             return;
         }
-        // create order numbers randomly（Dummy）
-        const orderId = (0, orderModel_1.createOrderId)();
-        console.log(`[Order Received] ID: ${orderId}, Customer: ${result.customerName}, Total: ${result.total}`);
+        // Save the order in memory (this also gives it an order number)
+        const order = (0, orderModel_1.saveOrder)(result);
+        console.log(`[Order Received] ID: ${order.orderId}, Customer: ${order.customerName}, Total: ${order.total}`);
         // Succesfull response
         res.status(200).json({
             success: true,
             message: "Order placed successfully!",
-            orderId: orderId,
-            name: result.customerName,
-            items: result.lines,
+            orderId: order.orderId,
+            name: order.customerName,
+            orderedAt: order.orderedAt,
+            status: order.status,
+            items: order.items,
             subtotal: result.subtotal,
             tax: result.tax,
-            total: result.total,
+            total: order.total,
         });
     }
     catch (error) {

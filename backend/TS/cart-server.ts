@@ -1,9 +1,9 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
-import { validateOrder, createOrderId } from "./models/orderModel"
+import { validateOrder, saveOrder } from "./models/orderModel"
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 
 // Setting middleware
@@ -30,21 +30,23 @@ app.post("/api/orders", (req: Request, res: Response) => {
             return;
         }
 
-        // create order numbers randomly（Dummy）
-        const orderId = createOrderId();
+        // Save the order in memory (this also gives it an order number)
+        const order = saveOrder(result);
 
-        console.log(`[Order Received] ID: ${orderId}, Customer: ${result.customerName}, Total: ${result.total}`);
+        console.log(`[Order Received] ID: ${order.orderId}, Customer: ${order.customerName}, Total: ${order.total}`);
 
         // Succesfull response
         res.status(200).json({
             success: true,
             message: "Order placed successfully!",
-            orderId: orderId,
-            name: result.customerName,
-            items: result.lines,
+            orderId: order.orderId,
+            name: order.customerName,
+            orderedAt: order.orderedAt,
+            status: order.status,
+            items: order.items,
             subtotal: result.subtotal,
             tax: result.tax,
-            total: result.total,
+            total: order.total,
         });
     } catch (error) {
         console.error("Error processing order:", error);

@@ -1,25 +1,20 @@
 import fs from "fs";
 import path from "path";
+import type { Order, BurgerOptions, OrderItem } from "../../../shared/types"
 
 type Product = {
     id: number;
     name: string;
     price: number;
-};
-
-type OrderLine = {
-    productId: number;
-    name: string;
-    price: number;
-    quantity: number;
-    lineTotal: number;
+    category: string;
+    ingredients: string[];
 };
 
 //What validateOrder() returns
 type OrderResult = {
     errors: string[]; // empty array = the order is OK
     customerName: string;
-    lines: OrderLine[];
+    lines: OrderItem[];
     subtotal: number;
     tax: number;
     total: number;
@@ -28,6 +23,7 @@ type OrderResult = {
 const taxRate = 0.08;
 const maxQuantity = 99;
 const maxNameLength = 50;
+const donenessChoices: BurgerOptions["doneness"][] = ["Medium rare", "Medium", "Well done"];
 
 // Load the menu once at startup (server-side source of truth for prices)
 // This file runs from backend/JS/models/, so go up two folders to reach backend/data/
@@ -35,20 +31,26 @@ const products: Product[] = JSON.parse(
     fs.readFileSync(path.join(__dirname, "../../data/product.json"), "utf-8")
 );
 
+// All placed orders, kept in server memory (they reset when the server restarts)
+const orders: Order[] = [];
+let nextOrderId = 1001;
+
 function roundMoney(value: number) {
     return Math.round(value * 100) / 100;
 }
 
-//Make a rondom order number like '#FG-1234'
-export function createOrderId(){
-    return `#FG-${Math.floor(1000 + Math.random() * 9000)}`;
+//Make the next order number: 1001, 1002, 1003, ...
+function createOrderId(){
+    const orderId = nextOrderId;
+    nextOrderId = nextOrderId + 1;
+    return orderId;
 }
 
 // Check the order sent from the frontend and calculate the price.
 // We use the prices in product.json, not the prices sent by the browser.
 export function validateOrder(body: unknown): OrderResult {
     const errors: string[] = [];
-    const lines: OrderLine[] = [];
+    const lines: OrderItem[] = [];
 
     //1, check the customer name ( body should be object )
     let customerName = "";
@@ -87,20 +89,53 @@ export function validateOrder(body: unknown): OrderResult {
                 continue; // skip to the next item
             }
 
-            lines.push({
+            const line: OrderItem = {
                 productId: product.id,
-                name: product.name,
-                price: product.price,
+                productName: product.name,
+                unitPrice: product.price,
                 quantity: quantity,
-                lineTotal: roundMoney(product.price * quantity),
-            });
+            };
+
+            //3-2, check the options (only burgers have options)
+            if(product.category === "burguer"){
+                // doneness must be one of the 3 choices
+                const doneness = donenessChoices.find((choice) => {
+                    return choice === item.options?.doneness
+                });
+
+                if(!doneness){
+                    errors.push(`${product.name}: please choose how the burger is cooked`);
+                    continue; // skip to the next item
+                }
+
+                // removedIngredients must be a list of this burger's ingredients
+                const removedIngredients = item.options?.removedIngredients ?? [];
+
+                if(!Array.isArray(removedIngredients)){
+                    errors.push(`${product.name}: removed ingredients must be a list`);
+                    continue; // skip to the next item
+                }
+
+                const unknownIngredient = removedIngredients.find((ingredient) => {
+                    return !product.ingredients.includes(ingredient)
+                });
+
+                if(unknownIngredient !== undefined){
+                    errors.push(`${product.name} does not have ${unknownIngredient}`);
+                    continue; // skip to the next item
+                }
+
+                line.options = { doneness, removedIngredients };
+            }
+
+            lines.push(line);
         }
     }
 
     //4, calculate the price
     let subtotal = 0;
     for(const line of lines){
-        subtotal = subtotal + line.lineTotal;
+        subtotal = subtotal + line.unitPrice * line.quantity;
     }
     subtotal = roundMoney(subtotal);
 
@@ -108,4 +143,26 @@ export function validateOrder(body: unknown): OrderResult {
     const total = roundMoney(subtotal + tax);
 
     return { errors, customerName, lines, subtotal, tax, total };
+}
+
+// Save a checked order in memory and return it
+export function saveOrder(result: OrderResult): Order {
+    const order: Order = {
+        orderId: createOrderId(),
+        customerName: result.customerName,
+        orderedAt: Date.now(),
+        status: "Received",
+        items: result.lines,
+        total: result.total,
+    };
+
+    orders.push(order);
+    return order;
+}
+
+// Find a saved order by its number (for order tracking)
+export function findOrderById(orderId: number) {
+    return orders.find((order) => {
+        return order.orderId === orderId
+    });
 }

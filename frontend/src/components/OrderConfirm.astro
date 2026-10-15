@@ -1,27 +1,28 @@
 ---
 export interface Props {
-	id: number;
-	name: string;
+	id?: number | string;
+	name?: string;
 }
 
-const { id, name } = Astro.props;
+// Default text, replaced by the real order in the script below
+const { id = "-", name = "Guest" } = Astro.props;
 ---
 
 <div id="order-confirmed-view" class="space-y-space-md">
-	<!-- Check the main card (Alex Johnson is dummy) -->
+	<!-- Check the main card -->
 	<div class="bg-surface-container-lowest rounded-lg p-space-lg text-center shadow-sm border border-outline-variant">
 		<div class="w-16 h-16 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full flex items-center justify-center text-3xl mx-auto mb-space-md">
 			✓
 		</div>
 		<h2 class="font-headline-lg-mobile text-headline-lg-mobile mb-space-sm">Order Confirmed!</h2>
 		<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-lg">
-			Thanks <span class="font-bold text-on-surface">{name}</span>, our kitchen has received your order and is firing up the grill.
+			Thanks <span id="confirm-name" class="font-bold text-on-surface">{name}</span>, our kitchen has received your order and is firing up the grill.
 		</p>
 
 		<!-- Show order number  -->
 		<div class="bg-surface-container-low rounded-default py-3 px-space-md border border-outline-variant flex items-center justify-center gap-space-sm">
 			<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Order Number:</span>
-			<span class="font-label-lg text-label-lg text-primary">{id}</span>
+			<span id="confirm-order-id" class="font-label-lg text-label-lg text-primary">{id}</span>
 		</div>
 	</div>
 
@@ -36,3 +37,26 @@ const { id, name } = Astro.props;
 		</div>
 	</div>
 </div>
+
+<script>
+	// Show the order that was just placed (PlaceOrderButton saves it as "lastOrder")
+	try {
+		const savedOrder = sessionStorage.getItem("lastOrder");
+
+		if (savedOrder) {
+			const order = JSON.parse(savedOrder);
+			const nameText = document.querySelector("#confirm-name");
+			const orderIdText = document.querySelector("#confirm-order-id");
+
+			if (nameText && order.name) {
+				nameText.textContent = order.name;
+			}
+
+			if (orderIdText && order.orderId) {
+				orderIdText.textContent = String(order.orderId);
+			}
+		}
+	} catch {
+		// Keep the default text if sessionStorage is not available
+	}
+</script>
