@@ -35,7 +35,7 @@ import "../../styles/tracking.css";
 
       <!-- Order Number -->
       <div>
-        <p id = order-number  class="text-sm text-on-surface-variant">Order #</p>
+        <p id="order-number" class="text-sm text-on-surface-variant">Order #</p>
 
         <h2 class="mt-2 font-headline text-2xl font-bold text-on-surface">
           Est. Ready in
@@ -219,14 +219,15 @@ import "../../styles/tracking.css";
         </h2>
 
         <span
-          id = "order-item-count" class="rounded-full bg-surface-container px-3 py-1 text-xs font-bold text-on-surface-variant"
+          id="order-item-count"
+          class="rounded-full bg-surface-container px-3 py-1 text-xs font-bold text-on-surface-variant"
         >
           Order Items (0)
         </span>
       </div>
 
-   <!-- Order Items -->
-<div id="order-items"></div>
+      <!-- Order Items -->
+      <div id="order-items"></div>
 
       <!-- Total -->
       <div class="flex items-center justify-between pt-1">
@@ -234,9 +235,13 @@ import "../../styles/tracking.css";
           <p class="font-bold text-on-surface">Total</p>
         </div>
 
-        <p id="order-total" class="font-headline text-2xl font-bold text-primary">CAD 0.00</p>
+        <p
+          id="order-total"
+          class="font-headline text-2xl font-bold text-primary"
+        >
+          CAD 0.00
+        </p>
       </div>
-
     </section>
   </main>
 
@@ -335,12 +340,9 @@ import "../../styles/tracking.css";
   const orderTotal = document.getElementById("order-total");
 
   async function loadOrder() {
-
     try {
       // Fetch order data from the backend
-      const response = await fetch(
-        `http://localhost:3000/orders/${orderNum}`
-      );
+      const response = await fetch(`http://localhost:3000/orders/${orderNum}`);
       const order = await response.json();
 
       if (!response.ok) {
@@ -377,7 +379,7 @@ import "../../styles/tracking.css";
                   CAD ${(item.unitPrice * item.quantity).toFixed(2)}
                 </p>
               </div>
-            `
+            `,
           )
           .join("");
       }

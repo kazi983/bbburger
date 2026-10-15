@@ -24,9 +24,7 @@ try {
   seedAdmin();
 } catch (error) {
   console.error(
-    error instanceof Error
-      ? error.message
-      : "Failed to seed admin account.",
+    error instanceof Error ? error.message : "Failed to seed admin account.",
   );
   process.exit(1);
 }
@@ -64,6 +62,8 @@ const io = new Server(server, {
 });
 
 io.engine.use(sessionMiddleware);
+
+app.set("io", io);
 
 registerOrderSockets(io);
 

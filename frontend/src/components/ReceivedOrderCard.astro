@@ -1,21 +1,3 @@
----
-import type { OrderStatus } from "../lib/constant";
-
-type Items = {
-  quantity: number;
-  name: string;
-};
-
-type Props = {
-  orderID: number;
-  customerName: string;
-  status: OrderStatus;
-  //   items: Items[];
-  createdAt: number;
-};
-const { orderID, customerName, status, createdAt } = Astro.props;
----
-
 <div class="receivedCard mb-8 md:mb-5">
   <hr class="cardBorder border-t-8 border-primary-container" />
   <div
@@ -24,8 +6,8 @@ const { orderID, customerName, status, createdAt } = Astro.props;
     <div class="grid grid-cols-2">
       <div>
         <p class="text-on-surface-variant font-bold">ORDER NUMBER</p>
-        <p class="js-order-id text-primary font-bold text-3xl">#{orderID}</p>
-        <h2 class="js-customer-name font-bold">{customerName}</h2>
+        <p class="js-order-id text-primary font-bold text-3xl"></p>
+        <h2 class="js-customer-name font-bold"></h2>
       </div>
 
       <div class="flex flex-col items-end">
@@ -50,13 +32,12 @@ const { orderID, customerName, status, createdAt } = Astro.props;
               <path d="m15 16l-2.414-2.414A2 2 0 0 1 12 12.172V6"></path>
             </g>
           </svg>
-          <p class="js-ordered-at text-sm">{createdAt} min ago</p>
+          <p class="js-ordered-at text-sm"></p>
         </div>
 
         <p
           class="js-status statusReceived bg-error-container rounded-full w-fit py-1 px-4 mt-2"
         >
-          {status}
         </p>
       </div>
     </div>
@@ -112,102 +93,128 @@ const { orderID, customerName, status, createdAt } = Astro.props;
 </div>
 
 <script>
-  import { socket } from "../lib/socket";
+  import { sendStatusUpdate } from "../lib/order";
+  import { showErrorToast } from "../lib/toast";
 
-  function sendStatusUpdate(status: string) {
-    socket.emit("updated_status", status);
+  // Returns true only when the server accepted the new status
+  async function updateStatus(orderId: number, status: string) {
+    try {
+      await sendStatusUpdate(orderId, status);
+      return true;
+    } catch (err) {
+      console.error("Failed to update order status:", err);
+      const reason = err instanceof Error ? err.message : String(err);
+      showErrorToast(`Order #${orderId}: could not set "${status}". ${reason}`);
+      return false;
+    }
   }
 
-  const cards = document.querySelectorAll(".receivedCard");
+  // Event delegation: cards are cloned from a <template> and rebuilt on every
+  // socket update, so a single listener on document handles all of them.
+  document.addEventListener("click", async (e) => {
+    const btn = (e.target as Element).closest<HTMLButtonElement>(
+      ".prepareBtn, .readyBtn, .deliverBtn",
+    );
+    if (!btn || btn.disabled) return;
 
-  cards.forEach((card) => {
-    const prepBtn = card.querySelector(".prepareBtn") as HTMLButtonElement;
-    const readyBtn = card.querySelector(".readyBtn") as HTMLButtonElement;
-    const deliverBtn = card.querySelector(".deliverBtn") as HTMLButtonElement;
+    const card = btn.closest<HTMLElement>(".receivedCard");
+    if (!card) return;
+
+    const prepBtn = card.querySelector<HTMLButtonElement>(".prepareBtn");
+    const readyBtn = card.querySelector<HTMLButtonElement>(".readyBtn");
+    const deliverBtn = card.querySelector<HTMLButtonElement>(".deliverBtn");
     const status = card.querySelector(".statusReceived");
     const border = card.querySelector(".cardBorder");
     const container = card.querySelector(".cardContainer");
+    if (
+      !prepBtn ||
+      !readyBtn ||
+      !deliverBtn ||
+      !status ||
+      !border ||
+      !container
+    )
+      return;
 
-    prepBtn?.addEventListener("click", () => {
-      if (status && border && container && prepBtn) {
-        status.textContent = "Preparing";
-        status.classList.remove("bg-bg-error-container");
-        status.classList.add("bg-secondary-fixed");
+    const orderId = Number(card.dataset.orderId);
+    const nextStatus =
+      btn === prepBtn ? "Preparing" : btn === readyBtn ? "Ready" : "Delivered";
 
-        border.classList.remove("border-primary-container");
-        border.classList.add("border-secondary-fixed-dim");
+    // Update the UI only after the server accepts the change.
+    // Disable the button while waiting to prevent double submits.
+    btn.disabled = true;
+    const ok = await updateStatus(orderId, nextStatus);
+    if (!ok) {
+      btn.disabled = false;
+      return;
+    }
 
-        container.classList.remove("hover:border-primary-container");
-        container.classList.add("hover:border-secondary-fixed-dim");
+    if (btn === prepBtn) {
+      status.textContent = "Preparing";
+      status.classList.remove("bg-error-container");
+      status.classList.add("bg-secondary-fixed");
 
-        prepBtn.disabled = true;
-        prepBtn.classList.remove("bg-surface-container", "cursor-pointer");
-        prepBtn.classList.add("cursor-not-allowed", "bg-secondary-fixed-dim");
+      border.classList.remove("border-primary-container");
+      border.classList.add("border-secondary-fixed-dim");
 
-        readyBtn.disabled = false;
-        readyBtn.classList.remove("opacity-50", "cursor-not-allowed");
-        readyBtn.classList.add("cursor-pointer");
-      }
+      container.classList.remove("hover:border-primary-container");
+      container.classList.add("hover:border-secondary-fixed-dim");
 
-      sendStatusUpdate("Preparing");
-    });
+      prepBtn.disabled = true;
+      prepBtn.classList.remove("bg-surface-container", "cursor-pointer");
+      prepBtn.classList.add("cursor-not-allowed", "bg-secondary-fixed-dim");
 
-    readyBtn?.addEventListener("click", () => {
-      if (status && border && container && readyBtn && prepBtn) {
-        status.textContent = "Ready";
-        status.classList.remove("bg-secondary-fixed");
-        status.classList.add("bg-tertiary-fixed-dim");
+      readyBtn.disabled = false;
+      readyBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      readyBtn.classList.add("cursor-pointer");
+    } else if (btn === readyBtn) {
+      status.textContent = "Ready";
+      status.classList.remove("bg-secondary-fixed");
+      status.classList.add("bg-tertiary-fixed-dim");
 
-        border.classList.remove("border-secondary-fixed-dim");
-        border.classList.add("border-tertiary-container");
+      border.classList.remove("border-secondary-fixed-dim");
+      border.classList.add("border-tertiary-container");
 
-        container.classList.remove("hover:border-[#FFAA01]");
-        container.classList.add("hover:border-tertiary-container");
+      container.classList.remove("hover:border-secondary-fixed-dim");
+      container.classList.add("hover:border-tertiary-container");
 
-        prepBtn.classList.remove("cursor-pointer");
-        prepBtn.classList.add("opacity-50", "cursor-not-allowed");
+      prepBtn.classList.remove("cursor-pointer");
+      prepBtn.classList.add("opacity-50", "cursor-not-allowed");
 
-        readyBtn.disabled = true;
-        readyBtn.classList.remove(
-          "bg-surface-container",
-          "text-on-surface-variant",
-        );
-        readyBtn.classList.add(
-          "cursor-not-allowed",
-          "bg-tertiary-container",
-          "text-white",
-        );
+      readyBtn.disabled = true;
+      readyBtn.classList.remove(
+        "bg-surface-container",
+        "text-on-surface-variant",
+      );
+      readyBtn.classList.add(
+        "cursor-not-allowed",
+        "bg-tertiary-container",
+        "text-white",
+      );
 
-        deliverBtn.disabled = false;
-        deliverBtn.classList.remove("opacity-50", "cursor-not-allowed");
-        deliverBtn.classList.add("cursor-pointer");
-      }
+      deliverBtn.disabled = false;
+      deliverBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      deliverBtn.classList.add("cursor-pointer");
+    } else if (btn === deliverBtn) {
+      status.textContent = "Delivered";
+      status.classList.remove("bg-tertiary-fixed-dim");
+      status.classList.add("bg-gray-200");
 
-      sendStatusUpdate("Ready");
-    });
+      border.classList.remove("border-tertiary-container");
+      border.classList.add("border-black");
 
-    deliverBtn?.addEventListener("click", () => {
-      if (status && border && container && deliverBtn && readyBtn) {
-        status.textContent = "Delivered";
-        status.classList.remove("bg-tertiary-fixed-dim");
-        status.classList.add("bg-gray-200");
+      container.classList.remove("hover:border-tertiary-container");
+      container.classList.add("hover:border-black");
 
-        border.classList.remove("border-tertiary-container");
-        border.classList.add("border-black");
+      readyBtn.classList.remove("cursor-pointer");
+      readyBtn.classList.add("opacity-50", "cursor-not-allowed");
 
-        container.classList.remove("hover:border-tertiary-container");
-        container.classList.add("hover:border-black");
-
-        readyBtn.classList.remove("cursor-pointer");
-        readyBtn.classList.add("opacity-50", "cursor-not-allowed");
-
-        deliverBtn.disabled = true;
-        deliverBtn.classList.remove(
-          "bg-surface-container",
-          "text-on-surface-variant",
-        );
-        deliverBtn.classList.add("bg-black", "text-white");
-      }
-    });
+      deliverBtn.disabled = true;
+      deliverBtn.classList.remove(
+        "bg-surface-container",
+        "text-on-surface-variant",
+      );
+      deliverBtn.classList.add("bg-black", "text-white");
+    }
   });
 </script>

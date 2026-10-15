@@ -2,7 +2,6 @@
 import Layout from "../../layouts/layout.astro";
 import ReceivedOrderCard from "../../components/ReceivedOrderCard.astro";
 import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
-import { OrderStatus } from "../../lib/constant";
 ---
 
 <Layout title="Kitchen Dashboard">
@@ -38,7 +37,7 @@ import { OrderStatus } from "../../lib/constant";
       <div class="lg:grid lg:grid-cols-2">
         <h1 class="text-4xl font-bold mt-5 mb-8">Kitchen Operation</h1>
 
-        <div class="grid grid-cols-4 gap-2 mb-5">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
           <div
             class="flex flex-col items-center bg-surface-container-low p-2 border border-outline-variant"
           >
@@ -75,14 +74,6 @@ import { OrderStatus } from "../../lib/constant";
           </div>
         </div>
       </div>
-
-      <hr class="my-4 border-t border-outline-variant" />
-
-      <div class="flex flex-row items-center justify-end sm:gap-1">
-        <span class="text-on-surface-variant text-xs"
-          >Auto-refreshing (1s)
-        </span>
-      </div>
     </div>
 
     <h2 class="text-2xl font-bold my-10">
@@ -92,12 +83,7 @@ import { OrderStatus } from "../../lib/constant";
     </h2>
 
     <template id="receivedCardTemplate">
-      <ReceivedOrderCard
-        orderID={0}
-        customerName=""
-        status={OrderStatus.Received}
-        createdAt={0}
-      />
+      <ReceivedOrderCard />
     </template>
 
     <div
@@ -118,26 +104,44 @@ import { OrderStatus } from "../../lib/constant";
       </span> Finished Orders
     </h2>
 
-    <div
-      class="hidden md:grid md:grid-cols-6 md:items-center md:gap-2 md:p-5 md:bg-surface-variant md:font-bold"
-    >
-      <h3>ORDER #</h3>
-      <h3>STATUS</h3>
-      <h3>CUSTOMER</h3>
-      <h3>ITEM SUMMARY</h3>
-      <h3>COMPLETED AT</h3>
-      <h3>TOTAL</h3>
+    <div class="md:grid md:grid-cols-[auto_auto_auto_1fr_auto_auto] md:gap-x-6">
+      <div
+        class="hidden md:grid md:grid-cols-subgrid md:col-span-6 md:items-center md:px-3 md:py-5 md:bg-surface-variant md:font-bold"
+      >
+        <h3>ORDER #</h3>
+        <h3>STATUS</h3>
+        <h3>CUSTOMER</h3>
+        <h3>ITEM SUMMARY</h3>
+        <h3>COMPLETED AT</h3>
+        <h3>TOTAL</h3>
+      </div>
+      <div
+        id="finishedOrdersContainer"
+        class="md:grid md:grid-cols-subgrid md:col-span-6"
+      >
+      </div>
     </div>
-    <div id="finishedOrdersContainer"></div>
 
     <template id="finishedOrdersTemplate">
-      <FinishedOrderCard orderID={0} customerName="" completedAt="" total="" />
+      <FinishedOrderCard />
     </template>
   </main>
+
+  <div
+    id="error-toast"
+    role="alert"
+    aria-atomic="true"
+    class="pointer-events-none fixed top-24 left-1/2 z-60 w-max max-w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-2 rounded-xl bg-error px-5 py-3 text-center text-sm text-on-error opacity-0 shadow-lg transition duration-200 motion-reduce:transition-none"
+  >
+  </div>
 </Layout>
 
 <script>
+  import { socket } from "../../lib/socket";
+  import type { Order } from "../../../../shared/types";
+  import { fetchOrders } from "../../lib/order";
   import { getMe, logout } from "../../lib/auth";
+  import { showErrorToast } from "../../lib/toast";
 
   const logoutButton =
     document.querySelector<HTMLButtonElement>("#logout-button");
@@ -151,24 +155,20 @@ import { OrderStatus } from "../../lib/constant";
   }
 
   // On page load: check the existing session
-  // const me = await getMe();
-  // if (me) showDashboard();
-  // else window.location.href = "/login";
+  const me = await getMe();
+  if (me) showDashboard();
+  else window.location.href = "/login";
 
-  // HACK
-  showDashboard();
-
+  // Render orders
   logoutButton?.addEventListener("click", async () => {
     try {
       await logout();
       window.location.href = "/login";
     } catch (error) {
       console.error("Logout failed.", error);
+      showErrorToast("Logout failed. Please try again.");
     }
   });
-
-  // render orders
-  import type { Order } from "../../../../shared/types";
 
   const receivedCounter = document.getElementById("receivedCounter");
   const preparingCounter = document.getElementById("preparingCounter");
@@ -192,7 +192,7 @@ import { OrderStatus } from "../../lib/constant";
     if (elem) elem.textContent = text;
   }
 
-  function updateCounters(orders: readonly Order[]) {
+  function updateCounters(orders: Order[]) {
     const receivedCount = orders.filter(
       (order) => order.status === "Received",
     ).length;
@@ -223,7 +223,7 @@ import { OrderStatus } from "../../lib/constant";
     else return rtf.format(-diffMinutes, "minute");
   }
 
-  function renderOrders(orders: readonly Order[]) {
+  function renderOrders(orders: Order[]) {
     if (!receivedCardTemplate || !finishedOrdersTemplate) return;
     receivedOrdersContainer?.replaceChildren();
     finishedOrdersContainer?.replaceChildren();
@@ -263,6 +263,10 @@ import { OrderStatus } from "../../lib/constant";
         const cloneCard = receivedCardTemplate.content.cloneNode(
           true,
         ) as DocumentFragment;
+
+        // Store the order ID on the card root so event handlers can read it
+        const cardElem = cloneCard.querySelector<HTMLElement>(".receivedCard");
+        if (cardElem) cardElem.dataset.orderId = String(order.orderId);
 
         setText(cloneCard, ".js-order-id", `#${order.orderId}`);
         setText(cloneCard, ".js-customer-name", order.customerName);
@@ -304,134 +308,28 @@ import { OrderStatus } from "../../lib/constant";
       });
   }, 30_000);
 
-  // HACK: render orders on page load
-  // socket.io: subscribe to order updates
-  import { socket } from "../../lib/socket";
-  socket.on("order_update", (orders: Order[]) => {
+  socket.on("connect", async () => {
+    try {
+      const orders = await fetchOrders();
+      renderOrders(orders);
+      updateCounters(orders);
+    } catch (err) {
+      console.error("Failed to fetch orders:", err);
+      showErrorToast("Failed to load orders. Please reload the page.");
+    }
+  });
+
+  socket.on("connect_error", () => {
+    showErrorToast("Cannot connect to the server. Retrying...");
+  });
+
+  socket.on("new_order", (orders: Order[]) => {
     renderOrders(orders);
     updateCounters(orders);
   });
 
-  // ==========================================================================
-  // STUB
-
-  const testOrders: Order[] = [
-    {
-      orderId: 123,
-      customerName: "Fernanda",
-      status: "Received",
-      orderedAt: new Date("2026/10/14 17:55").getTime(),
-      total: 50,
-      items: [
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Double Flame Burger",
-          quantity: 2,
-        },
-        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 3 },
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Strawberry Milkshake",
-          quantity: 1,
-        },
-      ],
-    },
-    {
-      orderId: 456,
-      customerName: "Kazi",
-      status: "Received",
-      orderedAt: new Date("2026/10/14 18:00").getTime(),
-      total: 50,
-      items: [
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Double Flame Burger",
-          quantity: 2,
-        },
-        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 3 },
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Strawberry Milkshake",
-          quantity: 1,
-        },
-      ],
-    },
-    {
-      orderId: 888,
-      customerName: "Kazi",
-      status: "Received",
-      orderedAt: Date.now(),
-      total: 50,
-      items: [
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Double Flame Burger",
-          quantity: 2,
-        },
-        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 3 },
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Strawberry Milkshake",
-          quantity: 1,
-        },
-      ],
-    },
-    {
-      orderId: 789,
-      customerName: "Kazi",
-      status: "Delivered",
-      orderedAt: 2,
-      completedAt: Date.now(),
-      total: 50,
-      items: [
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Cheese Flame Burger",
-          quantity: 2,
-        },
-        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 10 },
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Vanila Milkshake",
-          quantity: 1,
-        },
-      ],
-    },
-    {
-      orderId: 190,
-      customerName: "Kazi",
-      status: "Delivered",
-      orderedAt: 2,
-      completedAt: Date.now(),
-      total: 50,
-      items: [
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Cheese Flame Burger",
-          quantity: 2,
-        },
-        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 10 },
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Vanila Milkshake",
-          quantity: 1,
-        },
-      ],
-    },
-  ];
-
-  renderOrders(testOrders);
-  updateCounters(testOrders);
-
-  // ==========================================================================
+  socket.on("status_updated", (orders: Order[]) => {
+    renderOrders(orders);
+    updateCounters(orders);
+  });
 </script>
