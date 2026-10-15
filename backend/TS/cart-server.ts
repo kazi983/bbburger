@@ -1,106 +1,10 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
-import fs from "fs";
-import path from "path";
+import { validateOrder, createOrderId } from "./models/orderModel"
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-type Product = {
-    id: number;
-    name: string;
-    price: number;
-};
-
-type OrderLine = {
-    productId: number;
-    name: string;
-    price: number;
-    quantity: number;
-    lineTotal: number;
-};
-
-const TAX_RATE = 0.05;  //tax rate in BC
-const MAX_QUANTITY = 99;
-const MAX_NAME_LENGTH = 50;
-
-// Load the menu once at startup (server-side source of truth for prices)
-const products: Product[] = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "../data/product.json"), "utf-8")
-);
-
-const roundMoney = (value: number) => Math.round(value * 100) / 100;
-
-
-// Validate the order body and recalculate prices from product.json.
-// Returns a list of error messages, or the validated order.
-// function validateOrder(body: unknown):
-//     | { errors: string[] }
-//     | { customerName: string; lines: OrderLine[]; subtotal: number; tax: number; total: number } {
-//     const errors: string[] = [];
-//     const { customerName, items } = (body ?? {}) as { customerName?: unknown; items?: unknown };
-
-//     // Customer name
-//     const name = typeof customerName === "string" ? customerName.trim() : "";
-//     if (!name) {
-//         errors.push("Customer name is required.");
-//     } else if (name.length > MAX_NAME_LENGTH) {
-//         errors.push(`Customer name must be ${MAX_NAME_LENGTH} characters or less.`);
-//     }
-
-//     // Cart items
-//     if (!Array.isArray(items) || items.length === 0) {
-//         errors.push("Cart is empty.");
-//         return { errors };
-//     }
-
-//     const lines: OrderLine[] = [];
-//     const seenIds = new Set<number>();
-
-//     items.forEach((item: unknown, index: number) => {
-//         const { productId, quantity } = (item ?? {}) as { productId?: unknown; quantity?: unknown };
-//         const label = `Item ${index + 1}`;
-
-//         if (typeof productId !== "number" || !Number.isInteger(productId)) {
-//             errors.push(`${label}: productId must be an integer.`);
-//             return;
-//         }
-//         const product = products.find((p) => p.id === productId);
-//         if (!product) {
-//             errors.push(`${label}: product ${productId} does not exist.`);
-//             return;
-//         }
-//         if (seenIds.has(productId)) {
-//             errors.push(`${label}: product ${productId} is duplicated.`);
-//             return;
-//         }
-//         seenIds.add(productId);
-
-//         if (typeof quantity !== "number" || !Number.isInteger(quantity) || quantity < 1 || quantity > MAX_QUANTITY) {
-//             errors.push(`${label}: quantity must be an integer between 1 and ${MAX_QUANTITY}.`);
-//             return;
-//         }
-
-//         lines.push({
-//             productId,
-//             name: product.name,
-//             price: product.price,
-//             quantity,
-//             lineTotal: roundMoney(product.price * quantity),
-//         });
-//     });
-
-//     if (errors.length > 0) {
-//         return { errors };
-//     }
-
-//     // Never trust the total sent by the client; recalculate it here
-//     const subtotal = roundMoney(lines.reduce((sum, line) => sum + line.lineTotal, 0));
-//     const tax = roundMoney(subtotal * TAX_RATE);
-//     const total = roundMoney(subtotal + tax);
-
-//     return { customerName: name, lines, subtotal, tax, total };
-// }
 
 // Setting middleware
 app.use(express.json());
@@ -117,7 +21,7 @@ app.post("/api/orders", (req: Request, res: Response) => {
         // req.body is undefined when no JSON body is sent (Express 5)
         const result = validateOrder(req.body);
 
-        if ("errors" in result) {
+        if (result.errors.length > 0) {
             res.status(400).json({
                 success: false,
                 message: result.errors[0],
@@ -127,7 +31,7 @@ app.post("/api/orders", (req: Request, res: Response) => {
         }
 
         // create order numbers randomly（Dummy）
-        const orderId = `#FG-${Math.floor(1000 + Math.random() * 9000)}`;
+        const orderId = createOrderId();
 
         console.log(`[Order Received] ID: ${orderId}, Customer: ${result.customerName}, Total: ${result.total}`);
 
