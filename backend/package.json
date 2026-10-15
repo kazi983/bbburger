@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon JS/server.js",
-    "cart": "npm run build && node JS/cart-server.js",
+    "dev": "npm run build && node JS/server.js",
     "start": "node JS/server.js"
   },
   "repository": {

@@ -30,8 +30,7 @@ function createOrderId() {
 // Check the order sent from the frontend and calculate the price.
 // We use the prices in product.json, not the prices sent by the browser.
 function validateOrder(body) {
-    const errors = [];
-    const lines = [];
+    const items = [];
     //1, check the customer name ( body should be object )
     let customerName = "";
     const b = body;
@@ -39,32 +38,30 @@ function validateOrder(body) {
         customerName = b.customerName.trim();
     }
     if (customerName === "") {
-        errors.push("Customer name is required");
+        return { error: "Customer name is required" };
     }
-    else if (customerName.length > maxNameLength) {
-        errors.push(`Customer name must be ${maxNameLength} characters or less.`);
+    if (customerName.length > maxNameLength) {
+        return { error: `Customer name must be ${maxNameLength} characters or less` };
     }
     //2, check the cart is not empty
-    const items = b?.items;
-    if (!Array.isArray(items) || items.length === 0) {
-        errors.push("Cart is empty.");
+    const cartItems = b?.items;
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
+        return { error: "Cart is empty." };
     }
     else {
         //3, check each item in the cart
-        for (const item of items) {
+        for (const item of cartItems) {
             const product = products.find((p) => {
                 return p.id === item?.productId;
             });
             if (!product) {
-                errors.push(`Products ${item?.productId} does not exist`);
-                continue; // skip to the next item
+                return { error: `Products ${item?.productId} does not exist` };
             }
             const quantity = item.quantity;
             if (!Number.isInteger(quantity) || quantity < 1 || quantity > maxQuantity) {
-                errors.push(`${product.name}: quantity must be between 1 and ${maxQuantity}`);
-                continue; // skip to the next item
+                return { error: `${product.name}: quantity must be between 1 and ${maxQuantity}` };
             }
-            const line = {
+            const orderItem = {
                 productId: product.id,
                 productName: product.name,
                 unitPrice: product.price,
@@ -77,36 +74,33 @@ function validateOrder(body) {
                     return choice === item.options?.doneness;
                 });
                 if (!doneness) {
-                    errors.push(`${product.name}: please choose how the burger is cooked`);
-                    continue; // skip to the next item
+                    return { error: `${product.name}: please choose how the burger is cooked` };
                 }
                 // removedIngredients must be a list of this burger's ingredients
                 const removedIngredients = item.options?.removedIngredients ?? [];
                 if (!Array.isArray(removedIngredients)) {
-                    errors.push(`${product.name}: removed ingredients must be a list`);
-                    continue; // skip to the next item
+                    return { error: `${product.name}: removed ingredients must be a list` };
                 }
                 const unknownIngredient = removedIngredients.find((ingredient) => {
                     return !product.ingredients.includes(ingredient);
                 });
                 if (unknownIngredient !== undefined) {
-                    errors.push(`${product.name} does not have ${unknownIngredient}`);
-                    continue; // skip to the next item
+                    return { error: `${product.name} does not have ${unknownIngredient}` };
                 }
-                line.options = { doneness, removedIngredients };
+                orderItem.options = { doneness, removedIngredients };
             }
-            lines.push(line);
+            items.push(orderItem);
         }
     }
     //4, calculate the price
     let subtotal = 0;
-    for (const line of lines) {
-        subtotal = subtotal + line.unitPrice * line.quantity;
+    for (const orderItem of items) {
+        subtotal = subtotal + orderItem.unitPrice * orderItem.quantity;
     }
     subtotal = roundMoney(subtotal);
     const tax = roundMoney(subtotal * taxRate);
     const total = roundMoney(subtotal + tax);
-    return { errors, customerName, lines, subtotal, tax, total };
+    return { customerName, items, subtotal, tax, total };
 }
 // Save a checked order in memory and return it
 function saveOrder(result) {
@@ -115,7 +109,7 @@ function saveOrder(result) {
         customerName: result.customerName,
         orderedAt: Date.now(),
         status: "Received",
-        items: result.lines,
+        items: result.items,
         total: result.total,
     };
     orders.push(order);

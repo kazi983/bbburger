@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieSession from "cookie-session";
@@ -6,6 +6,7 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import { registerOrderSockets } from "./sockets/orderSocket";
 import orderRoutes from "./routes/orders";
+
 import authRoutes from "./routes/authRoutes";
 import { seedAdmin } from "./models/UserModel";
 
@@ -66,6 +67,26 @@ io.engine.use(sessionMiddleware);
 app.set("io", io);
 
 registerOrderSockets(io);
+
+// 404 handler for unknown routes (return JSON instead of HTML)
+app.use((req: Request, res: Response) => {
+    res.status(404).json({
+        success: false,
+        message: "Not found"
+    });
+});
+
+// Error handler, e.g. invalid JSON body (return JSON instead of HTML)
+app.use((err: { status?: number }, req: Request, res: Response, next: NextFunction) => {
+    const status = err.status || 500;
+    if (status >= 500) {
+        console.error("Unexpected error:", err);
+    }
+    res.status(status).json({
+        success: false,
+        message: status === 400 ? "Invalid request body." : "Internal server error."
+    });
+});
 
 server.listen(port, async () => {
   try {
