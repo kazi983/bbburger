@@ -118,9 +118,20 @@ import { OrderStatus } from "../../lib/constant";
 </Layout>
 
 <script>
+  import { getMe } from "../../lib/auth";
+
+  function showDashboard() {
+    document.getElementById("dashboard")!.hidden = false;
+  }
+
+  // On page load: check the existing session
+  const me = await getMe();
+  if (me) showDashboard();
+  else window.location.href = "/login";
+
+  // render orders
   import { $orders } from "../../stores/order";
   import type { Order } from "../../../../shared/types";
-  import { getMe } from "../../lib/auth";
 
   const receivedCardTemplate = document.querySelector<HTMLTemplateElement>(
     "#receivedCardTemplate",
@@ -351,13 +362,4 @@ import { OrderStatus } from "../../lib/constant";
     $orders.set([...$orders.get(), order]);
   });
   // ==========================================================================
-
-  function showDashboard() {
-    document.getElementById("dashboard")!.hidden = false;
-  }
-
-  // On page load: check the existing session
-  const me = await getMe();
-  if (me) showDashboard();
-  else window.location.href = "/login";
 </script>
