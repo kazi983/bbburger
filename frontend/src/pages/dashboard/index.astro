@@ -306,9 +306,11 @@ import { OrderStatus } from "../../lib/constant";
       });
   }, 30_000);
 
-  const orders = await fetchOrders();
-  renderOrders(orders);
-  updateCounters(orders);
+  socket.on("connect", async () => {
+    const orders = await fetchOrders();
+    renderOrders(orders);
+    updateCounters(orders);
+  });
 
   socket.on("new_order", (orders: Order[]) => {
     renderOrders(orders);
