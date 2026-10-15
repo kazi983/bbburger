@@ -1,3 +1,7 @@
 import { io } from "socket.io-client";
 
-export const socket = io(import.meta.env.PUBLIC_API_URL);
+const API_URL = import.meta.env.PUBLIC_API_URL;
+
+export const socket = io(API_URL, {
+  withCredentials: true,
+});

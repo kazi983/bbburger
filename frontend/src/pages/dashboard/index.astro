@@ -2,12 +2,11 @@
 import Layout from "../../layouts/layout.astro";
 import ReceivedOrderCard from "../../components/ReceivedOrderCard.astro";
 import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
-import { OrderStatus } from "../../lib/constant";
 ---
 
 <Layout title="Kitchen Dashboard">
   <header
-    class="top-0 flex items-center justify-between gap-3 bg-background/95 backdrop-blur-sm p-10"
+    class="top-0 flex items-center justify-between gap-3 bg-background/95 backdrop-blur-sm p-5"
   >
     <div
       class="flex min-w-0 items-center gap-2 text-base font-bold text-primary sm:text-2xl"
@@ -23,50 +22,57 @@ import { OrderStatus } from "../../lib/constant";
 
       <span class="font-bold text-primary sm:text-2xl">Awshaf BBB</span>
     </div>
+    <button
+      id="logout-button"
+      type="button"
+      class="rounded-lg bg-primary-container px-4 py-2 font-bold text-on-primary-container"
+      hidden
+    >
+      Log Out
+    </button>
   </header>
-  
-  <main id="dashboard" class="pt-20" hidden>
+
+  <main id="dashboard" class="pt-5 px-5 pb-10" hidden>
     <div class="bg-white p-3 shadow-lg">
       <div class="lg:grid lg:grid-cols-2">
         <h1 class="text-4xl font-bold mt-5 mb-8">Kitchen Operation</h1>
 
-        <div class="grid grid-cols-4 gap-2 mb-5">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
           <div
             class="flex flex-col items-center bg-surface-container-low p-2 border border-outline-variant"
           >
-            <h2 class="text-on-surface-variant text-sm font-bold">RECEIVED</h2>
-            <p class="text-3xl font-bold text-primary">1</p>
+            <h2 class="text-on-surface-variant text-xs font-bold">RECEIVED</h2>
+            <p id="receivedCounter" class="text-3xl font-bold text-primary">
+              1
+            </p>
           </div>
 
           <div
             class="flex flex-col items-center bg-surface-container-low p-2 border border-outline-variant"
           >
-            <h2 class="text-on-surface-variant text-sm font-bold">PREPARING</h2>
-            <p class="text-3xl font-bold text-secondary-container">1</p>
+            <h2 class="text-on-surface-variant text-xs font-bold">PREPARING</h2>
+            <p
+              id="preparingCounter"
+              class="text-3xl font-bold text-secondary-container"
+            >
+              1
+            </p>
           </div>
 
           <div
             class="flex flex-col items-center bg-surface-container-low p-2 border border-outline-variant"
           >
-            <h2 class="text-on-surface-variant text-sm font-bold">READY</h2>
-            <p class="text-3xl font-bold text-tertiary">1</p>
+            <h2 class="text-on-surface-variant text-xs font-bold">READY</h2>
+            <p id="readyCounter" class="text-3xl font-bold text-tertiary">1</p>
           </div>
 
           <div
             class="flex flex-col items-center bg-surface-container-low p-2 border border-outline-variant"
           >
-            <h2 class="text-on-surface-variant text-sm font-bold">DELIVERED</h2>
-            <p class="text-3xl font-bold text-black">1</p>
+            <h2 class="text-on-surface-variant text-xs font-bold">DELIVERED</h2>
+            <p id="deliveredCounter" class="text-3xl font-bold text-black">1</p>
           </div>
         </div>
-      </div>
-
-      <hr class="my-4 border-t border-outline-variant" />
-
-      <div class="flex flex-row items-center justify-end sm:gap-1">
-        <span class="text-on-surface-variant text-xs"
-          >Auto-refreshing (1s)
-        </span>
       </div>
     </div>
 
@@ -77,12 +83,7 @@ import { OrderStatus } from "../../lib/constant";
     </h2>
 
     <template id="receivedCardTemplate">
-      <ReceivedOrderCard
-        orderID={0}
-        customerName=""
-        status={OrderStatus.Received}
-        createdAt={0}
-      />
+      <ReceivedOrderCard />
     </template>
 
     <div
@@ -103,29 +104,54 @@ import { OrderStatus } from "../../lib/constant";
       </span> Finished Orders
     </h2>
 
-    <div
-      class="hidden md:grid md:grid-cols-6 md:items-center md:gap-2 md:p-5 md:bg-surface-variant md:font-bold"
-    >
-      <h3>ORDER #</h3>
-      <h3>STATUS</h3>
-      <h3>CUSTOMER</h3>
-      <h3>ITEM SUMMARY</h3>
-      <h3>COMPLETED AT</h3>
-      <h3>TOTAL</h3>
+    <div class="md:grid md:grid-cols-[auto_auto_auto_1fr_auto_auto] md:gap-x-6">
+      <div
+        class="hidden md:grid md:grid-cols-subgrid md:col-span-6 md:items-center md:px-3 md:py-5 md:bg-surface-variant md:font-bold"
+      >
+        <h3>ORDER #</h3>
+        <h3>STATUS</h3>
+        <h3>CUSTOMER</h3>
+        <h3>ITEM SUMMARY</h3>
+        <h3>COMPLETED AT</h3>
+        <h3>TOTAL</h3>
+      </div>
+      <div
+        id="finishedOrdersContainer"
+        class="md:grid md:grid-cols-subgrid md:col-span-6"
+      >
+      </div>
     </div>
-    <div id="finishedOrdersContainer"></div>
 
     <template id="finishedOrdersTemplate">
-      <FinishedOrderCard orderID={0} customerName="" completedAt="" total="" />
+      <FinishedOrderCard />
     </template>
   </main>
+
+  <div
+    id="error-toast"
+    role="alert"
+    aria-atomic="true"
+    class="pointer-events-none fixed top-24 left-1/2 z-60 w-max max-w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-2 rounded-xl bg-error px-5 py-3 text-center text-sm text-on-error opacity-0 shadow-lg transition duration-200 motion-reduce:transition-none"
+  >
+  </div>
 </Layout>
 
 <script>
-  import { getMe } from "../../lib/auth";
+  import { socket } from "../../lib/socket";
+  import type { Order } from "../../../../shared/types";
+  import { fetchOrders } from "../../lib/order";
+  import { getMe, logout } from "../../lib/auth";
+  import { showErrorToast } from "../../lib/toast";
+
+  const logoutButton =
+    document.querySelector<HTMLButtonElement>("#logout-button");
 
   function showDashboard() {
     document.getElementById("dashboard")!.hidden = false;
+
+    if (logoutButton) {
+      logoutButton.hidden = false;
+    }
   }
 
   // On page load: check the existing session
@@ -133,10 +159,21 @@ import { OrderStatus } from "../../lib/constant";
   if (me) showDashboard();
   else window.location.href = "/login";
 
-  // render orders
-  import { $orders } from "../../stores/order";
-  import type { Order } from "../../../../shared/types";
+  // Render orders
+  logoutButton?.addEventListener("click", async () => {
+    try {
+      await logout();
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed.", error);
+      showErrorToast("Logout failed. Please try again.");
+    }
+  });
 
+  const receivedCounter = document.getElementById("receivedCounter");
+  const preparingCounter = document.getElementById("preparingCounter");
+  const readyCounter = document.getElementById("readyCounter");
+  const deliveredCounter = document.getElementById("deliveredCounter");
   const receivedCardTemplate = document.querySelector<HTMLTemplateElement>(
     "#receivedCardTemplate",
   );
@@ -151,18 +188,42 @@ import { OrderStatus } from "../../lib/constant";
   );
 
   function setText(root: ParentNode, selector: string, text: string) {
-    root.querySelector(selector)!.textContent = text;
+    const elem = root.querySelector(selector);
+    if (elem) elem.textContent = text;
+  }
+
+  function updateCounters(orders: Order[]) {
+    const receivedCount = orders.filter(
+      (order) => order.status === "Received",
+    ).length;
+    const preparingCount = orders.filter(
+      (order) => order.status === "Preparing",
+    ).length;
+    const readyCount = orders.filter(
+      (order) => order.status === "Ready",
+    ).length;
+    const deliveredCount = orders.filter(
+      (order) => order.status === "Delivered",
+    ).length;
+
+    if (receivedCounter) receivedCounter.textContent = String(receivedCount);
+    if (preparingCounter) preparingCounter.textContent = String(preparingCount);
+    if (readyCounter) readyCounter.textContent = String(readyCount);
+    if (deliveredCounter) deliveredCounter.textContent = String(deliveredCount);
   }
 
   function formatMinutesAgo(orderedAt: number) {
-    const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    const rtf = new Intl.RelativeTimeFormat("en", {
+      numeric: "auto",
+      style: "short",
+    });
     const diffMinutes = Math.floor((Date.now() - orderedAt) / 60_000);
 
     if (diffMinutes === 0) return "Just now";
     else return rtf.format(-diffMinutes, "minute");
   }
 
-  function renderOrders(orders: readonly Order[]) {
+  function renderOrders(orders: Order[]) {
     if (!receivedCardTemplate || !finishedOrdersTemplate) return;
     receivedOrdersContainer?.replaceChildren();
     finishedOrdersContainer?.replaceChildren();
@@ -203,15 +264,20 @@ import { OrderStatus } from "../../lib/constant";
           true,
         ) as DocumentFragment;
 
+        // Store the order ID on the card root so event handlers can read it
+        const cardElem = cloneCard.querySelector<HTMLElement>(".receivedCard");
+        if (cardElem) cardElem.dataset.orderId = String(order.orderId);
+
         setText(cloneCard, ".js-order-id", `#${order.orderId}`);
         setText(cloneCard, ".js-customer-name", order.customerName);
         setText(cloneCard, ".js-status", order.status);
         setText(cloneCard, ".js-ordered-at", formatMinutesAgo(order.orderedAt));
 
         // Keep the raw timestamp on the element for periodic re-rendering
-        cloneCard.querySelector<HTMLElement>(
-          ".js-ordered-at",
-        )!.dataset.orderedAt = String(order.orderedAt);
+        const orderedAtElem =
+          cloneCard.querySelector<HTMLElement>(".js-ordered-at");
+        if (orderedAtElem)
+          orderedAtElem.dataset.orderedAt = String(order.orderedAt);
 
         const itemsTemplate =
           cloneCard.querySelector<HTMLTemplateElement>(".js-items-template")!;
@@ -242,128 +308,28 @@ import { OrderStatus } from "../../lib/constant";
       });
   }, 30_000);
 
-  $orders.subscribe(renderOrders);
-
-  // ==========================================================================
-  // STUB
-
-  const testOrders: Order[] = [
-    {
-      orderId: 123,
-      customerName: "Fernanda",
-      status: "Received",
-      orderedAt: new Date("2026/10/14 17:55").getTime(),
-      total: 50,
-      items: [
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Double Flame Burger",
-          quantity: 2,
-        },
-        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 3 },
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Strawberry Milkshake",
-          quantity: 1,
-        },
-      ],
-    },
-    {
-      orderId: 456,
-      customerName: "Kazi",
-      status: "Received",
-      orderedAt: new Date("2026/10/14 18:00").getTime(),
-      total: 50,
-      items: [
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Double Flame Burger",
-          quantity: 2,
-        },
-        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 3 },
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Strawberry Milkshake",
-          quantity: 1,
-        },
-      ],
-    },
-    {
-      orderId: 888,
-      customerName: "Kazi",
-      status: "Received",
-      orderedAt: Date.now(),
-      total: 50,
-      items: [
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Double Flame Burger",
-          quantity: 2,
-        },
-        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 3 },
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Strawberry Milkshake",
-          quantity: 1,
-        },
-      ],
-    },
-    {
-      orderId: 789,
-      customerName: "Kazi",
-      status: "Delivered",
-      orderedAt: 2,
-      completedAt: Date.now(),
-      total: 50,
-      items: [
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Cheese Flame Burger",
-          quantity: 2,
-        },
-        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 10 },
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Vanila Milkshake",
-          quantity: 1,
-        },
-      ],
-    },
-    {
-      orderId: 190,
-      customerName: "Kazi",
-      status: "Delivered",
-      orderedAt: 2,
-      completedAt: Date.now(),
-      total: 50,
-      items: [
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Cheese Flame Burger",
-          quantity: 2,
-        },
-        { productId: 1, unitPrice: 1, productName: "Mega Fries", quantity: 10 },
-        {
-          productId: 1,
-          unitPrice: 1,
-          productName: "Vanila Milkshake",
-          quantity: 1,
-        },
-      ],
-    },
-  ];
-
-  testOrders.forEach((order) => {
-    $orders.set([...$orders.get(), order]);
+  socket.on("connect", async () => {
+    try {
+      const orders = await fetchOrders();
+      renderOrders(orders);
+      updateCounters(orders);
+    } catch (err) {
+      console.error("Failed to fetch orders:", err);
+      showErrorToast("Failed to load orders. Please reload the page.");
+    }
   });
-  // ==========================================================================
+
+  socket.on("connect_error", () => {
+    showErrorToast("Cannot connect to the server. Retrying...");
+  });
+
+  socket.on("new_order", (orders: Order[]) => {
+    renderOrders(orders);
+    updateCounters(orders);
+  });
+
+  socket.on("status_updated", (orders: Order[]) => {
+    renderOrders(orders);
+    updateCounters(orders);
+  });
 </script>
