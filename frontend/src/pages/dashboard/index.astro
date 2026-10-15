@@ -24,9 +24,9 @@ import { OrderStatus } from "../../lib/constant";
       <span class="font-bold text-primary sm:text-2xl">Awshaf BBB</span>
     </div>
   </header>
-
-  <main class="mx-10">
-    <div class="bg-white p-10 shadow-lg rounded-xl">
+  
+  <main id="dashboard" class="pt-20" hidden>
+    <div class="bg-white p-3 shadow-lg">
       <div class="lg:grid lg:grid-cols-2">
         <h1 class="text-4xl font-bold mt-5 mb-8">Kitchen Operation</h1>
 
@@ -122,8 +122,20 @@ import { OrderStatus } from "../../lib/constant";
 </Layout>
 
 <script>
-  import { OrderStatus } from "../../lib/constant";
-  import { $orders, type Order } from "../../stores/order";
+  import { getMe } from "../../lib/auth";
+
+  function showDashboard() {
+    document.getElementById("dashboard")!.hidden = false;
+  }
+
+  // On page load: check the existing session
+  const me = await getMe();
+  if (me) showDashboard();
+  else window.location.href = "/login";
+
+  // render orders
+  import { $orders } from "../../stores/order";
+  import type { Order } from "../../../../shared/types";
 
   const receivedCardTemplate = document.querySelector<HTMLTemplateElement>(
     "#receivedCardTemplate",
@@ -156,7 +168,7 @@ import { OrderStatus } from "../../lib/constant";
     finishedOrdersContainer?.replaceChildren();
 
     orders.forEach((order) => {
-      if (order.status === OrderStatus.Completed) {
+      if (order.status === "Delivered") {
         // render finished orders
 
         const cloneCard = finishedOrdersTemplate.content.cloneNode(
@@ -239,7 +251,7 @@ import { OrderStatus } from "../../lib/constant";
     {
       orderId: 123,
       customerName: "Fernanda",
-      status: OrderStatus.Received,
+      status: "Received",
       orderedAt: new Date("2026/10/14 17:55").getTime(),
       total: 50,
       items: [
@@ -261,7 +273,7 @@ import { OrderStatus } from "../../lib/constant";
     {
       orderId: 456,
       customerName: "Kazi",
-      status: OrderStatus.Received,
+      status: "Received",
       orderedAt: new Date("2026/10/14 18:00").getTime(),
       total: 50,
       items: [
@@ -283,7 +295,7 @@ import { OrderStatus } from "../../lib/constant";
     {
       orderId: 888,
       customerName: "Kazi",
-      status: OrderStatus.Received,
+      status: "Received",
       orderedAt: Date.now(),
       total: 50,
       items: [
@@ -305,7 +317,7 @@ import { OrderStatus } from "../../lib/constant";
     {
       orderId: 789,
       customerName: "Kazi",
-      status: OrderStatus.Completed,
+      status: "Delivered",
       orderedAt: 2,
       completedAt: Date.now(),
       total: 50,
@@ -328,7 +340,7 @@ import { OrderStatus } from "../../lib/constant";
     {
       orderId: 190,
       customerName: "Kazi",
-      status: OrderStatus.Completed,
+      status: "Delivered",
       orderedAt: 2,
       completedAt: Date.now(),
       total: 50,
@@ -350,7 +362,8 @@ import { OrderStatus } from "../../lib/constant";
     },
   ];
 
-  renderOrders(testOrders);
-
+  testOrders.forEach((order) => {
+    $orders.set([...$orders.get(), order]);
+  });
   // ==========================================================================
 </script>
