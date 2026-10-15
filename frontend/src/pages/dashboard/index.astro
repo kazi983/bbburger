@@ -132,11 +132,11 @@ import { OrderStatus } from "../../lib/constant";
 <script>
   import { getMe, logout } from "../../lib/auth";
 
+  const logoutButton =
+    document.querySelector<HTMLButtonElement>("#logout-button");
+
   function showDashboard() {
     document.getElementById("dashboard")!.hidden = false;
-
-    const logoutButton =
-      document.querySelector<HTMLButtonElement>("#logout-button");
 
     if (logoutButton) {
       logoutButton.hidden = false;
@@ -147,9 +147,6 @@ import { OrderStatus } from "../../lib/constant";
   const me = await getMe();
   if (me) showDashboard();
   else window.location.href = "/login";
-
-  const logoutButton =
-    document.querySelector<HTMLButtonElement>("#logout-button");
 
   logoutButton?.addEventListener("click", async () => {
     try {
