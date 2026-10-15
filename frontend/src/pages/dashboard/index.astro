@@ -240,6 +240,10 @@ import { OrderStatus } from "../../lib/constant";
           true,
         ) as DocumentFragment;
 
+        // Store the order ID on the card root so event handlers can read it
+        const cardElem = cloneCard.querySelector<HTMLElement>(".receivedCard");
+        if (cardElem) cardElem.dataset.orderId = String(order.orderId);
+
         setText(cloneCard, ".js-order-id", `#${order.orderId}`);
         setText(cloneCard, ".js-customer-name", order.customerName);
         setText(cloneCard, ".js-status", order.status);
