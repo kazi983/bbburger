@@ -6,13 +6,22 @@ import BottomNavBar from "../../components/BottomNavBar.astro";
 ---
 
 <Layout title="BBB - Order Confirmation">
-  <Header title="Order Confirmation" />
+	<Header title="Order Confirmation" />
+	<div class="flex justify-center">
+		<div
+			class="text-on-background font-body pb-28 p-10 lg:mx-auto max-w-xl"
+		>
+			<!-- The real order number and name are filled in from sessionStorage -->
+			<OrderConfirm id={0} name="Guest" />
 
-  <div
-    class="text-on-background font-body pt-20 px-4 md:px-8 max-w-3xl mx-auto w-full"
-  >
-    <OrderConfirm id={1} name="Alex Johnson" />
-  </div>
+			<a
+				href="/home"
+				class="mt-6 block w-full text-center rounded-full bg-primary-container px-6 py-3 font-semibold text-on-primary-container hover:bg-primary"
+			>
+				Go back to home →
+			</a>
 
-  <BottomNavBar active="cart" />
+			<BottomNavBar active="tracking" />
+		</div>
+	</div>
 </Layout>
