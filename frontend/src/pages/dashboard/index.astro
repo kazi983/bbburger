@@ -143,33 +143,6 @@ import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
   import { getMe, logout } from "../../lib/auth";
   import { showErrorToast } from "../../lib/toast";
 
-  const logoutButton =
-    document.querySelector<HTMLButtonElement>("#logout-button");
-
-  function showDashboard() {
-    document.getElementById("dashboard")!.hidden = false;
-
-    if (logoutButton) {
-      logoutButton.hidden = false;
-    }
-  }
-
-  // On page load: check the existing session
-  const me = await getMe();
-  if (me) showDashboard();
-  else window.location.href = "/login";
-
-  // Render orders
-  logoutButton?.addEventListener("click", async () => {
-    try {
-      await logout();
-      window.location.href = "/login";
-    } catch (error) {
-      console.error("Logout failed.", error);
-      showErrorToast("Logout failed. Please try again.");
-    }
-  });
-
   const receivedCounter = document.getElementById("receivedCounter");
   const preparingCounter = document.getElementById("preparingCounter");
   const readyCounter = document.getElementById("readyCounter");
@@ -186,6 +159,17 @@ import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
   const finishedOrdersContainer = document.getElementById(
     "finishedOrdersContainer",
   );
+
+  const logoutButton =
+    document.querySelector<HTMLButtonElement>("#logout-button");
+
+  function showDashboard() {
+    document.getElementById("dashboard")!.hidden = false;
+
+    if (logoutButton) {
+      logoutButton.hidden = false;
+    }
+  }
 
   function setText(root: ParentNode, selector: string, text: string) {
     const elem = root.querySelector(selector);
@@ -394,15 +378,6 @@ import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
     });
   }
 
-  // update only the elapsed-time labels every 30 seconds
-  setInterval(() => {
-    document
-      .querySelectorAll<HTMLElement>(".js-ordered-at[data-ordered-at]")
-      .forEach((el) => {
-        el.textContent = formatMinutesAgo(Number(el.dataset.orderedAt));
-      });
-  }, 30_000);
-
   socket.on("connect", async () => {
     try {
       const orders = await fetchOrders();
@@ -427,4 +402,32 @@ import FinishedOrderCard from "../../components/FinishedOrderCard.astro";
     renderOrders(orders);
     updateCounters(orders);
   });
+
+  logoutButton?.addEventListener("click", async () => {
+    try {
+      await logout();
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed.", error);
+      showErrorToast("Logout failed. Please try again.");
+    }
+  });
+
+  // update only the elapsed-time labels every 30 seconds
+  setInterval(() => {
+    document
+      .querySelectorAll<HTMLElement>(".js-ordered-at[data-ordered-at]")
+      .forEach((el) => {
+        el.textContent = formatMinutesAgo(Number(el.dataset.orderedAt));
+      });
+  }, 30_000);
+
+  // On page load: check the existing session
+  const me = await getMe();
+  if (me) {
+    showDashboard();
+  } else {
+    socket.disconnect();
+    window.location.href = "/login";
+  }
 </script>
