@@ -85,7 +85,7 @@ app.set("io", io);
 registerOrderSockets(io);
 
 // 404 handler for unknown routes (return JSON instead of HTML)
-app.use((req: Request, res: Response) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: "Not found",
@@ -96,9 +96,9 @@ app.use((req: Request, res: Response) => {
 app.use(
   (
     err: { status?: number },
-    req: Request,
+    _req: Request,
     res: Response,
-    next: NextFunction,
+    _next: NextFunction,
   ) => {
     const status = err.status || 500;
     if (status >= 500) {
