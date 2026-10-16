@@ -79,23 +79,31 @@ registerOrderSockets(io);
 
 // 404 handler for unknown routes (return JSON instead of HTML)
 app.use((req: Request, res: Response) => {
-    res.status(404).json({
-        success: false,
-        message: "Not found"
-    });
+  res.status(404).json({
+    success: false,
+    message: "Not found",
+  });
 });
 
 // Error handler, e.g. invalid JSON body (return JSON instead of HTML)
-app.use((err: { status?: number }, req: Request, res: Response, next: NextFunction) => {
+app.use(
+  (
+    err: { status?: number },
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     const status = err.status || 500;
     if (status >= 500) {
-        console.error("Unexpected error:", err);
+      console.error("Unexpected error:", err);
     }
     res.status(status).json({
-        success: false,
-        message: status === 400 ? "Invalid request body." : "Internal server error."
+      success: false,
+      message:
+        status === 400 ? "Invalid request body." : "Internal server error.",
     });
-});
+  },
+);
 
 server.listen(port, async () => {
   try {
