@@ -39,7 +39,6 @@ export function placeOrder(req: Request, res: Response) {
     const order = saveOrder(result);
 
     // notify all connected clients after the update succeeded
-    console.log([...orders.values()]);
     req.app.get("io").emit("new_order", [...orders.values()]);
 
     // Succesfull response
