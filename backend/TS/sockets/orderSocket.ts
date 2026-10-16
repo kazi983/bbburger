@@ -1,5 +1,6 @@
 import type { IncomingMessage } from "http";
 import type { Server, Socket } from "socket.io";
+import { findOrderById } from "../models/orderModel";
 
 let currentOrderStatus = "Received";
 
@@ -36,9 +37,11 @@ export function registerOrderSockets(io: Server) {
     });
 
     // create a room for customers to track their order.
-    socket.on("track_order", (orderId: number) =>
-      socket.join(`order:${orderId}`),
-    );
+    socket.on("track_order", (orderId: number) => {
+      socket.join(`order:${orderId}`);
+      const order = findOrderById(orderId);
+      if (order) socket.emit("order_status", order.status);
+    });
 
     socket.on("disconnect", () => {
       console.log("client disconnected");
