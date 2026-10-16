@@ -111,5 +111,11 @@ export function updateOrderStatus(req: Request, res: Response) {
   // notify staff after the update succeeded
   req.app.get("io").to("staff").emit("status_updated", findAllOrders());
 
+  // notify the order status room after the update succeeded
+  req.app
+    .get("io")
+    .to(`order:${order.orderId}`)
+    .emit("order_status", order.status);
+
   res.json(order);
 }

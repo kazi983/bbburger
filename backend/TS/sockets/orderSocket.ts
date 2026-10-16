@@ -21,9 +21,6 @@ export function registerOrderSockets(io: Server) {
       socket.join("staff");
     }
 
-    // Send current status to connected clients.
-    socket.emit("actual_order_status", currentOrderStatus);
-
     // Only authenticated staff can update the order status.
     socket.on("status_updated", (newStatus: string) => {
       if (!isStaff) {
@@ -37,6 +34,11 @@ export function registerOrderSockets(io: Server) {
       // Customers still need status updates for tracking.
       io.emit("new_status", currentOrderStatus);
     });
+
+    // create a room for customers to track their order.
+    socket.on("track_order", (orderId: number) =>
+      socket.join(`order:${orderId}`),
+    );
 
     socket.on("disconnect", () => {
       console.log("client disconnected");
