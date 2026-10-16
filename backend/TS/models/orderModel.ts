@@ -40,7 +40,7 @@ const products: Product[] = JSON.parse(
 );
 
 // All placed orders, kept in server memory (they reset when the server restarts)
-export const orders: Order[] = [];
+const orders: Order[] = [];
 let nextOrderId = 1001;
 
 function roundMoney(value: number) {
