@@ -40,7 +40,7 @@ const products: Product[] = JSON.parse(
 );
 
 // All placed orders, kept in server memory (they reset when the server restarts)
-const orders: Order[] = [];
+const orders = new Map<number, Order>();
 let nextOrderId = 1001;
 
 function roundMoney(value: number) {
@@ -177,19 +177,17 @@ export function saveOrder(result: ValidOrder): Order {
     total: result.total,
   };
 
-  orders.push(order);
+  orders.set(order.orderId, order);
   return order;
 }
 
 export function findAllOrders() {
-  return orders;
+  return Array.from(orders.values());
 }
 
 // Find a saved order by its number (for order tracking)
 export function findOrderById(orderId: number): Order | undefined {
-  return orders.find((order) => {
-    return order.orderId === orderId;
-  });
+  return orders.get(orderId);
 }
 
 // Change the status of a saved order and return it (undefined if not found)
