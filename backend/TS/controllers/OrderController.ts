@@ -108,8 +108,8 @@ export function updateOrderStatus(req: Request, res: Response) {
     return;
   }
 
-  // notify all connected clients after the update succeeded
-  req.app.get("io").emit("status_updated", findAllOrders());
+  // notify staff after the update succeeded
+  req.app.get("io").to("staff").emit("status_updated", findAllOrders());
 
   res.json(order);
 }
