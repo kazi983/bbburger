@@ -30,13 +30,22 @@ try {
   process.exit(1);
 }
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const sessionMiddleware = cookieSession({
   name: "session",
   keys: [sessionSecret],
   httpOnly: true,
-  sameSite: "lax",
-  secure: false,
+
+  // When running in production, allow cross-site requests (`sameSite: none`, which requires `secure: true`);
+  // otherwise, use the browser's default (`sameSite: lax`).
+  sameSite: isProduction ? "none" : "lax",
+  // `secure: true` encures cookies are sent only over HTTPS.
+  secure: isProduction,
 });
+
+// Trusts exactly one reverse proxy immediately in front of the app. (trust proxy: 1)
+if (isProduction) app.set("trust proxy", 1);
 
 app.use(
   cors({
