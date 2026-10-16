@@ -7,7 +7,6 @@ import {
   findOrderById,
   setOrderStatus,
 } from "../models/orderModel";
-import { orders } from "../models/orderModel";
 
 const STATUS_MAP: Record<OrderStatus, true> = {
   Received: true,
