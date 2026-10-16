@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon JS/server.js",
-    "cart": "npm run build && node JS/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npm run build && node JS/server.js",
+    "start": "node JS/server.js"
   },
   "repository": {
     "type": "git",

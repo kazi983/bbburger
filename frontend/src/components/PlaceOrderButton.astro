@@ -20,11 +20,9 @@
   import { cart, clearCart } from "../stores/cartStore";
   import products from "../../../backend/data/product.json";
 
-  const API_URL = "http://localhost:3000";
+  const API_URL = import.meta.env.PUBLIC_API_URL;
 
-  const button = document.querySelector<HTMLButtonElement>(
-    "#place-order-btn"
-  );
+  const button = document.querySelector<HTMLButtonElement>("#place-order-btn");
 
   const message = document.querySelector("#place-order-message");
 
@@ -88,7 +86,7 @@
 
     nameInput.value = customerName;
 
-        // 1. Build the data to send (only what the server needs)
+    // 1. Build the data to send (only what the server needs)
     const items = cart.get().map((item) => ({
       productId: item.productId,
       quantity: item.quantity,
@@ -122,7 +120,8 @@
     } catch (error) {
       // 6. The server isn't running, or the network failed
       console.error("Error placing order:", error);
-      message.textContent = "Could not connect to the server. Please try again.";
+      message.textContent =
+        "Could not connect to the server. Please try again.";
       if (button) button.disabled = false;
     }
 

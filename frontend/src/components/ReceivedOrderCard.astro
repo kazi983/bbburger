@@ -123,18 +123,7 @@
     const prepBtn = card.querySelector<HTMLButtonElement>(".prepareBtn");
     const readyBtn = card.querySelector<HTMLButtonElement>(".readyBtn");
     const deliverBtn = card.querySelector<HTMLButtonElement>(".deliverBtn");
-    const status = card.querySelector(".statusReceived");
-    const border = card.querySelector(".cardBorder");
-    const container = card.querySelector(".cardContainer");
-    if (
-      !prepBtn ||
-      !readyBtn ||
-      !deliverBtn ||
-      !status ||
-      !border ||
-      !container
-    )
-      return;
+    if (!prepBtn || !readyBtn || !deliverBtn) return;
 
     const orderId = Number(card.dataset.orderId);
     const nextStatus =
@@ -146,75 +135,6 @@
     const ok = await updateStatus(orderId, nextStatus);
     if (!ok) {
       btn.disabled = false;
-      return;
-    }
-
-    if (btn === prepBtn) {
-      status.textContent = "Preparing";
-      status.classList.remove("bg-error-container");
-      status.classList.add("bg-secondary-fixed");
-
-      border.classList.remove("border-primary-container");
-      border.classList.add("border-secondary-fixed-dim");
-
-      container.classList.remove("hover:border-primary-container");
-      container.classList.add("hover:border-secondary-fixed-dim");
-
-      prepBtn.disabled = true;
-      prepBtn.classList.remove("bg-surface-container", "cursor-pointer");
-      prepBtn.classList.add("cursor-not-allowed", "bg-secondary-fixed-dim");
-
-      readyBtn.disabled = false;
-      readyBtn.classList.remove("opacity-50", "cursor-not-allowed");
-      readyBtn.classList.add("cursor-pointer");
-    } else if (btn === readyBtn) {
-      status.textContent = "Ready";
-      status.classList.remove("bg-secondary-fixed");
-      status.classList.add("bg-tertiary-fixed-dim");
-
-      border.classList.remove("border-secondary-fixed-dim");
-      border.classList.add("border-tertiary-container");
-
-      container.classList.remove("hover:border-secondary-fixed-dim");
-      container.classList.add("hover:border-tertiary-container");
-
-      prepBtn.classList.remove("cursor-pointer");
-      prepBtn.classList.add("opacity-50", "cursor-not-allowed");
-
-      readyBtn.disabled = true;
-      readyBtn.classList.remove(
-        "bg-surface-container",
-        "text-on-surface-variant",
-      );
-      readyBtn.classList.add(
-        "cursor-not-allowed",
-        "bg-tertiary-container",
-        "text-white",
-      );
-
-      deliverBtn.disabled = false;
-      deliverBtn.classList.remove("opacity-50", "cursor-not-allowed");
-      deliverBtn.classList.add("cursor-pointer");
-    } else if (btn === deliverBtn) {
-      status.textContent = "Delivered";
-      status.classList.remove("bg-tertiary-fixed-dim");
-      status.classList.add("bg-gray-200");
-
-      border.classList.remove("border-tertiary-container");
-      border.classList.add("border-black");
-
-      container.classList.remove("hover:border-tertiary-container");
-      container.classList.add("hover:border-black");
-
-      readyBtn.classList.remove("cursor-pointer");
-      readyBtn.classList.add("opacity-50", "cursor-not-allowed");
-
-      deliverBtn.disabled = true;
-      deliverBtn.classList.remove(
-        "bg-surface-container",
-        "text-on-surface-variant",
-      );
-      deliverBtn.classList.add("bg-black", "text-white");
     }
   });
 </script>

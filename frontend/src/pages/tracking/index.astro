@@ -264,7 +264,7 @@ import "../../styles/tracking.css";
     const stage2 = document.getElementById("stage2");
     const stage3 = document.getElementById("stage3");
 
-    socket.on("new_status", (status: string) => {
+    socket.on("order_status", (status: string) => {
       if (status === "Preparing") {
         if (
           prepStatus &&
@@ -329,6 +329,10 @@ import "../../styles/tracking.css";
   </script>
 </Layout>
 <script>
+  import { socket } from "../../lib/socket";
+
+  const API_URL = import.meta.env.PUBLIC_API_URL;
+
   // Get the order number from the URL
   const params = new URLSearchParams(window.location.search);
   const orderNum = params.get("orderNum");
@@ -342,7 +346,7 @@ import "../../styles/tracking.css";
   async function loadOrder() {
     try {
       // Fetch order data from the backend
-      const response = await fetch(`http://localhost:3000/orders/${orderNum}`);
+      const response = await fetch(`${API_URL}/orders/${orderNum}`);
       const order = await response.json();
 
       if (!response.ok) {
@@ -396,4 +400,8 @@ import "../../styles/tracking.css";
   }
 
   loadOrder();
+
+  socket.on("connect", () => {
+    socket.emit("track_order", Number(orderNum));
+  });
 </script>

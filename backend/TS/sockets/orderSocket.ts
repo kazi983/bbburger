@@ -1,7 +1,6 @@
 import type { IncomingMessage } from "http";
 import type { Server, Socket } from "socket.io";
-
-let currentOrderStatus = "Received";
+import { findOrderById } from "../models/orderModel";
 
 type SessionRequest = IncomingMessage & {
   session?: {
@@ -21,21 +20,11 @@ export function registerOrderSockets(io: Server) {
       socket.join("staff");
     }
 
-    // Send current status to connected clients.
-    socket.emit("actual_order_status", currentOrderStatus);
-
-    // Only authenticated staff can update the order status.
-    socket.on("updated_status", (newStatus: string) => {
-      if (!isStaff) {
-        return;
-      }
-
-      currentOrderStatus = newStatus;
-
-      console.log(`Order status updated to: ${newStatus}`);
-
-      // Customers still need status updates for tracking.
-      io.emit("new_status", currentOrderStatus);
+    // create a room for customers to track their order.
+    socket.on("track_order", (orderId: number) => {
+      socket.join(`order:${orderId}`);
+      const order = findOrderById(orderId);
+      if (order) socket.emit("order_status", order.status);
     });
 
     socket.on("disconnect", () => {

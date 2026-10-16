@@ -13,12 +13,13 @@ export async function sendStatusUpdate(orderId: number, status: string) {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status }),
+    credentials: "include",
   });
   if (!res.ok) throw await toError(res, "Failed to update order status");
 }
 
 export async function fetchOrders(): Promise<Order[]> {
-  const res = await fetch(`${API_URL}/orders/`);
+  const res = await fetch(`${API_URL}/orders/`, { credentials: "include" });
   if (!res.ok) throw await toError(res, "Failed to fetch orders");
   return res.json();
 }

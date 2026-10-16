@@ -21,6 +21,13 @@ if (!sessionSecret) {
   process.exit(1);
 }
 
+const frontendUrl = process.env.FRONTEND_URL;
+
+if (!frontendUrl) {
+  console.error("FRONTEND_URL is not configured.");
+  process.exit(1);
+}
+
 try {
   seedAdmin();
 } catch (error) {
@@ -30,17 +37,26 @@ try {
   process.exit(1);
 }
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const sessionMiddleware = cookieSession({
   name: "session",
   keys: [sessionSecret],
   httpOnly: true,
-  sameSite: "lax",
-  secure: false,
+
+  // When running in production, allow cross-site requests (`sameSite: none`, which requires `secure: true`);
+  // otherwise, use the browser's default (`sameSite: lax`).
+  sameSite: isProduction ? "none" : "lax",
+  // `secure: true` encures cookies are sent only over HTTPS.
+  secure: isProduction,
 });
+
+// Trusts exactly one reverse proxy immediately in front of the app. (trust proxy: 1)
+if (isProduction) app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: "http://localhost:4321",
+    origin: frontendUrl,
     credentials: true,
   }),
 );
@@ -57,7 +73,7 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:4321",
+    origin: frontendUrl,
     credentials: true,
   },
 });
@@ -69,24 +85,32 @@ app.set("io", io);
 registerOrderSockets(io);
 
 // 404 handler for unknown routes (return JSON instead of HTML)
-app.use((req: Request, res: Response) => {
-    res.status(404).json({
-        success: false,
-        message: "Not found"
-    });
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({
+    success: false,
+    message: "Not found",
+  });
 });
 
 // Error handler, e.g. invalid JSON body (return JSON instead of HTML)
-app.use((err: { status?: number }, req: Request, res: Response, next: NextFunction) => {
+app.use(
+  (
+    err: { status?: number },
+    _req: Request,
+    res: Response,
+    _next: NextFunction,
+  ) => {
     const status = err.status || 500;
     if (status >= 500) {
-        console.error("Unexpected error:", err);
+      console.error("Unexpected error:", err);
     }
     res.status(status).json({
-        success: false,
-        message: status === 400 ? "Invalid request body." : "Internal server error."
+      success: false,
+      message:
+        status === 400 ? "Invalid request body." : "Internal server error.",
     });
-});
+  },
+);
 
 server.listen(port, async () => {
   try {

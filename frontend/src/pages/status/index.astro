@@ -148,6 +148,8 @@ import "../../styles/tracking.css";
 </Layout>
 
 <script>
+  const API_URL = import.meta.env.PUBLIC_API_URL;
+
   const trackingForm =
     document.querySelector<HTMLFormElement>("#tracking-form");
 
@@ -201,7 +203,7 @@ import "../../styles/tracking.css";
     try {
       // Fetch order data from the backend
       const response = await fetch(
-        `http://localhost:3000/orders/${encodeURIComponent(orderNum)}`,
+        `${API_URL}/orders/${encodeURIComponent(orderNum)}`,
       );
       const data = await response.json();
 
