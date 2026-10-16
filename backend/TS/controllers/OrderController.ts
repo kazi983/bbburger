@@ -38,8 +38,8 @@ export function placeOrder(req: Request, res: Response) {
     // Save the order in memory (this also gives it an order number)
     const order = saveOrder(result);
 
-    // notify all connected clients after the update succeeded
-    req.app.get("io").emit("new_order", [...orders.values()]);
+    // notify staff after the update succeeded
+    req.app.get("io").to("staff").emit("new_order", findAllOrders());
 
     // Succesfull response
     res.status(200).json({
