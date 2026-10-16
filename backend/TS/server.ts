@@ -21,6 +21,13 @@ if (!sessionSecret) {
   process.exit(1);
 }
 
+const frontendUrl = process.env.FRONTEND_URL;
+
+if (!frontendUrl) {
+  console.error("FRONTEND_URL is not configured.");
+  process.exit(1);
+}
+
 try {
   seedAdmin();
 } catch (error) {
@@ -49,7 +56,7 @@ if (isProduction) app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: frontendUrl,
     credentials: true,
   }),
 );
@@ -66,7 +73,7 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: frontendUrl,
     credentials: true,
   },
 });
