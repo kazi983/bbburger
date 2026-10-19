@@ -1,9 +1,9 @@
 ---
-import Layout from "../../layouts/layout.astro";
-import BottomNavBar from "../../components/BottomNavBar.astro";
-import ProductGallery from "../../components/ProductGallery.astro";
-import BurgerCustomizer from "../../components/BurgerCustomizer.astro";
-import products from "../../../../backend/data/product.json";
+import Layout from "../layouts/layout.astro";
+import BottomNavBar from "../components/BottomNavBar.astro";
+import ProductGallery from "../components/ProductGallery.astro";
+import BurgerCustomizer from "../components/BurgerCustomizer.astro";
+import products from "../../../backend/data/product.json";
 
 const categories = [
   { value: "all", label: "All", icon: "restaurant_menu" },
@@ -37,19 +37,19 @@ const currency = new Intl.NumberFormat("en-CA", {
 ---
 
 <Layout title="Menu | Awshaf BBB">
-  <div class="mx-auto max-w-7xl px-4 pb-28">
+  <div class="mx-auto px-4 pb-28 max-w-7xl">
     <header
-      class="sticky top-0 z-40 mb-8 flex items-center justify-between gap-3 bg-background/95 py-3 backdrop-blur-sm"
+      class="top-0 z-40 sticky flex justify-between items-center gap-3 bg-background/95 backdrop-blur-sm mb-8 py-3"
     >
       <a
-        href="/home"
-        class="flex min-w-0 items-center gap-2 text-base font-bold text-primary sm:text-2xl"
+        href="/"
+        class="flex items-center gap-2 min-w-0 font-bold text-primary text-base sm:text-2xl"
       >
         <span
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container"
+          class="flex justify-center items-center bg-primary-container rounded-full w-9 h-9 text-on-primary-container shrink-0"
           aria-hidden="true"
         >
-          <span class="material-symbols-outlined fill-icon">
+          <span class="fill-icon material-symbols-outlined">
             local_fire_department
           </span>
         </span>
@@ -60,7 +60,7 @@ const currency = new Intl.NumberFormat("en-CA", {
       <a
         id="header-cart"
         href="/cart"
-        class="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary-container px-3 py-3 text-sm font-bold text-on-primary-container shadow-lg hover:bg-primary sm:gap-3 sm:px-6 sm:py-4 sm:text-lg"
+        class="inline-flex items-center gap-2 sm:gap-3 bg-primary-container hover:bg-primary shadow-lg px-3 sm:px-6 py-3 sm:py-4 rounded-full font-bold text-on-primary-container text-sm sm:text-lg shrink-0"
       >
         <svg
           class="cart-icon"
@@ -84,7 +84,7 @@ const currency = new Intl.NumberFormat("en-CA", {
 
         <span
           id="cart-count"
-          class="rounded-full bg-surface-container-lowest px-2.5 py-1 text-sm text-primary"
+          class="bg-surface-container-lowest px-2.5 py-1 rounded-full text-primary text-sm"
         >
           0
         </span>
@@ -93,40 +93,40 @@ const currency = new Intl.NumberFormat("en-CA", {
 
     <main>
       <section
-        class="grid items-center gap-8 overflow-hidden rounded-3xl bg-surface-container-lowest p-6 shadow-sm sm:p-10 md:grid-cols-2"
+        class="items-center gap-8 grid md:grid-cols-2 bg-surface-container-lowest shadow-sm p-6 sm:p-10 rounded-3xl overflow-hidden"
       >
         <div>
           <p
-            class="mb-4 inline-block rounded-full bg-secondary-container px-3 py-1 text-xs font-semibold text-on-secondary-container"
+            class="inline-block bg-secondary-container mb-4 px-3 py-1 rounded-full font-semibold text-on-secondary-container text-xs"
           >
             FLAME-BROILED PERFECTION
           </p>
 
           <h1
-            class="font-headline text-4xl font-bold leading-tight sm:text-5xl"
+            class="font-headline font-bold text-4xl sm:text-5xl leading-tight"
           >
             Craving Pure
             <span class="block text-primary">Flame Power?</span>
           </h1>
 
-          <p class="mt-4 max-w-md leading-relaxed text-on-surface-variant">
+          <p class="mt-4 max-w-md text-on-surface-variant leading-relaxed">
             Sizzle up your day with fresh 100% Angus patties seared on open
             flames, crispy golden fries, and chef-crafted smoky house dips.
           </p>
 
           <a
-            href="/home"
-            class="mt-6 inline-block rounded-full bg-primary-container px-6 py-3 font-semibold text-on-primary-container hover:bg-primary"
+            href="/"
+            class="inline-block bg-primary-container hover:bg-primary mt-6 px-6 py-3 rounded-full font-semibold text-on-primary-container"
           >
             Explore the Menu →
           </a>
 
           <div class="mt-4">
             <div
-              class="inline-flex items-center gap-2 rounded-full bg-surface-container px-4 py-2 text-sm font-semibold text-on-surface-variant"
+              class="inline-flex items-center gap-2 bg-surface-container px-4 py-2 rounded-full font-semibold text-on-surface-variant text-sm"
             >
               <span
-                class="material-symbols-outlined fill-icon text-tertiary"
+                class="fill-icon text-tertiary material-symbols-outlined"
                 aria-hidden="true"
               >
                 timer
@@ -140,21 +140,21 @@ const currency = new Intl.NumberFormat("en-CA", {
         <img
           src="/images/hero-burger.jpg"
           alt="Burger promotion"
-          class="h-64 w-full rounded-2xl object-cover sm:h-80"
+          class="rounded-2xl w-full h-64 sm:h-80 object-cover"
           fetchpriority="high"
         />
       </section>
 
-      <section id="menu" class="menu-products mt-10">
-        <h2 class="font-headline text-2xl font-bold">Craveable Menu</h2>
+      <section id="menu" class="mt-10 menu-products">
+        <h2 class="font-headline font-bold text-2xl">Craveable Menu</h2>
 
-        <p class="mt-1 text-sm text-on-surface-variant">
+        <p class="mt-1 text-on-surface-variant text-sm">
           Handcrafted, fresh off the grill
         </p>
 
         <div
           id="category-filters"
-          class="mt-6 flex flex-wrap gap-2 sm:gap-3"
+          class="flex flex-wrap gap-2 sm:gap-3 mt-6"
           role="group"
           aria-label="Filter menu by category"
         >
@@ -164,7 +164,7 @@ const currency = new Intl.NumberFormat("en-CA", {
                 type="button"
                 data-category={category.value}
                 aria-pressed={category.value === "all" ? "true" : "false"}
-                class="flex min-h-20 w-24 flex-col items-center justify-center gap-1.5 rounded-2xl border border-outline-variant bg-surface-container-lowest px-2 py-3 text-primary shadow-sm transition-colors hover:bg-surface-container aria-pressed:border-primary-container aria-pressed:bg-primary-container aria-pressed:text-on-primary-container sm:w-28"
+                class="flex flex-col justify-center items-center gap-1.5 bg-surface-container-lowest aria-pressed:bg-primary-container hover:bg-surface-container shadow-sm px-2 py-3 border aria-pressed:border-primary-container rounded-2xl border-outline-variant w-24 sm:w-28 min-h-20 text-primary aria-pressed:text-on-primary-container transition-colors"
               >
                 <span
                   class="material-symbols-outlined"
@@ -174,49 +174,49 @@ const currency = new Intl.NumberFormat("en-CA", {
                   {category.icon}
                 </span>
 
-                <span class="text-sm font-bold">{category.label}</span>
+                <span class="font-bold text-sm">{category.label}</span>
               </button>
             ))
           }
         </div>
 
-        <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="gap-5 grid sm:grid-cols-2 lg:grid-cols-3 mt-6">
           {
             products.map((product) => (
               <article
                 data-product-category={product.category}
-                class="flex min-w-0 flex-col overflow-hidden rounded-2xl bg-surface-container-lowest shadow-sm"
+                class="flex flex-col bg-surface-container-lowest shadow-sm rounded-2xl min-w-0 overflow-hidden"
               >
                 <ProductGallery
                   name={product.name}
                   images={productImages[product.id]}
                 />
 
-                <div class="flex flex-1 flex-col p-5">
-                  <p class="mb-3 text-xs font-semibold uppercase text-primary">
+                <div class="flex flex-col flex-1 p-5">
+                  <p class="mb-3 font-semibold text-primary text-xs uppercase">
                     {categories.find(
                       (category) => category.value === product.category,
                     )?.label ?? product.category}
                   </p>
 
-                  <h3 class="font-headline text-lg font-bold">
+                  <h3 class="font-headline font-bold text-lg">
                     {product.name}
                   </h3>
 
-                  <p class="mt-2 text-sm text-on-surface-variant">
+                  <p class="mt-2 text-on-surface-variant text-sm">
                     {product.description}
                   </p>
 
                   {product.ingredients.length > 0 && (
-                    <p class="mt-3 text-sm text-on-surface-variant">
+                    <p class="mt-3 text-on-surface-variant text-sm">
                       {product.ingredients.join(", ")}
                     </p>
                   )}
 
-                  <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5">
+                  <div class="flex flex-wrap justify-between items-center gap-3 mt-auto pt-5">
                     <div>
-                      <p class="text-xs text-on-surface-variant">Price</p>
-                      <p class="text-lg font-bold text-primary">
+                      <p class="text-on-surface-variant text-xs">Price</p>
+                      <p class="font-bold text-primary text-lg">
                         {currency.format(product.price)}
                       </p>
                     </div>
@@ -232,7 +232,7 @@ const currency = new Intl.NumberFormat("en-CA", {
                       aria-haspopup={
                         product.category === "burguer" ? "dialog" : undefined
                       }
-                      class="rounded-full bg-primary-container px-5 py-2 font-semibold text-on-primary-container hover:bg-primary"
+                      class="bg-primary-container hover:bg-primary px-5 py-2 rounded-full font-semibold text-on-primary-container"
                     >
                       + Add
                     </button>
@@ -261,13 +261,13 @@ const currency = new Intl.NumberFormat("en-CA", {
 </Layout>
 
 <script>
-  import products from "../../../../backend/data/product.json";
+  import products from "../../../backend/data/product.json";
   import {
     cart,
     loadCart,
     addToCart,
     type BurgerOptions,
-  } from "../../stores/cartStore";
+  } from "../stores/cartStore";
 
   const filterButtons = document.querySelectorAll<HTMLButtonElement>(
     "#category-filters button",
@@ -343,15 +343,15 @@ const currency = new Intl.NumberFormat("en-CA", {
   function animateToCart(button: HTMLButtonElement) {
     if (!headerCart) return;
 
-    if (
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
 
-    const photo = button.closest("article")?.querySelector<HTMLImageElement>(
-      "[data-card-photo], .product-gallery img"
-    );
+    const photo = button
+      .closest("article")
+      ?.querySelector<HTMLImageElement>(
+        "[data-card-photo], .product-gallery img",
+      );
 
     if (!photo) return;
 
@@ -424,95 +424,88 @@ const currency = new Intl.NumberFormat("en-CA", {
     flight.oncancel = () => flyingPhoto.remove();
   }
 
-  document.querySelectorAll<HTMLButtonElement>(
-    "[data-add-product]"
-  ).forEach((button) => {
-    button.addEventListener("click", () => {
-      const productId = Number(button.dataset.addProduct);
-      const product = products.find(
-        (product) => product.id === productId
-      );
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-add-product]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const productId = Number(button.dataset.addProduct);
+        const product = products.find((product) => product.id === productId);
 
         if (!product) return;
 
-      if (product.category === "burguer") {
-        const dialog = document.querySelector<HTMLDialogElement>(
-          `[data-burger-dialog="${productId}"]`
-        );
+        if (product.category === "burguer") {
+          const dialog = document.querySelector<HTMLDialogElement>(
+            `[data-burger-dialog="${productId}"]`,
+          );
 
-        if (!dialog) return;
+          if (!dialog) return;
 
-        selectedButton = button;
-        dialog.querySelector<HTMLFormElement>("form")?.reset();
-        dialog.showModal();
-        return;
-      }
+          selectedButton = button;
+          dialog.querySelector<HTMLFormElement>("form")?.reset();
+          dialog.showModal();
+          return;
+        }
 
-      addToCart(productId);
-      showCartMessage(product.name);
-      animateToCart(button);
-    });
-  });
-
-  document.querySelectorAll<HTMLDialogElement>(
-    "[data-burger-dialog]"
-  ).forEach((dialog) => {
-    dialog.querySelector("[data-close-customizer]")?.addEventListener(
-      "click",
-      () => dialog.close()
-    );
-
-    const form = dialog.querySelector<HTMLFormElement>(
-      "[data-burger-form]"
-    );
-
-    form?.addEventListener("submit", (event) => {
-      event.preventDefault();
-
-      const productId = Number(dialog.dataset.burgerDialog);
-      const product = products.find(
-        (product) => product.id === productId
-      );
-
-      if (!product || !form || !form.reportValidity()) return;
-
-      const formData = new FormData(form);
-      const doneness = formData.get("doneness");
-
-      if (
-        doneness !== "Medium rare" &&
-        doneness !== "Medium" &&
-        doneness !== "Well done"
-      ) {
-        return;
-      }
-
-      const options: BurgerOptions = {
-        removedIngredients: formData
-          .getAll("removedIngredients")
-          .filter(
-            (value): value is string =>
-              typeof value === "string" &&
-              product.ingredients.includes(value)
-          ),
-        doneness,
-      };
-
-      const sourceButton = selectedButton;
-
-      addToCart(productId, options);
-      dialog.close();
-      showCartMessage(product.name);
-
-      if (sourceButton) {
-        requestAnimationFrame(() => animateToCart(sourceButton));
-      }
+        addToCart(productId);
+        showCartMessage(product.name);
+        animateToCart(button);
+      });
     });
 
-    dialog.addEventListener("close", () => {
-      selectedButton = null;
+  document
+    .querySelectorAll<HTMLDialogElement>("[data-burger-dialog]")
+    .forEach((dialog) => {
+      dialog
+        .querySelector("[data-close-customizer]")
+        ?.addEventListener("click", () => dialog.close());
+
+      const form = dialog.querySelector<HTMLFormElement>("[data-burger-form]");
+
+      form?.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const productId = Number(dialog.dataset.burgerDialog);
+        const product = products.find((product) => product.id === productId);
+
+        if (!product || !form || !form.reportValidity()) return;
+
+        const formData = new FormData(form);
+        const doneness = formData.get("doneness");
+
+        if (
+          doneness !== "Medium rare" &&
+          doneness !== "Medium" &&
+          doneness !== "Well done"
+        ) {
+          return;
+        }
+
+        const options: BurgerOptions = {
+          removedIngredients: formData
+            .getAll("removedIngredients")
+            .filter(
+              (value): value is string =>
+                typeof value === "string" &&
+                product.ingredients.includes(value),
+            ),
+          doneness,
+        };
+
+        const sourceButton = selectedButton;
+
+        addToCart(productId, options);
+        dialog.close();
+        showCartMessage(product.name);
+
+        if (sourceButton) {
+          requestAnimationFrame(() => animateToCart(sourceButton));
+        }
+      });
+
+      dialog.addEventListener("close", () => {
+        selectedButton = null;
+      });
     });
-  });
 
   loadCart();
   cart.subscribe(updateCartCount);

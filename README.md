@@ -46,7 +46,7 @@ A full stack, real-time food ordering app. Customers build an order from the bur
 
 | Route        | Description                                  | Auth |
 | ------------ | -------------------------------------------- | ---- |
-| `/home`      | Menu and product gallery                     | –    |
+| `/`      | Menu and product gallery                     | –    |
 | `/cart`      | Cart, customer form and order placement      | –    |
 | `/confirmed` | Order confirmation                           | –    |
 | `/tracking`  | Live order status for the customer           | –    |
