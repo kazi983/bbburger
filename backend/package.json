@@ -1,5 +1,5 @@
 {
-  "name": "m-0526-web-development-ii-wad-202-chat-app-final-project-group-1",
+  "name": "@awshaf-bbb/backend",
   "version": "1.0.0",
   "description": "This final project will help you build a full stack web application using Node.js, Express, Astro, authentication, API calls, and WebSockets.",
   "main": "index.js",
@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "private": true,
   "bugs": {
     "url": "https://github.com/Cornerstone-CICCC/m-0526-web-development-ii-wad-202-chat-app-final-project-group-1/issues"
   },

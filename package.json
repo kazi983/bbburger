@@ -1,7 +1,19 @@
 {
   "name": "awshaf-bbb-monorepo",
   "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "engines": {
     "node": ">=22.12.0"
+  },
+  "scripts": {
+    "backend": "npm run dev -w @awshaf-bbb/backend",
+    "frontend": "npm run dev -w @awshaf-bbb/frontend",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6"
   }
 }
